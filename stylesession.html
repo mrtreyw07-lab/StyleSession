@@ -1,0 +1,3813 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>StyleSession</title>
+
+<!-- ========================================== -->
+<!-- 🔮 STYLESESSION UI STYLES -->
+<!-- ========================================== -->
+<style id="__vi-styles">
+  :root {
+    --vi-font: 'Inter', system-ui, sans-serif;
+    --vi-mono: 'JetBrains Mono', monospace;
+    --vi-bg: rgba(20, 20, 24, 0.96);
+    --vi-panel-bg: linear-gradient(145deg, rgba(32, 32, 36, 0.95) 0%, rgba(14, 14, 18, 0.98) 100%);
+    --vi-border: rgba(255, 255, 255, 0.06);
+    --vi-text: #F3F4F6;
+    --vi-text-dim: #9CA3AF;
+    --vi-accent: #00E5CC;
+    --vi-hover: #3b82f6;
+    --vi-warn: #ff4757;
+    --vi-success: #2ed573;
+    --vi-orange: #ffa502;
+    --vi-input-bg: rgba(255, 255, 255, 0.04);
+    --vi-z: 2147483600;
+  }
+
+  /* Reset for Inspector UI */
+  .__vi-ui {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%; overflow: visible;
+    z-index: var(--vi-z);
+    font-family: var(--vi-font);
+    color: var(--vi-text);
+    box-sizing: border-box;
+    pointer-events: none;
+  }
+  .__vi-ui * { box-sizing: border-box; }
+
+  /* Hover & Select Overlays */
+  .__vi-overlay {
+    position: absolute;
+    pointer-events: none;
+    transition: all 0.05s linear;
+    display: none;
+    z-index: var(--vi-z);
+  }
+  .__vi-overlay.active { display: block; }
+
+  .__vi-overlay-hover {
+    border: 2px dashed var(--vi-hover);
+    background: rgba(59, 130, 246, 0.05);
+  }
+  .__vi-overlay-select {
+    border: 3px dashed var(--vi-accent);
+    background: rgba(0, 229, 204, 0.08);
+    box-shadow: inset 0 0 0 2px rgba(0,0,0,0.5), 0 0 0 2px rgba(0,0,0,0.5), 0 0 10px rgba(0,229,204,0.6);
+  }
+
+  /* Margin/Padding Hover Overlays */
+  .__vi-margin-overlay {
+    position: absolute; pointer-events: none; display: none; z-index: calc(var(--vi-z) - 1);
+    background: rgba(255, 165, 2, 0.12); border: 1px dashed rgba(255,165,2,0.4);
+  }
+  .__vi-margin-overlay.active { display: block; }
+  .__vi-padding-overlay {
+    position: absolute; pointer-events: none; display: none; z-index: calc(var(--vi-z) - 1);
+    background: rgba(46, 213, 115, 0.12); border: 1px dashed rgba(46,213,115,0.4);
+  }
+  .__vi-padding-overlay.active { display: block; }
+
+  /* Distance Measurement Lines */
+  .__vi-measure-line {
+    position: absolute; pointer-events: none; z-index: calc(var(--vi-z) + 2);
+    background: #ff6b81;
+  }
+  .__vi-measure-label {
+    position: absolute; pointer-events: none; z-index: calc(var(--vi-z) + 3);
+    background: #ff4757; color: #fff; font-family: var(--vi-mono); font-size: 9px;
+    font-weight: 700; padding: 2px 5px; border-radius: 3px; white-space: nowrap;
+  }
+
+  /* Info Label */
+  .__vi-label {
+    position: absolute;
+    background: var(--vi-accent);
+    color: #000;
+    font-family: var(--vi-mono);
+    font-size: 10px;
+    font-weight: 700;
+    padding: 4px 8px;
+    border-radius: 4px;
+    pointer-events: none;
+    white-space: nowrap;
+    display: none;
+    z-index: calc(var(--vi-z) + 1);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    transform: translateY(-100%);
+    margin-top: -4px;
+  }
+  .__vi-label.active { display: block; }
+  .__vi-label .dim { opacity: 0.6; font-weight: 400; margin-left: 6px; }
+
+  /* Toolbar */
+  .__vi-toolbar {
+    position: fixed;
+    left: 24px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: var(--vi-bg);
+    backdrop-filter: blur(28px) saturate(200%);
+    -webkit-backdrop-filter: blur(28px) saturate(200%);
+    border: 1px solid var(--vi-border);
+    border-radius: 16px;
+    padding: 12px 8px;
+    display: flex;
+    flex-direction: column;
+    gap: clamp(6px, 1vh, 8px);
+    pointer-events: auto;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+    z-index: var(--vi-z);
+    user-select: none;
+  }
+  .__vi-toolbar-drag {
+    height: 16px;
+    margin: -4px 0 4px;
+    border-radius: 10px;
+    cursor: grab;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(180deg, rgba(255,255,255,0.07) 0%, rgba(255,255,255,0.01) 100%);
+  }
+  .__vi-toolbar-drag:active { cursor: grabbing; }
+  .__vi-toolbar-drag-dots {
+    width: 16px;
+    height: 4px;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.25);
+  }
+  
+  .__vi-tb-group {
+    display: flex; flex-direction: column; gap: 4px;
+    padding-bottom: 8px; margin-bottom: 4px;
+    border-bottom: 1px solid var(--vi-border);
+  }
+  .__vi-tb-group:last-child { border-bottom: none; padding-bottom: 0; margin-bottom: 0; }
+
+  .__vi-btn {
+    width: clamp(34px, 2.6vw, 40px); height: clamp(34px, 2.6vw, 40px);
+    border-radius: 10px;
+    background: transparent;
+    border: 1px solid transparent;
+    color: var(--vi-text-dim);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 16px;
+    position: relative;
+  }
+  .__vi-btn svg { flex-shrink: 0; }
+  .__vi-btn:hover {
+    background: rgba(255,255,255,0.05);
+    color: var(--vi-text);
+  }
+  .__vi-btn.active {
+    background: rgba(0, 229, 204, 0.1);
+    color: var(--vi-accent);
+    border-color: rgba(0, 229, 204, 0.2);
+  }
+  /* Active indicator pip */
+  .__vi-btn .pip {
+    position: absolute; top: 4px; right: 4px;
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--vi-accent); display: none;
+    box-shadow: 0 0 4px var(--vi-accent);
+  }
+  .__vi-btn .pip.on { display: block; }
+
+  /* More Menu */
+  .__vi-more-menu {
+    position: absolute; left: calc(100% + 12px); top: 50%; transform: translateY(-50%);
+    background: var(--vi-panel-bg); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--vi-border); border-radius: 12px; padding: 8px;
+    display: flex; flex-direction: column; gap: 4px;
+    opacity: 0; visibility: hidden; transition: all 0.2s; pointer-events: none; width: 200px;
+    z-index: calc(var(--vi-z) + 15);
+    max-height: min(420px, calc(100vh - 24px));
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255,255,255,0.12) transparent;
+  }
+  .__vi-more-menu::-webkit-scrollbar { width: 5px; }
+  .__vi-more-menu::-webkit-scrollbar-track { background: transparent; margin: 8px 0; }
+  .__vi-more-menu::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,0.10);
+    border-radius: 10px;
+    transition: background 0.2s;
+  }
+  .__vi-more-menu:hover::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.18); }
+  .__vi-more-menu::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.28); }
+  .__vi-more-menu.open { opacity: 1; visibility: visible; pointer-events: auto; transform: translateY(-50%); }
+  .__vi-more-btn {
+    background: transparent; border: none; color: var(--vi-text-dim); text-align: left;
+    padding: 8px 12px; font-size: 11px; font-family: var(--vi-font); border-radius: 6px;
+    cursor: pointer; transition: all 0.2s; white-space: nowrap; width: 100%;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .__vi-more-btn:hover { background: rgba(255,255,255,0.05); color: var(--vi-text); }
+  .__vi-more-btn svg { flex-shrink: 0; opacity: 0.5; }
+  .__vi-more-btn:hover svg { opacity: 1; }
+  .__vi-more-btn .status-dot {
+    width: 6px; height: 6px; border-radius: 50%; background: transparent; flex-shrink: 0;
+    margin-left: auto;
+  }
+  .__vi-more-btn .status-dot.on { background: var(--vi-accent); box-shadow: 0 0 4px var(--vi-accent); }
+  .__vi-btn-compare.active { background: #ff4757; color: #fff; border-color: #ff4757; }
+
+  /* Tool cursor override — prevents I-beam on text while tools are active */
+  [data-vi-tool="select"] *:not(#__vi-root):not(#__vi-root *) { cursor: default !important; }
+  [data-vi-tool="move"] *:not(#__vi-root):not(#__vi-root *) { cursor: grab !important; }
+  [data-vi-tool="spacing"] *:not(#__vi-root):not(#__vi-root *),
+  [data-vi-tool="typography"] *:not(#__vi-root):not(#__vi-root *),
+  [data-vi-tool="color"] *:not(#__vi-root):not(#__vi-root *),
+  [data-vi-tool="border"] *:not(#__vi-root):not(#__vi-root *),
+  [data-vi-tool="effects"] *:not(#__vi-root):not(#__vi-root *),
+  [data-vi-tool="animation"] *:not(#__vi-root):not(#__vi-root *),
+  [data-vi-tool="tokens"] *:not(#__vi-root):not(#__vi-root *) { cursor: default !important; }
+  [data-vi-tool="browse"] *:not(#__vi-root):not(#__vi-root *) { cursor: default !important; }
+
+  /* Tooltip */
+  .__vi-btn::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    left: 100%; top: 50%;
+    transform: translateY(-50%) translateX(8px);
+    background: #000; color: #fff;
+    padding: 4px 8px; border-radius: 4px;
+    font-size: 10px; font-family: var(--vi-font); font-weight: 500;
+    white-space: nowrap; pointer-events: none;
+    opacity: 0; visibility: hidden; transition: all 0.2s;
+  }
+  .__vi-btn:hover::after { opacity: 1; visibility: visible; transform: translateY(-50%) translateX(12px); }
+
+  /* Panel */
+  .__vi-panel {
+    position: fixed;
+    right: -360px;
+    top: 24px; 
+    max-height: calc(100vh - 48px);
+    height: max-content;
+    width: clamp(260px, 28vw, 340px);
+    min-width: 260px;
+    background: var(--vi-panel-bg);
+    backdrop-filter: blur(28px) saturate(200%);
+    -webkit-backdrop-filter: blur(28px) saturate(200%);
+    border: 1px solid var(--vi-border);
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 12px;
+    box-shadow: -8px 0 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05);
+    z-index: var(--vi-z);
+    pointer-events: auto;
+    display: flex; flex-direction: column;
+    transition: right 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    user-select: none;
+  }
+  .__vi-panel.open { right: 24px; }
+  .__vi-panel.dragging { transition: none; }
+  .__vi-panel.__vi-panel-floating {
+    right: auto;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    opacity: 0;
+    pointer-events: none;
+    transform: scale(0.98);
+  }
+  .__vi-panel.__vi-panel-floating.open {
+    opacity: 1;
+    pointer-events: auto;
+    transform: scale(1);
+  }
+
+  /* Panel drag handle */
+  .__vi-panel-drag {
+    height: 28px; display: flex; align-items: center; justify-content: center;
+    cursor: grab; flex-shrink: 0;
+    border-top-left-radius: 12px; border-top-right-radius: 12px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0) 100%);
+  }
+  .__vi-panel-drag:active { cursor: grabbing; }
+  .__vi-panel-drag-dots {
+    display: flex; gap: 3px; opacity: 0.3;
+  }
+  .__vi-panel-drag-dots span {
+    width: 4px; height: 4px; border-radius: 50%; background: #fff;
+  }
+
+  /* Panel resize handle */
+  .__vi-panel-resize {
+    position: absolute; left: -4px; top: 0; bottom: 0; width: 8px;
+    cursor: ew-resize; z-index: 1;
+  }
+
+  .__vi-panel-header {
+    padding: 8px 20px 12px;
+    border-bottom: 1px solid var(--vi-border);
+    display: flex; flex-direction: column; gap: 4px;
+  }
+  .__vi-panel-header-row {
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .__vi-panel-title { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 1.5px; color: var(--vi-text-dim); }
+  .__vi-panel-subtitle { font-family: var(--vi-font); font-size: 11px; color: var(--vi-accent); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 500; letter-spacing: 0.2px; }
+
+  /* Breadcrumb */
+  .__vi-breadcrumb {
+    display: flex; align-items: center; gap: 4px; font-size: 10px; flex-wrap: wrap;
+    padding: 6px 20px; border-bottom: 1px solid var(--vi-border);
+    color: var(--vi-text-dim); font-family: var(--vi-mono);
+  }
+  .__vi-breadcrumb-item {
+    cursor: pointer; padding: 1px 4px; border-radius: 3px; transition: all 0.15s;
+    color: var(--vi-text-dim);
+    background: none; border: none; font-family: var(--vi-mono); font-size: 10px;
+  }
+  .__vi-breadcrumb-item:hover { background: rgba(0,229,204,0.15); color: var(--vi-accent); }
+  .__vi-breadcrumb-sep { opacity: 0.3; }
+
+  /* Panel tabs */
+  .__vi-panel-tabs {
+    display: flex; border-bottom: 1px solid var(--vi-border); flex-shrink: 0;
+  }
+  .__vi-panel-tab {
+    flex: 1; padding: 8px; text-align: center; font-size: 10px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.5px; color: var(--vi-text-dim);
+    cursor: pointer; border: none; background: none; transition: all 0.2s;
+    border-bottom: 2px solid transparent;
+    font-family: var(--vi-font);
+  }
+  .__vi-panel-tab:hover { color: var(--vi-text); }
+  .__vi-panel-tab.active { color: var(--vi-accent); border-bottom-color: var(--vi-accent); }
+
+  .__vi-panel-body {
+    flex: 1; overflow-y: auto;
+    padding: 16px 20px;
+  }
+  .__vi-panel-body::-webkit-scrollbar { width: 4px; }
+  .__vi-panel-body::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
+
+  .__vi-panel-body-wrapper {
+    font-size: 12px;
+    font-family: var(--vi-font);
+    color: var(--vi-text-dim);
+  }
+  .__vi-panel-body-wrapper .__vi-section {
+    margin-bottom: 16px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--vi-border);
+  }
+  .__vi-panel-body-wrapper .__vi-section:last-child {
+    border-bottom: none; margin-bottom: 0; padding-bottom: 0;
+  }
+  .__vi-section-title {
+    color: #fff;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+
+  /* Generic Input */
+  .__vi-input {
+    background: var(--vi-input-bg);
+    border: 1px solid transparent;
+    border-radius: 4px;
+    color: var(--vi-text);
+    font-family: var(--vi-mono);
+    font-size: 11px;
+    padding: 6px 8px;
+    width: 100%;
+    outline: none;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.2);
+  }
+  .__vi-input:hover { background: rgba(255, 255, 255, 0.08); }
+  .__vi-input:focus { border-color: var(--vi-accent); background: rgba(0, 0, 0, 0.3); box-shadow: 0 0 0 2px rgba(0, 229, 204, 0.15), inset 0 1px 2px rgba(0,0,0,0.2); }
+  
+  .__vi-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 10px; }
+  .__vi-row > label { font-size: 10px; color: var(--vi-text-dim); min-width: 65px; letter-spacing: 0.3px; text-transform: uppercase; font-weight: 500; }
+  .__vi-row > input, .__vi-row > select { flex: 1; }
+  .__vi-filter-val { font-size: 9px; color: var(--vi-text-dim); min-width: 32px; text-align: right; font-family: var(--vi-mono); }
+
+  /* Copy button inline */
+  .__vi-copy-btn {
+    background: none; border: none; color: var(--vi-text-dim); cursor: pointer;
+    font-size: 10px; padding: 2px 4px; border-radius: 3px; transition: all 0.15s;
+    font-family: var(--vi-mono); opacity: 0.5; flex-shrink: 0;
+  }
+  .__vi-copy-btn:hover { opacity: 1; color: var(--vi-accent); background: rgba(0,229,204,0.1); }
+
+  /* Box Model Diagram */
+  .__vi-box-model {
+    display: flex; flex-direction: column; align-items: center; gap: 0;
+    margin: 8px 0 16px;
+  }
+  .__vi-bm-margin {
+    background: rgba(255,165,2,0.1); border: 1px dashed rgba(255,165,2,0.4);
+    padding: 12px; display: flex; flex-direction: column; align-items: center;
+    border-radius: 6px; position: relative; width: 100%;
+  }
+  .__vi-bm-border {
+    background: rgba(255,220,100,0.08); border: 1px solid rgba(255,220,100,0.3);
+    padding: 12px; display: flex; flex-direction: column; align-items: center;
+    border-radius: 4px; position: relative; width: 100%;
+  }
+  .__vi-bm-padding {
+    background: rgba(46,213,115,0.1); border: 1px dashed rgba(46,213,115,0.4);
+    padding: 12px; display: flex; flex-direction: column; align-items: center;
+    border-radius: 3px; position: relative; width: 100%;
+  }
+  .__vi-bm-content {
+    background: rgba(59,130,246,0.15); border: 1px solid rgba(59,130,246,0.4);
+    padding: 8px 12px; text-align: center; border-radius: 3px;
+    font-family: var(--vi-mono); font-size: 10px; color: var(--vi-text);
+    min-width: 60px;
+  }
+  .__vi-bm-val {
+    position: absolute; font-family: var(--vi-mono); font-size: 9px; color: var(--vi-text);
+    cursor: pointer; padding: 1px 3px; border-radius: 2px;
+  }
+  .__vi-bm-val:hover { background: rgba(255,255,255,0.1); }
+  .__vi-bm-label {
+    position: absolute; font-size: 8px; text-transform: uppercase; letter-spacing: 0.5px;
+    color: var(--vi-text-dim); opacity: 0.6;
+  }
+
+  /* Empty state */
+  .__vi-empty {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    height: 100%; text-align: center; color: var(--vi-text-dim); gap: 12px;
+    padding: 20px 0;
+  }
+  .__vi-empty svg { width: 32px; height: 32px; opacity: 0.5; }
+  .__vi-empty p { font-size: 13px; margin: 0; line-height: 1.5; }
+  .__vi-kbd { display: inline-block; background: rgba(255,255,255,0.1); border-radius: 4px; padding: 2px 6px; font-family: var(--vi-mono); font-size: 10px; color: var(--vi-text); }
+
+  /* Toast Stack */
+  .__vi-toast-container {
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+    display: flex; flex-direction: column-reverse; gap: 8px; align-items: center;
+    z-index: calc(var(--vi-z) + 20); pointer-events: none;
+  }
+  .__vi-toast {
+    background: var(--vi-accent); color: #000; padding: 8px 16px; border-radius: 8px;
+    font-size: 11px; font-weight: 700; font-family: var(--vi-mono);
+    transition: all 0.3s; opacity: 0; transform: translateY(20px); pointer-events: none;
+    white-space: nowrap;
+  }
+  .__vi-toast.show { opacity: 1; transform: translateY(0); }
+  .__vi-toast.warn { background: var(--vi-orange); }
+  .__vi-toast.error { background: var(--vi-warn); color: #fff; }
+  .__vi-toast.success { background: var(--vi-success); }
+
+  /* Rulers & Guides */
+  .__vi-ruler { position: fixed; background: var(--vi-bg); z-index: calc(var(--vi-z) - 5); display: none; }
+  .__vi-ruler.active { display: block; }
+  .__vi-ruler-top { top: 0; left: 0; right: 0; font-size: 0; height: 24px; border-bottom: 1px solid var(--vi-border); cursor: ns-resize; }
+  .__vi-ruler-left { top: 0; left: 0; bottom: 0; font-size: 0; width: 24px; border-right: 1px solid var(--vi-border); cursor: ew-resize; }
+  .__vi-ruler-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; }
+  
+  .__vi-guide { position: fixed; background: var(--vi-accent); z-index: calc(var(--vi-z) - 4); transition: background 0.2s; }
+  .__vi-guide:hover { background: #fff; box-shadow: 0 0 8px rgba(0,229,204,0.5); }
+  .__vi-guide-h { height: 1px; left: 0; right: 0; cursor: ns-resize; padding: 2px 0; background-clip: content-box; transform: translateY(-2px); }
+  .__vi-guide-v { width: 1px; top: 0; bottom: 0; cursor: ew-resize; padding: 0 2px; background-clip: content-box; transform: translateX(-2px); }
+
+  /* Command Palette */
+  .__vi-palette {
+    position: fixed; top: 20%; left: 50%; transform: translateX(-50%) scale(0.95);
+    width: 420px; background: var(--vi-panel-bg); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--vi-border); border-radius: 12px; box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+    z-index: calc(var(--vi-z) + 10); display: none; flex-direction: column; opacity: 0; transition: all 0.2s;
+  }
+  .__vi-palette.open { display: flex; opacity: 1; transform: translateX(-50%) scale(1); }
+  .__vi-palette-input {
+    background: transparent; border: none; padding: 16px 20px; font-size: 14px; color: var(--vi-text);
+    font-family: var(--vi-font); outline: none; border-bottom: 1px solid var(--vi-border); width: 100%;
+  }
+  .__vi-palette-results { max-height: 300px; overflow-y: auto; padding: 8px; }
+  .__vi-palette-result {
+    padding: 8px 12px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 8px;
+    font-family: var(--vi-mono); font-size: 11px; color: var(--vi-text-dim); transition: background 0.1s;
+  }
+  .__vi-palette-result.active, .__vi-palette-result:hover { background: rgba(0, 229, 204, 0.1); color: var(--vi-accent); }
+  .__vi-palette-result .shortcut { margin-left: auto; opacity: 0.4; font-size: 9px; }
+
+  /* Annotations */
+  .__vi-note {
+    position: absolute; background: #FFF3CD; border: 1px solid #FFE69C; border-radius: 8px;
+    padding: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); z-index: calc(var(--vi-z) + 15);
+    width: 200px; display: flex; flex-direction: column; gap: 8px; pointer-events: auto;
+  }
+  .__vi-note textarea {
+    background: transparent; border: none; outline: none; resize: vertical; min-height: 60px;
+    font-family: var(--vi-font); font-size: 13px; color: #664D03;
+  }
+  .__vi-note button {
+    position: absolute; top: -8px; right: -8px; width: 24px; height: 24px; border-radius: 12px;
+    background: #ff4757; color: white; border: none; cursor: pointer; font-size: 14px;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  /* Keyboard Shortcut Modal */
+  .__vi-shortcuts-modal {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.7); backdrop-filter: blur(4px);
+    z-index: calc(var(--vi-z) + 50); display: none; align-items: center; justify-content: center;
+  }
+  .__vi-shortcuts-modal.open { display: flex; }
+  .__vi-shortcuts-inner {
+    background: var(--vi-panel-bg); backdrop-filter: blur(20px);
+    border: 1px solid var(--vi-border); border-radius: 16px;
+    padding: clamp(20px, 3vw, 32px); width: min(560px, calc(100vw - 32px)); max-height: 80vh; overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5); pointer-events: auto;
+  }
+  .__vi-shortcuts-header {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    margin: 0 0 20px;
+  }
+  .__vi-shortcuts-inner h2 { margin: 0; font-size: 16px; color: var(--vi-text); }
+  .__vi-shortcuts-close {
+    width: 28px; height: 28px; border-radius: 8px;
+    border: 1px solid var(--vi-border);
+    background: rgba(255,255,255,0.04);
+    color: var(--vi-text-dim);
+    font-family: var(--vi-font);
+    font-size: 16px;
+    line-height: 1;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .__vi-shortcuts-close:hover { background: rgba(255,255,255,0.1); color: var(--vi-text); }
+  .__vi-shortcuts-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 6px;
+  }
+  .__vi-shortcut-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 6px 8px; border-radius: 6px; font-size: 11px;
+  }
+  .__vi-shortcut-row:hover { background: rgba(255,255,255,0.03); }
+  .__vi-shortcut-row .key { font-family: var(--vi-mono); background: rgba(255,255,255,0.08); padding: 2px 6px; border-radius: 4px; font-size: 10px; color: var(--vi-accent); }
+
+  /* Confirm Modal (themed) */
+  .__vi-confirm-modal {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.65); backdrop-filter: blur(4px);
+    z-index: calc(var(--vi-z) + 55); display: none; align-items: center; justify-content: center;
+    pointer-events: auto;
+  }
+  .__vi-confirm-modal.open { display: flex; }
+  .__vi-confirm-inner {
+    background: var(--vi-panel-bg); backdrop-filter: blur(20px);
+    border: 1px solid var(--vi-border); border-radius: 14px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.45);
+    width: min(440px, calc(100vw - 32px));
+    padding: 18px;
+  }
+  .__vi-confirm-title {
+    color: var(--vi-text); font-size: 14px; font-weight: 700; margin: 0 0 8px;
+  }
+  .__vi-confirm-text {
+    color: var(--vi-text-dim); font-size: 12px; line-height: 1.45; margin: 0 0 16px;
+  }
+  .__vi-confirm-actions {
+    display: flex; justify-content: flex-end; gap: 8px;
+  }
+  .__vi-confirm-btn {
+    border: 1px solid var(--vi-border);
+    border-radius: 8px;
+    background: rgba(255,255,255,0.04);
+    color: var(--vi-text);
+    font-family: var(--vi-font);
+    font-size: 12px;
+    font-weight: 600;
+    padding: 8px 12px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .__vi-confirm-btn:hover { background: rgba(255,255,255,0.1); }
+  .__vi-confirm-btn.danger {
+    background: rgba(255,71,87,0.18);
+    border-color: rgba(255,71,87,0.5);
+    color: #ffd9dd;
+  }
+  .__vi-confirm-btn.danger:hover { background: rgba(255,71,87,0.28); color: #fff; }
+
+  /* Mobile Preview Shell */
+  .__vi-mobile-shell {
+    position: fixed; inset: 0;
+    z-index: calc(var(--vi-z) - 10);
+    background: #0b0d10;
+    display: flex; flex-direction: column; align-items: center;
+    justify-content: center; gap: 0;
+    pointer-events: none;
+  }
+  .__vi-mobile-device-bar {
+    display: flex; align-items: center; gap: 6px;
+    padding: 8px 12px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 10px;
+    margin-bottom: 12px;
+    pointer-events: auto;
+    flex-shrink: 0;
+  }
+  .__vi-mobile-device-btn {
+    background: transparent; border: 1px solid transparent;
+    color: rgba(255,255,255,0.45); font-family: var(--vi-font);
+    font-size: 11px; font-weight: 500; padding: 5px 10px;
+    border-radius: 6px; cursor: pointer; transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .__vi-mobile-device-btn:hover {
+    color: rgba(255,255,255,0.8); background: rgba(255,255,255,0.06);
+  }
+  .__vi-mobile-device-btn.active {
+    color: var(--vi-accent); background: rgba(0,229,204,0.1);
+    border-color: rgba(0,229,204,0.25);
+  }
+  .__vi-mobile-device-label {
+    color: rgba(255,255,255,0.3); font-family: var(--vi-mono);
+    font-size: 10px; margin-left: 6px; letter-spacing: 0.3px;
+  }
+  .__vi-mobile-viewport {
+    border-radius: 40px;
+    border: 3px solid rgba(255,255,255,0.18);
+    box-shadow:
+      0 0 0 1px rgba(0,0,0,0.8),
+      0 20px 60px rgba(0,0,0,0.55),
+      inset 0 0 0 1px rgba(255,255,255,0.06);
+    background: #000;
+    overflow: hidden;
+    pointer-events: auto;
+    position: relative;
+    transition: width 0.3s ease, height 0.3s ease;
+  }
+  .__vi-mobile-viewport::before {
+    content: '';
+    position: absolute;
+    top: 8px; left: 50%; transform: translateX(-50%);
+    width: 80px; height: 5px;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.15);
+    z-index: 2;
+    pointer-events: none;
+  }
+  .__vi-mobile-stage {
+    width: 100%; height: 100%;
+    overflow: auto; overflow-x: hidden;
+    border-radius: 37px;
+    background: #fff;
+    position: relative;
+  }
+  .__vi-mobile-iframe {
+    width: 100%; height: 100%;
+    border: none;
+    border-radius: 37px;
+    background: #fff;
+    display: block;
+  }
+
+  @media (max-width: 1100px), (max-height: 780px) {
+    .__vi-toolbar { left: 12px; }
+    .__vi-panel.open { right: 12px; top: 12px; max-height: calc(100vh - 24px); }
+  }
+
+  @media (max-width: 760px) {
+    .__vi-panel { width: calc(100vw - 24px); min-width: 0; }
+    .__vi-panel.open { right: 12px; }
+    .__vi-shortcuts-grid { grid-template-columns: 1fr; }
+  }
+
+  /* Context Menu */
+  .__vi-context-menu {
+    position: fixed; z-index: calc(var(--vi-z) + 30);
+    background: var(--vi-panel-bg); backdrop-filter: blur(20px);
+    border: 1px solid var(--vi-border); border-radius: 10px;
+    padding: 6px; min-width: 180px; box-shadow: 0 12px 32px rgba(0,0,0,0.4);
+    display: none; pointer-events: auto;
+  }
+  .__vi-context-menu.open { display: block; }
+  .__vi-ctx-item {
+    padding: 7px 12px; border-radius: 6px; cursor: pointer; font-size: 11px;
+    color: var(--vi-text-dim); transition: all 0.1s; display: flex; align-items: center; gap: 8px;
+    background: none; border: none; width: 100%; text-align: left; font-family: var(--vi-font);
+  }
+  .__vi-ctx-item:hover { background: rgba(0,229,204,0.1); color: var(--vi-accent); }
+  .__vi-ctx-sep { height: 1px; background: var(--vi-border); margin: 4px 0; }
+
+  /* Gradient builder */
+  .__vi-gradient-bar {
+    width: 100%; height: 24px; border-radius: 4px; border: 1px solid var(--vi-border);
+    position: relative; cursor: crosshair; margin: 8px 0;
+  }
+  .__vi-gradient-stop {
+    position: absolute; top: -4px; width: 12px; height: 32px;
+    border: 2px solid #fff; border-radius: 3px; cursor: grab;
+    transform: translateX(-50%); box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+  }
+
+  /* A11y contrast badge */
+  .__vi-a11y-badge {
+    display: inline-block; font-size: 9px; font-weight: 700; padding: 2px 5px;
+    border-radius: 3px; font-family: var(--vi-mono); margin-left: 4px;
+  }
+  .__vi-a11y-pass { background: rgba(46,213,115,0.2); color: #2ed573; }
+  .__vi-a11y-fail { background: rgba(255,71,87,0.2); color: #ff4757; }
+</style>
+</head>
+<body>
+
+<!-- ========================================== -->
+<!-- 🔮 STYLESESSION UI INJECTION -->
+<!-- ========================================== -->
+<div id="__vi-root" class="__vi-ui">
+  <!-- Toolbar -->
+  <div id="__vi-toolbar" class="__vi-toolbar">
+    <div id="__vi-toolbar-drag" class="__vi-toolbar-drag" data-tooltip="Drag Toolbar">
+      <span class="__vi-toolbar-drag-dots"></span>
+    </div>
+    <div class="__vi-tb-group">
+      <button class="__vi-btn active" data-tool="browse" data-tooltip="Browse (Q)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></button>
+      <button class="__vi-btn" data-tool="select" data-tooltip="Select (V)"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M4 2l14 10.5-6 1.5 4 8-3 1.5-4-8-5 5z"/></svg></button>
+      <button class="__vi-btn" data-tool="move" data-tooltip="Move (M)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 9l-3 3 3 3M9 5l3-3 3 3M15 19l-3 3-3-3M19 9l3 3-3 3M2 12h20M12 2v20"/></svg></button>
+      <button class="__vi-btn" data-tool="spacing" data-tooltip="Spacing (S)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="6" width="12" height="12" rx="1"/><line x1="6" y1="1" x2="6" y2="5"/><line x1="18" y1="1" x2="18" y2="5"/><line x1="6" y1="19" x2="6" y2="23"/><line x1="18" y1="19" x2="18" y2="23"/></svg></button>
+      <button class="__vi-btn" data-tool="typography" data-tooltip="Typography (T)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 7 4 4 20 4 20 7"/><line x1="9.5" y1="20" x2="14.5" y2="20"/><line x1="12" y1="4" x2="12" y2="20"/></svg></button>
+      <button class="__vi-btn" data-tool="color" data-tooltip="Fill & Color (F)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg></button>
+      <button class="__vi-btn" data-tool="border" data-tooltip="Border & Shadow (B)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><rect x="7" y="7" width="10" height="10" rx="1" stroke-dasharray="3 2"/></svg></button>
+      <button class="__vi-btn" data-tool="effects" data-tooltip="Effects (E)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg></button>
+      <button class="__vi-btn" data-tool="animation" data-tooltip="Animation (O)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg></button>
+      <button class="__vi-btn" data-tool="tokens" data-tooltip="Design Tokens (K)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg></button>
+    </div>
+    <div class="__vi-tb-group">
+      <button class="__vi-btn" id="__vi-btn-undo" data-tooltip="Undo (Ctrl+Z)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg></button>
+      <button class="__vi-btn" id="__vi-btn-redo" data-tooltip="Redo (Ctrl+Shift+Z)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.13-9.36L23 10"/></svg></button>
+      <button class="__vi-btn" id="__vi-btn-reset" data-tooltip="Reset to Default"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M20.49 15a9 9 0 0 1-14.13 3.36L1 14"/><path d="M3.51 9a9 9 0 0 1 14.13-3.36L23 10"/></svg></button>
+    </div>
+    <div class="__vi-tb-group">
+      <button class="__vi-btn __vi-btn-compare" id="__vi-btn-compare" data-tooltip="Compare Original (Shift+C)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="18" rx="2"/><line x1="12" y1="3" x2="12" y2="21"/></svg></button>
+      <button class="__vi-btn" id="__vi-btn-more" data-tooltip="More Tools"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="none"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg></button>
+    </div>
+    <div class="__vi-tb-group">
+      <button class="__vi-btn" id="__vi-btn-export" data-tooltip="Export CSS (Ctrl+Shift+E)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/></svg></button>
+      <button class="__vi-btn" id="__vi-btn-power" data-tooltip="Turn Off (Esc)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    
+    <div id="__vi-more-menu" class="__vi-more-menu">
+      <button class="__vi-more-btn" data-action="ruler"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5h18M3 5v14l18-14v14"/><line x1="7" y1="5" x2="7" y2="9"/><line x1="11" y1="5" x2="11" y2="7"/><line x1="15" y1="5" x2="15" y2="9"/><line x1="19" y1="5" x2="19" y2="7"/></svg>Rulers<span class="status-dot" id="__vi-dot-ruler"></span></button>
+      <button class="__vi-more-btn" data-action="layout"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="3" x2="9" y2="21"/></svg>Layout Grid<span class="status-dot" id="__vi-dot-layout"></span></button>
+      <button class="__vi-more-btn" data-action="a11y"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="4" r="2"/><path d="M12 6v6"/><path d="M6 10l6 2 6-2"/><path d="M8 22l4-8 4 8"/></svg>A11y Scan<span class="status-dot" id="__vi-dot-a11y"></span></button>
+      <button class="__vi-more-btn" data-action="palette"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>Search Elements</button>
+      <button class="__vi-more-btn" data-action="mobile"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>Mobile View<span class="status-dot" id="__vi-dot-mobile"></span></button>
+      <button class="__vi-more-btn" data-action="dark"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>Dark Mode<span class="status-dot" id="__vi-dot-dark"></span></button>
+      <button class="__vi-more-btn" data-action="note"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Drop Note</button>
+      <button class="__vi-more-btn" data-action="snapshot"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="18" rx="2"/><line x1="12" y1="3" x2="12" y2="21"/></svg>Snapshot<span class="status-dot" id="__vi-dot-snap"></span></button>
+      <button class="__vi-more-btn" data-action="shortcuts"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M6 8h.01M10 8h.01M14 8h.01M18 8h.01M8 12h.01M12 12h.01M16 12h.01M8 16h8"/></svg>Shortcuts</button>
+      <button class="__vi-more-btn" data-action="download"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Download Session</button>
+      <button class="__vi-more-btn" data-action="import"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>Import Session</button>
+      <button class="__vi-more-btn" data-action="hidden"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg>Hidden Elements<span class="status-dot" id="__vi-dot-hidden"></span></button>
+      <button class="__vi-more-btn" data-action="csseditor"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>CSS Editor<span class="status-dot" id="__vi-dot-csseditor"></span></button>
+      <button class="__vi-more-btn" data-action="history"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Undo History</button>
+    </div>
+  </div>
+
+  <!-- Panel -->
+  <div id="__vi-panel" class="__vi-panel">
+    <div class="__vi-panel-drag" id="__vi-panel-drag">
+      <div class="__vi-panel-drag-dots"><span></span><span></span><span></span><span></span><span></span></div>
+    </div>
+    <div class="__vi-panel-resize" id="__vi-panel-resize"></div>
+    <div class="__vi-panel-header">
+      <div class="__vi-panel-header-row">
+        <div class="__vi-panel-title" id="__vi-panel-tool-name">Browse</div>
+      </div>
+      <div class="__vi-panel-subtitle" id="__vi-panel-target">No element selected</div>
+    </div>
+    <div id="__vi-breadcrumb" class="__vi-breadcrumb" style="display:none;"></div>
+    <div id="__vi-panel-tabs" class="__vi-panel-tabs" style="display:none;">
+      <button class="__vi-panel-tab active" data-tab="tool">Tool</button>
+      <button class="__vi-panel-tab" data-tab="computed">Computed</button>
+    </div>
+    <div class="__vi-panel-body" id="__vi-panel-content">
+      <div class="__vi-empty">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M13.8 12H3"/></svg>
+        <p>Hover an element and click to inspect it.<br/><br/>Hold <span class="__vi-kbd">Shift</span> to multi-select.<br/>Press <span class="__vi-kbd">Esc</span> to deselect.<br/>Press <span class="__vi-kbd">?</span> for all shortcuts.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Overlays -->
+  <div id="__vi-hover-overlay" class="__vi-overlay __vi-overlay-hover"></div>
+  <div id="__vi-select-overlay" class="__vi-overlay __vi-overlay-select"></div>
+  <div id="__vi-margin-overlay" class="__vi-margin-overlay"></div>
+  <div id="__vi-padding-overlay" class="__vi-padding-overlay"></div>
+  <div id="__vi-label" class="__vi-label">tag <span class="dim">0x0</span></div>
+  <div id="__vi-measure-container"></div>
+
+  <!-- Toast Stack -->
+  <div id="__vi-toast-container" class="__vi-toast-container"></div>
+
+  <!-- Rulers & Guides -->
+  <div id="__vi-ruler-top" class="__vi-ruler __vi-ruler-top"><canvas class="__vi-ruler-canvas"></canvas></div>
+  <div id="__vi-ruler-left" class="__vi-ruler __vi-ruler-left"><canvas class="__vi-ruler-canvas"></canvas></div>
+  <div id="__vi-guides-container"></div>
+
+  <!-- Command Palette -->
+  <div id="__vi-palette" class="__vi-palette">
+    <input type="text" id="__vi-palette-input" class="__vi-palette-input" placeholder="Search elements or type > for commands...">
+    <div id="__vi-palette-results" class="__vi-palette-results"></div>
+  </div>
+
+  <!-- Keyboard Shortcuts Modal -->
+  <div id="__vi-shortcuts-modal" class="__vi-shortcuts-modal">
+    <div class="__vi-shortcuts-inner" id="__vi-shortcuts-inner"></div>
+  </div>
+
+  <!-- Confirm Modal -->
+  <div id="__vi-confirm-modal" class="__vi-confirm-modal">
+    <div class="__vi-confirm-inner">
+      <h3 class="__vi-confirm-title">Reset to default?</h3>
+      <p class="__vi-confirm-text">This will remove all current StyleSession edits and restore the page to its original styles.</p>
+      <div class="__vi-confirm-actions">
+        <button id="__vi-confirm-cancel" class="__vi-confirm-btn" type="button">Cancel</button>
+        <button id="__vi-confirm-reset" class="__vi-confirm-btn danger" type="button">Reset</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Context Menu -->
+  <div id="__vi-context-menu" class="__vi-context-menu"></div>
+</div>
+
+<!-- ========================================== -->
+<!-- 🔮 STYLESESSION ENGINE -->
+<!-- ========================================== -->
+<script>
+(function StyleSession() {
+  'use strict';
+
+  // ============================================================
+  // STATE
+  // ============================================================
+  const state = {
+    active: true,
+    currentTool: 'browse',
+    currentTab: 'tool',
+    hoveredEl: null,
+    selectedEls: [],
+    undoStack: [],
+    redoStack: [],
+    originalStyles: new Map(),
+    features: { rulers: false, layout: false, a11y: false, dark: false, mobile: false, snap: false },
+    ui: {}
+  };
+
+  // ============================================================
+  // DOM REFS (after DOM ready)
+  // ============================================================
+  function cacheUI() {
+    state.ui = {
+      root: document.getElementById('__vi-root'),
+      toolbar: document.getElementById('__vi-toolbar'),
+      panel: document.getElementById('__vi-panel'),
+      panelDrag: document.getElementById('__vi-panel-drag'),
+      panelResize: document.getElementById('__vi-panel-resize'),
+      hoverOverlay: document.getElementById('__vi-hover-overlay'),
+      selectOverlay: document.getElementById('__vi-select-overlay'),
+      marginOverlay: document.getElementById('__vi-margin-overlay'),
+      paddingOverlay: document.getElementById('__vi-padding-overlay'),
+      label: document.getElementById('__vi-label'),
+      panelTarget: document.getElementById('__vi-panel-target'),
+      panelToolName: document.getElementById('__vi-panel-tool-name'),
+      panelContent: document.getElementById('__vi-panel-content'),
+      breadcrumb: document.getElementById('__vi-breadcrumb'),
+      panelTabs: document.getElementById('__vi-panel-tabs'),
+      measureContainer: document.getElementById('__vi-measure-container'),
+      toastContainer: document.getElementById('__vi-toast-container'),
+      contextMenu: document.getElementById('__vi-context-menu'),
+      shortcutsModal: document.getElementById('__vi-shortcuts-modal'),
+      confirmModal: document.getElementById('__vi-confirm-modal'),
+      confirmCancel: document.getElementById('__vi-confirm-cancel'),
+      confirmReset: document.getElementById('__vi-confirm-reset'),
+    };
+  }
+
+  // ============================================================
+  // INIT
+  // ============================================================
+  function init() {
+    cacheUI();
+    bindMouseEvents();
+    bindKeyboardEvents();
+    bindToolbarEvents();
+    bindPanelDrag();
+    bindPanelResize();
+    bindPanelTabs();
+    bindCompare();
+    bindMoreMenu();
+    bindMoveEvents();
+    bindGuides();
+    bindExport();
+    bindContextMenu();
+    bindConfirmModal();
+    initInlineTextEditing();
+    loadSession();
+    requestAnimationFrame(renderLoop);
+    updateUndoRedoUI();
+  }
+
+  // ============================================================
+  // TOAST SYSTEM (queued, colored)
+  // ============================================================
+  function showToast(msg, type = '') {
+    const toast = document.createElement('div');
+    toast.className = '__vi-toast' + (type ? ' ' + type : '');
+    toast.textContent = msg;
+    state.ui.toastContainer.appendChild(toast);
+    requestAnimationFrame(() => toast.classList.add('show'));
+    setTimeout(() => {
+      toast.classList.remove('show');
+      setTimeout(() => toast.remove(), 300);
+    }, 2200);
+  }
+
+  // ============================================================
+  // COMMAND LOGIC (UNDO/REDO)
+  // ============================================================
+  function applyChange(el, prop, newVal) {
+    let oldVal = el.style[prop];
+    if (!oldVal) oldVal = window.getComputedStyle(el)[prop];
+    if (!state.originalStyles.has(el)) state.originalStyles.set(el, new Map());
+    const origMap = state.originalStyles.get(el);
+    if (!origMap.has(prop)) origMap.set(prop, oldVal);
+    el.style[prop] = newVal;
+    state.undoStack.push({ el, prop, oldVal, newVal });
+    state.redoStack = [];
+    updateUndoRedoUI();
+  }
+
+  function cssEscape(value) {
+    if (window.CSS && typeof window.CSS.escape === 'function') return window.CSS.escape(value);
+    return String(value).replace(/[^a-zA-Z0-9_-]/g, ch => '\\' + ch);
+  }
+
+  function escAttr(s) {
+    return String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+
+  function getElementPath(el) {
+    const parts = [];
+    let cur = el;
+    while (cur && cur !== document.body && cur.nodeType === 1) {
+      let idx = 1;
+      let sib = cur;
+      while ((sib = sib.previousElementSibling)) {
+        if (sib.tagName === cur.tagName) idx++;
+      }
+      parts.unshift(`${cur.tagName.toLowerCase()}:nth-of-type(${idx})`);
+      cur = cur.parentElement;
+    }
+    return 'body>' + parts.join('>');
+  }
+
+  function resolveSessionTargets(change) {
+    if (!change) return [];
+
+    // Prefer exact path targeting to avoid broad selector matches.
+    if (change.path) {
+      try {
+        const exact = document.querySelector(change.path);
+        if (exact) return [exact];
+      } catch (e) {
+        // fall through to selector fallback
+      }
+    }
+
+    if (change.selector) {
+      try {
+        return Array.from(document.querySelectorAll(change.selector));
+      } catch (e) {
+        return [];
+      }
+    }
+
+    return [];
+  }
+
+  function getElementSelector(el) {
+    if (el.id) return '#' + cssEscape(el.id);
+    if (el.className && typeof el.className === 'string') {
+      const classes = el.className.split(' ').filter(c => c && !c.startsWith('__vi'));
+      if (classes.length) return '.' + classes.map(cssEscape).join('.');
+    }
+    return el.tagName.toLowerCase();
+  }
+
+  function collectSessionChanges() {
+    const changes = [];
+    state.originalStyles.forEach((propsMap, el) => {
+      const styles = {};
+      propsMap.forEach((origVal, prop) => {
+        let curVal;
+        if (prop.startsWith('--')) {
+          curVal = el.style.getPropertyValue(prop).trim();
+        } else {
+          curVal = el.style[prop];
+        }
+        if (curVal) {
+          const kebab = prop.startsWith('--') ? prop : prop.replace(/[A-Z]/g, m => '-' + m.toLowerCase());
+          styles[kebab] = curVal;
+        }
+      });
+      if (Object.keys(styles).length > 0) {
+        changes.push({ selector: getElementSelector(el), path: getElementPath(el), styles });
+      }
+    });
+    return changes;
+  }
+
+  function collectTextChanges() {
+    const seen = new Set();
+    const textChanges = [];
+    // Walk undo stack in order; last entry per element wins
+    for (let i = state.undoStack.length - 1; i >= 0; i--) {
+      const cmd = state.undoStack[i];
+      if (cmd.prop !== '__textContent') continue;
+      if (seen.has(cmd.el)) continue;
+      seen.add(cmd.el);
+      textChanges.push({ selector: getElementSelector(cmd.el), path: getElementPath(cmd.el), text: cmd.el.textContent });
+    }
+    return textChanges;
+  }
+
+  function undo() {
+    if (compareMode) {
+      showToast('Exit Compare to undo', 'warn');
+      return;
+    }
+    if (state.undoStack.length === 0) return;
+    const cmd = state.undoStack.pop();
+    if (cmd.prop === '__textContent') {
+      cmd.el.textContent = cmd.oldVal;
+    } else if (cmd.prop.startsWith('--')) {
+      cmd.el.style.setProperty(cmd.prop, cmd.oldVal);
+    } else {
+      cmd.el.style[cmd.prop] = cmd.oldVal;
+    }
+    state.redoStack.push(cmd);
+    updateUndoRedoUI();
+    if (state.selectedEls.includes(cmd.el)) renderPanelForCurrentTool();
+  }
+
+  function redo() {
+    if (compareMode) {
+      showToast('Exit Compare to redo', 'warn');
+      return;
+    }
+    if (state.redoStack.length === 0) return;
+    const cmd = state.redoStack.pop();
+    if (cmd.prop === '__textContent') {
+      cmd.el.textContent = cmd.newVal;
+    } else if (cmd.prop.startsWith('--')) {
+      cmd.el.style.setProperty(cmd.prop, cmd.newVal);
+    } else {
+      cmd.el.style[cmd.prop] = cmd.newVal;
+    }
+    state.undoStack.push(cmd);
+    updateUndoRedoUI();
+    if (state.selectedEls.includes(cmd.el)) renderPanelForCurrentTool();
+  }
+
+  function closeResetConfirm() {
+    state.ui.confirmModal.classList.remove('open');
+  }
+
+  function openResetConfirm() {
+    state.ui.confirmModal.classList.add('open');
+  }
+
+  function performResetToDefault() {
+    closeResetConfirm();
+
+    if (compareMode) toggleCompare();
+
+    state.originalStyles.forEach((propsMap, el) => {
+      propsMap.forEach((oldVal, prop) => {
+        if (prop.startsWith('--')) {
+          if (oldVal) el.style.setProperty(prop, oldVal);
+          else el.style.removeProperty(prop);
+        } else {
+          el.style[prop] = oldVal || '';
+        }
+      });
+    });
+
+    const legacy = document.getElementById('__vi-session-style');
+    if (legacy) legacy.remove();
+    localStorage.removeItem('__vi_session');
+
+    if (state.features.snap) toggleSnapshot();
+    if (state.features.dark) toggleDarkMode();
+    if (state.features.mobile) toggleMobileView();
+    if (state.features.layout) toggleLayoutInspector();
+    if (state.features.a11y) toggleA11yInspector();
+    if (state.features.rulers) toggleRulers();
+    if (annotationsActive) toggleAnnotations();
+
+    state.originalStyles.clear();
+    state.undoStack.length = 0;
+    state.redoStack.length = 0;
+    updateUndoRedoUI();
+
+    clearHover();
+    clearSelection();
+    togglePalette(true);
+    state.ui.contextMenu.classList.remove('open');
+    setTool('browse');
+    showToast('Reset to default complete', 'success');
+  }
+
+  function resetToDefault() {
+    openResetConfirm();
+  }
+
+  function updateUndoRedoUI() {
+    const u = document.getElementById('__vi-btn-undo');
+    const r = document.getElementById('__vi-btn-redo');
+    if (u) u.style.opacity = state.undoStack.length ? '1' : '0.4';
+    if (r) r.style.opacity = state.redoStack.length ? '1' : '0.4';
+  }
+
+  function togglePower() {
+    state.active = !state.active;
+
+    if (!state.active) {
+      // Turn off active feature overlays so the page is fully restored.
+      if (state.features.snap) toggleSnapshot();
+      if (state.features.mobile) toggleMobileView();
+      if (state.features.layout) toggleLayoutInspector();
+      if (state.features.a11y) toggleA11yInspector();
+      if (state.features.rulers) toggleRulers();
+      if (state.features.dark) toggleDarkMode();
+      if (annotationsActive) toggleAnnotations();
+      if (state.features.csseditor) toggleCSSEditor();
+      const hiddenPanel = document.getElementById('__vi-hidden-panel');
+      if (hiddenPanel) { hiddenPanel.remove(); state.features.hidden = false; }
+      const historyPanel = document.getElementById('__vi-history-panel');
+      if (historyPanel) historyPanel.remove();
+
+      clearHover();
+      clearSelection();
+      state.ui.root.style.display = 'none';
+      document.documentElement.removeAttribute('data-vi-tool');
+      return;
+    }
+
+    state.ui.root.style.display = 'block';
+    document.documentElement.setAttribute('data-vi-tool', state.currentTool);
+  }
+
+  // ============================================================
+  // SELECTION SYSTEM (single source of truth — no dupes)
+  // ============================================================
+  function clearHover() {
+    state.hoveredEl = null;
+    state.ui.hoverOverlay.classList.remove('active');
+    state.ui.marginOverlay.classList.remove('active');
+    state.ui.paddingOverlay.classList.remove('active');
+    clearMeasurements();
+  }
+
+  function clearSelection() {
+    state.selectedEls = [];
+    document.querySelectorAll('.__vi-overlay-select').forEach((o, i) => {
+      if (i === 0) o.classList.remove('active');
+      else o.remove();
+    });
+    state.ui.panel.classList.remove('open');
+    state.ui.breadcrumb.style.display = 'none';
+    state.ui.panelTabs.style.display = 'none';
+    clearMeasurements();
+  }
+
+  function selectElement(el) {
+    state.selectedEls = [el];
+    // Clean surplus select overlays
+    document.querySelectorAll('.__vi-overlay-select').forEach((o, i) => { if (i > 0) o.remove(); });
+    state.ui.panel.classList.add('open');
+    const path = generateElementPath(el);
+    state.ui.panelTarget.textContent = path;
+    state.ui.panelTarget.title = path;
+    state.ui.panelTabs.style.display = 'flex';
+    renderBreadcrumb(el);
+    renderPanelForCurrentTool();
+  }
+
+  function generateElementPath(el) {
+    const parts = [];
+    let cur = el;
+    while (cur && cur !== document.body && cur !== document.documentElement && parts.length < 4) {
+      let str = cur.tagName.toLowerCase();
+      if (cur.id) str += '#' + cur.id;
+      else if (cur.className && typeof cur.className === 'string') {
+        const cls = cur.className.split(' ').find(c => !c.startsWith('__vi'));
+        if (cls) str += '.' + cls;
+      }
+      parts.unshift(str);
+      cur = cur.parentElement;
+    }
+    return parts.join(' > ');
+  }
+
+  function getElementLabel(el) {
+    let name = el.tagName.toLowerCase();
+    if (el.id) name += '#' + el.id;
+    else if (el.className && typeof el.className === 'string' && !el.className.includes('__vi')) {
+      const first = el.className.trim().split(' ')[0];
+      if (first) name += '.' + first;
+    }
+    return name;
+  }
+
+  // ============================================================
+  // BREADCRUMB NAVIGATION
+  // ============================================================
+  function renderBreadcrumb(el) {
+    const bc = state.ui.breadcrumb;
+    bc.innerHTML = '';
+    bc.style.display = 'flex';
+    const chain = [];
+    let cur = el;
+    while (cur && cur !== document.documentElement && chain.length < 6) {
+      chain.unshift(cur);
+      cur = cur.parentElement;
+    }
+    chain.forEach((node, i) => {
+      if (i > 0) {
+        const sep = document.createElement('span');
+        sep.className = '__vi-breadcrumb-sep';
+        sep.textContent = '›';
+        bc.appendChild(sep);
+      }
+      const btn = document.createElement('button');
+      btn.className = '__vi-breadcrumb-item';
+      btn.textContent = getElementLabel(node);
+      btn.addEventListener('click', () => selectElement(node));
+      bc.appendChild(btn);
+    });
+  }
+
+  // ============================================================
+  // OVERLAY RENDER LOOP (60fps)
+  // ============================================================
+  function renderLoop() {
+    if (!state.active) { requestAnimationFrame(renderLoop); return; }
+
+    // Skip all overlay work while actively dragging an element — avoids layout thrashing
+    if (isDraggingEl && _moveDragCommitted) { requestAnimationFrame(renderLoop); return; }
+
+    // Hover overlay + margin/padding visualization
+    if (state.hoveredEl && !state.selectedEls.includes(state.hoveredEl)) {
+      updateOverlayBox(state.ui.hoverOverlay, state.hoveredEl);
+      updateLabel(state.hoveredEl);
+      showBoxOverlays(state.hoveredEl);
+      // Distance measurements from selected to hovered
+      if (state.selectedEls.length > 0 && state.hoveredEl !== state.selectedEls[0]) {
+        drawMeasurements(state.selectedEls[0], state.hoveredEl);
+      }
+    } else {
+      state.ui.hoverOverlay.classList.remove('active');
+      state.ui.marginOverlay.classList.remove('active');
+      state.ui.paddingOverlay.classList.remove('active');
+      if (state.selectedEls.length === 0) clearMeasurements();
+    }
+
+    // Select overlays
+    if (state.selectedEls.length > 0) {
+      while (document.querySelectorAll('.__vi-overlay-select').length < state.selectedEls.length) {
+        const div = document.createElement('div');
+        div.className = '__vi-overlay __vi-overlay-select';
+        state.ui.root.insertBefore(div, state.ui.label);
+      }
+      const overlays = document.querySelectorAll('.__vi-overlay-select');
+      overlays.forEach(o => o.classList.remove('active'));
+      state.selectedEls.forEach((target, i) => updateOverlayBox(overlays[i], target));
+      if (!state.hoveredEl || state.selectedEls.includes(state.hoveredEl)) {
+        updateLabel(state.selectedEls[0]);
+      }
+    } else {
+      document.querySelectorAll('.__vi-overlay-select').forEach(o => o.classList.remove('active'));
+      if (!state.hoveredEl) state.ui.label.classList.remove('active');
+    }
+
+    requestAnimationFrame(renderLoop);
+  }
+
+  function updateOverlayBox(overlayEl, targetEl) {
+    const rect = targetEl.getBoundingClientRect();
+    if (rect.width === 0 || rect.height === 0) return;
+    overlayEl.style.top = (rect.top + window.scrollY) + 'px';
+    overlayEl.style.left = (rect.left + window.scrollX) + 'px';
+    overlayEl.style.width = rect.width + 'px';
+    overlayEl.style.height = rect.height + 'px';
+    overlayEl.classList.add('active');
+  }
+
+  function updateLabel(targetEl) {
+    const rect = targetEl.getBoundingClientRect();
+    const label = state.ui.label;
+    const name = getElementLabel(targetEl);
+    const dims = `${Math.round(rect.width)}×${Math.round(rect.height)}`;
+    label.innerHTML = `${name} <span class="dim">${dims}</span>`;
+    let top = rect.top + window.scrollY;
+    if (top < 24) top += 24;
+    label.style.top = top + 'px';
+    label.style.left = (rect.left + window.scrollX) + 'px';
+    label.classList.add('active');
+  }
+
+  // ============================================================
+  // MARGIN/PADDING BOX OVERLAYS
+  // ============================================================
+  function showBoxOverlays(el) {
+    const rect = el.getBoundingClientRect();
+    const cs = window.getComputedStyle(el);
+    const mt = parseFloat(cs.marginTop) || 0;
+    const mr = parseFloat(cs.marginRight) || 0;
+    const mb = parseFloat(cs.marginBottom) || 0;
+    const ml = parseFloat(cs.marginLeft) || 0;
+    const pt = parseFloat(cs.paddingTop) || 0;
+    const pr = parseFloat(cs.paddingRight) || 0;
+    const pb = parseFloat(cs.paddingBottom) || 0;
+    const pl = parseFloat(cs.paddingLeft) || 0;
+
+    // Margin overlay (outer box)
+    const mo = state.ui.marginOverlay;
+    mo.style.top = (rect.top + window.scrollY - mt) + 'px';
+    mo.style.left = (rect.left + window.scrollX - ml) + 'px';
+    mo.style.width = (rect.width + ml + mr) + 'px';
+    mo.style.height = (rect.height + mt + mb) + 'px';
+    if (mt || mr || mb || ml) mo.classList.add('active'); else mo.classList.remove('active');
+
+    // Padding overlay (inner region)
+    const po = state.ui.paddingOverlay;
+    const bwt = parseFloat(cs.borderTopWidth) || 0;
+    const bwl = parseFloat(cs.borderLeftWidth) || 0;
+    po.style.top = (rect.top + window.scrollY + bwt) + 'px';
+    po.style.left = (rect.left + window.scrollX + bwl) + 'px';
+    po.style.width = (rect.width - parseFloat(cs.borderLeftWidth || 0) - parseFloat(cs.borderRightWidth || 0)) + 'px';
+    po.style.height = (rect.height - parseFloat(cs.borderTopWidth || 0) - parseFloat(cs.borderBottomWidth || 0)) + 'px';
+    if (pt || pr || pb || pl) po.classList.add('active'); else po.classList.remove('active');
+  }
+
+  // ============================================================
+  // DISTANCE MEASUREMENTS
+  // ============================================================
+  function clearMeasurements() {
+    state.ui.measureContainer.innerHTML = '';
+  }
+
+  function drawMeasurements(elA, elB) {
+    clearMeasurements();
+    const rA = elA.getBoundingClientRect();
+    const rB = elB.getBoundingClientRect();
+    const sx = window.scrollX, sy = window.scrollY;
+    const container = state.ui.measureContainer;
+
+    // Horizontal distance
+    let hDist = 0, hX = 0, hY = 0;
+    if (rB.left >= rA.right) { hDist = rB.left - rA.right; hX = rA.right; }
+    else if (rA.left >= rB.right) { hDist = rA.left - rB.right; hX = rB.right; }
+    else { // overlapping
+      hDist = Math.abs(rA.left - rB.left); hX = Math.min(rA.left, rB.left);
+    }
+    hY = Math.max(rA.top, rB.top) + Math.min(Math.min(rA.bottom, rB.bottom) - Math.max(rA.top, rB.top), 40) / 2;
+
+    if (hDist > 0) {
+      const line = document.createElement('div');
+      line.className = '__vi-measure-line';
+      line.style.cssText = `left:${hX + sx}px; top:${hY + sy}px; width:${hDist}px; height:1px;`;
+      container.appendChild(line);
+      const lbl = document.createElement('div');
+      lbl.className = '__vi-measure-label';
+      lbl.textContent = Math.round(hDist) + 'px';
+      lbl.style.cssText = `left:${hX + sx + hDist / 2}px; top:${hY + sy - 14}px; transform:translateX(-50%);`;
+      container.appendChild(lbl);
+    }
+
+    // Vertical distance
+    let vDist = 0, vX = 0, vY = 0;
+    if (rB.top >= rA.bottom) { vDist = rB.top - rA.bottom; vY = rA.bottom; }
+    else if (rA.top >= rB.bottom) { vDist = rA.top - rB.bottom; vY = rB.bottom; }
+    else { vDist = Math.abs(rA.top - rB.top); vY = Math.min(rA.top, rB.top); }
+    vX = Math.max(rA.left, rB.left) + Math.min(Math.min(rA.right, rB.right) - Math.max(rA.left, rB.left), 40) / 2;
+
+    if (vDist > 0) {
+      const line = document.createElement('div');
+      line.className = '__vi-measure-line';
+      line.style.cssText = `left:${vX + sx}px; top:${vY + sy}px; width:1px; height:${vDist}px;`;
+      container.appendChild(line);
+      const lbl = document.createElement('div');
+      lbl.className = '__vi-measure-label';
+      lbl.textContent = Math.round(vDist) + 'px';
+      lbl.style.cssText = `left:${vX + sx + 6}px; top:${vY + sy + vDist / 2}px; transform:translateY(-50%);`;
+      container.appendChild(lbl);
+    }
+  }
+
+  // ============================================================
+  // MOUSE & SELECTION
+  // ============================================================
+  function bindMouseEvents() {
+    window.addEventListener('mousemove', (e) => {
+      if (!state.active || state.currentTool === 'browse') return;
+      // Suppress hover tracking while dragging to avoid layout thrashing
+      if (isDraggingEl) return;
+      if (e.target.closest('#__vi-root')) { clearHover(); return; }
+      state.hoveredEl = e.target;
+    }, { passive: true });
+
+    window.addEventListener('click', (e) => {
+      if (!state.active || state.currentTool === 'browse') return;
+      if (e.target.closest('#__vi-root')) return;
+      // Move tool handles its own selection via mousedown — skip click handler
+      // to avoid re-selecting and panel flicker after a drag ends.
+      if (state.currentTool === 'move') { e.preventDefault(); e.stopPropagation(); return; }
+      e.preventDefault();
+      e.stopPropagation();
+      if (state.hoveredEl) {
+        if (e.shiftKey) {
+          if (!state.selectedEls.includes(state.hoveredEl)) state.selectedEls.push(state.hoveredEl);
+          else state.selectedEls = state.selectedEls.filter(el => el !== state.hoveredEl);
+          if (state.selectedEls.length > 0) {
+            state.ui.panel.classList.add('open');
+            state.ui.panelTarget.textContent = `${state.selectedEls.length} elements selected`;
+            state.ui.panelTabs.style.display = 'flex';
+            renderPanelForCurrentTool();
+          } else clearSelection();
+        } else {
+          selectElement(state.hoveredEl);
+        }
+      } else clearSelection();
+    }, { capture: true });
+  }
+
+  // ============================================================
+  // TOOLBAR (drag in BOTH axes)
+  // ============================================================
+  function bindToolbarEvents() {
+    const btns = state.ui.toolbar.querySelectorAll('button[data-tool]');
+    btns.forEach(btn => btn.addEventListener('click', () => setTool(btn.getAttribute('data-tool'))));
+    const dragHandle = document.getElementById('__vi-toolbar-drag');
+
+    // Full XY drag
+    let isDragging = false, startX, startY, startLeft, startTop;
+    dragHandle.addEventListener('mousedown', (e) => {
+      isDragging = true;
+      startX = e.clientX; startY = e.clientY;
+      const rect = state.ui.toolbar.getBoundingClientRect();
+      startLeft = rect.left + window.scrollX;
+      startTop = rect.top + window.scrollY;
+      state.ui.toolbar.style.left = startLeft + 'px';
+      state.ui.toolbar.style.top = startTop + 'px';
+      state.ui.toolbar.style.transform = 'none';
+      e.preventDefault();
+    });
+    window.addEventListener('mousemove', (e) => {
+      if (!isDragging) return;
+      state.ui.toolbar.style.left = (startLeft + e.clientX - startX) + 'px';
+      state.ui.toolbar.style.top = (startTop + e.clientY - startY) + 'px';
+    });
+    window.addEventListener('mouseup', () => { isDragging = false; });
+
+    document.getElementById('__vi-btn-undo').addEventListener('click', undo);
+    document.getElementById('__vi-btn-redo').addEventListener('click', redo);
+    document.getElementById('__vi-btn-reset').addEventListener('click', resetToDefault);
+    document.getElementById('__vi-btn-power').addEventListener('click', togglePower);
+  }
+
+  function bindConfirmModal() {
+    state.ui.confirmCancel.addEventListener('click', closeResetConfirm);
+    state.ui.confirmReset.addEventListener('click', performResetToDefault);
+    state.ui.confirmModal.addEventListener('click', (e) => {
+      if (e.target === state.ui.confirmModal) closeResetConfirm();
+    });
+  }
+
+  function setTool(toolName) {
+    state.currentTool = toolName;
+    state.ui.toolbar.querySelectorAll('button[data-tool]').forEach(b => {
+      b.classList.toggle('active', b.getAttribute('data-tool') === toolName);
+    });
+    state.ui.panelToolName.textContent = toolName.charAt(0).toUpperCase() + toolName.slice(1);
+    state.currentTab = 'tool';
+    updateTabUI();
+    // Set page-wide cursor based on active tool
+    document.documentElement.setAttribute('data-vi-tool', toolName);
+    if (toolName === 'browse') { clearHover(); clearSelection(); state.ui.panel.classList.remove('open'); return; }
+    if (state.selectedEls.length > 0) renderPanelForCurrentTool();
+  }
+
+  // ============================================================
+  // PANEL DRAG (move the entire panel)
+  // ============================================================
+  function bindPanelDrag() {
+    let dragging = false, sx, sy, pl, pt;
+    state.ui.panelDrag.addEventListener('mousedown', (e) => {
+      dragging = true;
+      sx = e.clientX; sy = e.clientY;
+      const cs = window.getComputedStyle(state.ui.panel);
+      pl = parseInt(cs.left, 10) || (window.innerWidth - 320 - 24);
+      pt = parseInt(cs.top, 10) || 24;
+      state.ui.panel.classList.add('dragging');
+      state.ui.panel.classList.add('__vi-panel-floating');
+      // Switch from right-based to left-based positioning
+      state.ui.panel.style.right = 'auto';
+      state.ui.panel.style.left = pl + 'px';
+      state.ui.panel.style.top = pt + 'px';
+      e.preventDefault();
+    });
+    window.addEventListener('mousemove', (e) => {
+      if (!dragging) return;
+      const dx = e.clientX - sx, dy = e.clientY - sy;
+      state.ui.panel.style.left = (pl + dx) + 'px';
+      state.ui.panel.style.top = (pt + dy) + 'px';
+    });
+    window.addEventListener('mouseup', () => {
+      if (!dragging) return;
+      dragging = false;
+      state.ui.panel.classList.remove('dragging');
+    });
+  }
+
+  // ============================================================
+  // PANEL RESIZE
+  // ============================================================
+  function bindPanelResize() {
+    let resizing = false, startW, startX;
+    state.ui.panelResize.addEventListener('mousedown', (e) => {
+      resizing = true;
+      startX = e.clientX;
+      startW = state.ui.panel.offsetWidth;
+      state.ui.panel.classList.add('dragging');
+      e.preventDefault();
+    });
+    window.addEventListener('mousemove', (e) => {
+      if (!resizing) return;
+      const dx = startX - e.clientX;
+      const maxW = Math.min(window.innerWidth - 100, 800);
+      state.ui.panel.style.width = Math.min(maxW, Math.max(260, startW + dx)) + 'px';
+    });
+    window.addEventListener('mouseup', () => {
+      if (!resizing) return;
+      resizing = false;
+      state.ui.panel.classList.remove('dragging');
+    });
+  }
+
+  // ============================================================
+  // PANEL TABS (Tool / Computed)
+  // ============================================================
+  function bindPanelTabs() {
+    state.ui.panelTabs.querySelectorAll('.__vi-panel-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        state.currentTab = tab.getAttribute('data-tab');
+        updateTabUI();
+        renderPanelForCurrentTool();
+      });
+    });
+  }
+
+  function updateTabUI() {
+    state.ui.panelTabs.querySelectorAll('.__vi-panel-tab').forEach(t => {
+      t.classList.toggle('active', t.getAttribute('data-tab') === state.currentTab);
+    });
+  }
+
+  // ============================================================
+  // HELPER: rgb2hex (robust — handles hsl, named colors, etc.)
+  // ============================================================
+  function rgb2hex(color) {
+    if (!color || color === 'transparent' || color === 'rgba(0, 0, 0, 0)') return '#ffffff';
+    const rgbMatch = color.match(/rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/i);
+    if (rgbMatch) {
+      return '#' +
+        ('0' + parseInt(rgbMatch[1], 10).toString(16)).slice(-2) +
+        ('0' + parseInt(rgbMatch[2], 10).toString(16)).slice(-2) +
+        ('0' + parseInt(rgbMatch[3], 10).toString(16)).slice(-2);
+    }
+    // Fallback: use a canvas to resolve named/hsl colors
+    const ctx = document.createElement('canvas').getContext('2d');
+    ctx.fillStyle = color;
+    const resolved = ctx.fillStyle; // browser normalizes to #rrggbb or rgb()
+    if (resolved.startsWith('#')) return resolved;
+    return rgb2hex(resolved);
+  }
+
+  // ============================================================
+  // WCAG CONTRAST RATIO
+  // ============================================================
+  function luminance(r, g, b) {
+    const [rs, gs, bs] = [r, g, b].map(c => { c /= 255; return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4); });
+    return 0.2126 * rs + 0.7152 * gs + 0.0722 * bs;
+  }
+
+  function contrastRatio(rgb1, rgb2) {
+    const parse = (c) => {
+      const m = c.match(/rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/);
+      return m ? [+m[1], +m[2], +m[3]] : [0, 0, 0];
+    };
+    const l1 = luminance(...parse(rgb1));
+    const l2 = luminance(...parse(rgb2));
+    const lighter = Math.max(l1, l2), darker = Math.min(l1, l2);
+    return (lighter + 0.05) / (darker + 0.05);
+  }
+
+  function getEffectiveBgColor(el) {
+    let cur = el, depth = 0;
+    while (cur && depth < 50) {
+      const bg = window.getComputedStyle(cur).backgroundColor;
+      if (bg && bg !== 'transparent' && bg !== 'rgba(0, 0, 0, 0)') return bg;
+      cur = cur.parentElement;
+      depth++;
+    }
+    return 'rgb(255,255,255)';
+  }
+
+  // ============================================================
+  // COPY TO CLIPBOARD helper
+  // ============================================================
+  function copyText(text) {
+    navigator.clipboard.writeText(text).then(() => showToast('Copied!', 'success')).catch(() => showToast('Copy failed', 'error'));
+  }
+
+  // ============================================================
+  // PANEL ROUTER (Tool tab vs Computed tab)
+  // ============================================================
+  function renderPanelForCurrentTool() {
+    if (state.selectedEls.length === 0) return;
+    if (state.currentTab === 'computed') { renderComputedTab(); return; }
+
+    const el = state.selectedEls[0];
+    const computed = window.getComputedStyle(el);
+    const content = state.ui.panelContent;
+    content.innerHTML = '';
+
+    if (state.currentTool === 'select') {
+      renderSelectPanel(el, computed, content);
+    } else if (state.currentTool === 'move') {
+      renderMovePanel(el, computed, content);
+    } else if (state.currentTool === 'spacing') {
+      renderSpacingPanel(el, computed, content);
+    } else if (state.currentTool === 'typography') {
+      renderTypographyPanel(el, computed, content);
+    } else if (state.currentTool === 'color') {
+      renderColorPanel(el, computed, content);
+    } else if (state.currentTool === 'border') {
+      renderBorderPanel(el, computed, content);
+    } else if (state.currentTool === 'effects') {
+      renderEffectsPanel(el, computed, content);
+    } else if (state.currentTool === 'animation') {
+      renderAnimationPanel(el, computed, content);
+    } else if (state.currentTool === 'tokens') {
+      renderTokensPanel(content);
+    } else {
+      content.innerHTML = `<div class="__vi-empty"><p>Tool: <strong style="color:var(--vi-accent)">${state.currentTool}</strong></p></div>`;
+    }
+  }
+
+  // ---- SELECT TOOL ----
+  function renderSelectPanel(el, computed, content) {
+    // 2-element diff
+    if (state.selectedEls.length === 2) {
+      const c1 = window.getComputedStyle(state.selectedEls[0]);
+      const c2 = window.getComputedStyle(state.selectedEls[1]);
+      const props = ['display','position','width','height','margin','padding','color','background-color','font-family','font-size','font-weight','border-radius','gap','justify-content','align-items'];
+      let html = '';
+      props.forEach(p => {
+        const k = p.replace(/-([a-z])/g, g => g[1].toUpperCase());
+        const v1 = c1[k], v2 = c2[k];
+        if (v1 !== v2) {
+          html += `<div style="display:flex;flex-direction:column;margin-bottom:8px;background:rgba(255,255,255,0.05);padding:6px;border-radius:4px;">
+            <span style="color:var(--vi-accent);font-weight:bold;margin-bottom:4px;">${p}</span>
+            <div style="display:flex;justify-content:space-between;color:#ff4757">El 1: <span>${v1}</span></div>
+            <div style="display:flex;justify-content:space-between;color:#00E5CC">El 2: <span>${v2}</span></div></div>`;
+        }
+      });
+      content.innerHTML = `<div class="__vi-panel-body-wrapper"><div class="__vi-section-title">DIFF MATRIX (2 Elements)</div>${html || '<div style="color:#2ed573">No differences found.</div>'}</div>`;
+      return;
+    }
+
+    // Multi-select (3+)
+    if (state.selectedEls.length > 2) {
+      content.innerHTML = `<div class="__vi-panel-body-wrapper"><div class="__vi-section-title">${state.selectedEls.length} ELEMENTS SELECTED</div>
+        <p style="line-height:1.5;margin:0;">Switch to a tool (Spacing, Typography, Color, etc.) to batch-edit all selected elements.</p></div>`;
+      return;
+    }
+
+    // Single select — dimensions + box model
+    const rect = el.getBoundingClientRect();
+    const mt = computed.marginTop, mr = computed.marginRight, mb = computed.marginBottom, ml = computed.marginLeft;
+    const pt = computed.paddingTop, pr = computed.paddingRight, pb = computed.paddingBottom, pl = computed.paddingLeft;
+    const bw = computed.borderWidth;
+    const w = Math.round(rect.width), h = Math.round(rect.height);
+
+    // Contrast check
+    const fgColor = computed.color;
+    const bgColor = getEffectiveBgColor(el);
+    const ratio = contrastRatio(fgColor, bgColor);
+    const passAA = ratio >= 4.5;
+    const passAAA = ratio >= 7;
+    const badgeClass = passAA ? '__vi-a11y-pass' : '__vi-a11y-fail';
+    const badgeText = passAAA ? 'AAA' : passAA ? 'AA' : 'FAIL';
+
+    content.innerHTML = `
+      <div class="__vi-panel-body-wrapper">
+        <div class="__vi-section">
+          <div class="__vi-section-title">DIMENSIONS <button class="__vi-copy-btn" data-copy="${w}×${h}">⧉</button></div>
+          <div>${w} × ${h} px</div>
+        </div>
+        <div class="__vi-section">
+          <div class="__vi-section-title">BOX MODEL</div>
+          <div class="__vi-box-model">
+            <div class="__vi-bm-margin">
+              <span class="__vi-bm-label" style="top:2px;left:4px;">margin</span>
+              <span class="__vi-bm-val" style="top:0;left:50%;transform:translateX(-50%);">${pxVal(mt)}</span>
+              <span class="__vi-bm-val" style="right:2px;top:50%;transform:translateY(-50%);">${pxVal(mr)}</span>
+              <span class="__vi-bm-val" style="bottom:0;left:50%;transform:translateX(-50%);">${pxVal(mb)}</span>
+              <span class="__vi-bm-val" style="left:2px;top:50%;transform:translateY(-50%);">${pxVal(ml)}</span>
+              <div class="__vi-bm-border">
+                <span class="__vi-bm-label" style="top:2px;left:4px;">border</span>
+                <span class="__vi-bm-val" style="top:0;left:50%;transform:translateX(-50%);">${pxVal(bw)}</span>
+                <div class="__vi-bm-padding">
+                  <span class="__vi-bm-label" style="top:2px;left:4px;">padding</span>
+                  <span class="__vi-bm-val" style="top:0;left:50%;transform:translateX(-50%);">${pxVal(pt)}</span>
+                  <span class="__vi-bm-val" style="right:2px;top:50%;transform:translateY(-50%);">${pxVal(pr)}</span>
+                  <span class="__vi-bm-val" style="bottom:0;left:50%;transform:translateX(-50%);">${pxVal(pb)}</span>
+                  <span class="__vi-bm-val" style="left:2px;top:50%;transform:translateY(-50%);">${pxVal(pl)}</span>
+                  <div class="__vi-bm-content">${w}×${h}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="__vi-section">
+          <div class="__vi-section-title">LAYOUT</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px 12px;">
+            <div>Display: <span style="color:var(--vi-text)">${computed.display}</span></div>
+            <div>Position: <span style="color:var(--vi-text)">${computed.position}</span></div>
+            <div>Overflow: <span style="color:var(--vi-text)">${computed.overflow}</span></div>
+            <div>Z-index: <span style="color:var(--vi-text)">${computed.zIndex}</span></div>
+          </div>
+        </div>
+        <div class="__vi-section">
+          <div class="__vi-section-title">CONTRAST <span class="__vi-a11y-badge ${badgeClass}">${badgeText} ${ratio.toFixed(1)}:1</span></div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <div style="width:16px;height:16px;border-radius:50%;background:${fgColor};border:1px solid rgba(255,255,255,0.2)"></div>
+            <span>Text</span>
+            <button class="__vi-copy-btn" data-copy="${rgb2hex(fgColor)}">⧉</button>
+            <div style="width:16px;height:16px;border-radius:50%;background:${bgColor};border:1px solid rgba(255,255,255,0.2)"></div>
+            <span>Bg</span>
+            <button class="__vi-copy-btn" data-copy="${rgb2hex(bgColor)}">⧉</button>
+          </div>
+        </div>
+      </div>`;
+    bindCopyButtons(content);
+  }
+
+  function pxVal(v) {
+    const n = parseInt(v, 10);
+    return isNaN(n) ? '-' : n;
+  }
+
+  // ---- COMPUTED TAB ----
+  function renderComputedTab() {
+    if (state.selectedEls.length === 0) return;
+    const el = state.selectedEls[0];
+    const cs = window.getComputedStyle(el);
+    const content = state.ui.panelContent;
+    const importantProps = [
+      'display','position','top','right','bottom','left','width','height','min-width','max-width','min-height','max-height',
+      'margin','padding','border','border-radius','overflow','z-index','opacity',
+      'color','background-color','background','background-image',
+      'font-family','font-size','font-weight','line-height','letter-spacing','text-align','text-transform','text-decoration',
+      'flex-direction','flex-wrap','justify-content','align-items','gap','grid-template-columns','grid-template-rows',
+      'box-shadow','text-shadow','transform','filter','transition','animation','cursor','pointer-events','visibility',
+      'white-space','word-break','text-overflow'
+    ];
+    let html = `<div class="__vi-panel-body-wrapper"><input class="__vi-input" id="__vi-computed-search" placeholder="Filter properties..." style="margin-bottom:12px;">`;
+    importantProps.forEach(p => {
+      const k = p.replace(/-([a-z])/g, g => g[1].toUpperCase());
+      const v = cs[k] || '';
+      if (!v) return;
+      html += `<div class="__vi-computed-row" data-prop="${p}" style="display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.03);">
+        <span style="color:var(--vi-text-dim);font-size:10px;">${p}</span>
+        <span style="display:flex;align-items:center;gap:4px;"><span style="color:var(--vi-text);font-family:var(--vi-mono);font-size:10px;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${escAttr(v)}">${escAttr(v)}</span><button class="__vi-copy-btn" data-copy="${escAttr(v)}">⧉</button></span>
+      </div>`;
+    });
+    html += '</div>';
+    content.innerHTML = html;
+    bindCopyButtons(content);
+
+    // Search filter
+    const searchInput = document.getElementById('__vi-computed-search');
+    searchInput.addEventListener('input', () => {
+      const q = searchInput.value.toLowerCase();
+      content.querySelectorAll('.__vi-computed-row, [data-prop]').forEach(row => {
+        if (!row.dataset.prop) return;
+        row.style.display = row.dataset.prop.includes(q) ? '' : 'none';
+      });
+    });
+  }
+
+  // ---- MOVE TOOL ----
+  function renderMovePanel(el, computed, content) {
+    content.innerHTML = `<div class="__vi-panel-body-wrapper"><div class="__vi-section">
+      <div class="__vi-section-title">POSITION</div>
+      <p style="margin:0 0 12px;line-height:1.5;">Drag the element or use arrow keys to nudge.</p>
+      <div class="__vi-row"><label>Left</label><input class="__vi-input" data-prop="left" value="${el.style.left || computed.left}"></div>
+      <div class="__vi-row"><label>Top</label><input class="__vi-input" data-prop="top" value="${el.style.top || computed.top}"></div>
+      <div class="__vi-row"><label>Position</label>
+        <select class="__vi-input" data-prop="position">
+          <option value="static" ${computed.position==='static'?'selected':''}>static</option>
+          <option value="relative" ${computed.position==='relative'?'selected':''}>relative</option>
+          <option value="absolute" ${computed.position==='absolute'?'selected':''}>absolute</option>
+          <option value="fixed" ${computed.position==='fixed'?'selected':''}>fixed</option>
+          <option value="sticky" ${computed.position==='sticky'?'selected':''}>sticky</option>
+        </select>
+      </div>
+      <p style="font-size:10px;margin:8px 0 0;">Arrow keys = 1px, Shift+Arrow = 10px</p>
+    </div></div>`;
+    attachInputHandlers(el);
+  }
+
+  // ---- SPACING TOOL (with box model diagram) ----
+  function renderSpacingPanel(el, computed, content) {
+    const isFlex = computed.display === 'flex' || computed.display === 'inline-flex';
+    const isGrid = computed.display === 'grid' || computed.display === 'inline-grid';
+    const flexGridSection = (isFlex || isGrid) ? `
+      <div class="__vi-section">
+        <div class="__vi-section-title">${isFlex ? 'FLEXBOX' : 'GRID'}</div>
+        ${isFlex ? `
+        <div class="__vi-row"><label>Direction</label>
+          <select class="__vi-input" data-prop="flexDirection">${['row','row-reverse','column','column-reverse'].map(v=>`<option value="${v}" ${computed.flexDirection===v?'selected':''}>${v}</option>`).join('')}</select></div>
+        <div class="__vi-row"><label>Wrap</label>
+          <select class="__vi-input" data-prop="flexWrap">${['nowrap','wrap','wrap-reverse'].map(v=>`<option value="${v}" ${computed.flexWrap===v?'selected':''}>${v}</option>`).join('')}</select></div>
+        ` : `
+        <div class="__vi-row"><label>Columns</label><input class="__vi-input" data-prop="gridTemplateColumns" value="${el.style.gridTemplateColumns || ''}" placeholder="1fr 1fr 1fr"></div>
+        <div class="__vi-row"><label>Rows</label><input class="__vi-input" data-prop="gridTemplateRows" value="${el.style.gridTemplateRows || ''}" placeholder="auto"></div>
+        `}
+        <div class="__vi-row"><label>Justify</label>
+          <select class="__vi-input" data-prop="justifyContent">${['flex-start','flex-end','center','space-between','space-around','space-evenly','stretch'].map(v=>`<option value="${v}" ${computed.justifyContent===v?'selected':''}>${v}</option>`).join('')}</select></div>
+        <div class="__vi-row"><label>Align</label>
+          <select class="__vi-input" data-prop="alignItems">${['stretch','flex-start','flex-end','center','baseline'].map(v=>`<option value="${v}" ${computed.alignItems===v?'selected':''}>${v}</option>`).join('')}</select></div>
+        <div class="__vi-row"><label>Align Content</label>
+          <select class="__vi-input" data-prop="alignContent">${['normal','flex-start','flex-end','center','space-between','space-around','stretch'].map(v=>`<option value="${v}" ${computed.alignContent===v?'selected':''}>${v}</option>`).join('')}</select></div>
+      </div>` : '';
+
+    content.innerHTML = `<div class="__vi-panel-body-wrapper">
+      <div class="__vi-section">
+        <div class="__vi-section-title">MARGIN</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+          <label style="display:flex;flex-direction:column;gap:4px;">Top <input class="__vi-input" data-prop="marginTop" value="${computed.marginTop}"></label>
+          <label style="display:flex;flex-direction:column;gap:4px;">Right <input class="__vi-input" data-prop="marginRight" value="${computed.marginRight}"></label>
+          <label style="display:flex;flex-direction:column;gap:4px;">Bottom <input class="__vi-input" data-prop="marginBottom" value="${computed.marginBottom}"></label>
+          <label style="display:flex;flex-direction:column;gap:4px;">Left <input class="__vi-input" data-prop="marginLeft" value="${computed.marginLeft}"></label>
+        </div>
+      </div>
+      <div class="__vi-section">
+        <div class="__vi-section-title">PADDING</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+          <label style="display:flex;flex-direction:column;gap:4px;">Top <input class="__vi-input" data-prop="paddingTop" value="${computed.paddingTop}"></label>
+          <label style="display:flex;flex-direction:column;gap:4px;">Right <input class="__vi-input" data-prop="paddingRight" value="${computed.paddingRight}"></label>
+          <label style="display:flex;flex-direction:column;gap:4px;">Bottom <input class="__vi-input" data-prop="paddingBottom" value="${computed.paddingBottom}"></label>
+          <label style="display:flex;flex-direction:column;gap:4px;">Left <input class="__vi-input" data-prop="paddingLeft" value="${computed.paddingLeft}"></label>
+        </div>
+      </div>
+      <div class="__vi-section">
+        <div class="__vi-section-title">SIZE</div>
+        <div class="__vi-row"><label>Width</label><input class="__vi-input" data-prop="width" value="${computed.width}"></div>
+        <div class="__vi-row"><label>Height</label><input class="__vi-input" data-prop="height" value="${computed.height}"></div>
+        <div class="__vi-row"><label>Display</label>
+          <select class="__vi-input" data-prop="display">
+            ${['block','inline','inline-block','flex','inline-flex','grid','inline-grid','none'].map(v => `<option value="${v}" ${computed.display===v?'selected':''}>${v}</option>`).join('')}
+          </select>
+        </div>
+        <div class="__vi-row"><label>Gap</label><input class="__vi-input" data-prop="gap" value="${computed.gap === 'normal' ? '' : computed.gap}" placeholder="e.g. 16px"></div>
+      </div>
+      ${flexGridSection}
+    </div>`;
+    attachInputHandlers(el);
+  }
+
+  // ---- TYPOGRAPHY TOOL ----
+  function renderTypographyPanel(el, computed, content) {
+    const googleFonts = ['Inter','Roboto','Open Sans','Lato','Montserrat','Oswald','Raleway','PT Sans','Merriweather','Nunito','Ubuntu','Playfair Display','Rubik','Work Sans','Poppins','Fira Sans','Quicksand','Karla','Barlow','Mulish','DM Sans','Space Grotesk','Outfit','Cinzel','Bebas Neue','Josefin Sans','Cabin','Anton','Dancing Script','Pacifico','Caveat','Abril Fatface'];
+    let fontOpts = `<option value="${computed.fontFamily.replace(/"/g, '&quot;')}">${computed.fontFamily.split(',')[0].replace(/"/g, '')}</option>
+      <option value="inherit">Inherit</option><option disabled>── System ──</option>
+      <option value="Arial, sans-serif">Arial</option><option value="'Helvetica Neue', sans-serif">Helvetica Neue</option>
+      <option value="'Segoe UI', sans-serif">Segoe UI</option><option value="Georgia, serif">Georgia</option>
+      <option value="'Courier New', monospace">Courier New</option><option value="Verdana, sans-serif">Verdana</option>
+      <option disabled>── Google ──</option>`;
+    googleFonts.forEach(f => { fontOpts += `<option value="'${f}', sans-serif">${f}</option>`; });
+
+    content.innerHTML = `<div class="__vi-panel-body-wrapper">
+      <div class="__vi-row"><label>Family</label><select class="__vi-input" data-prop="fontFamily" data-googlefont="true">${fontOpts}</select></div>
+      <div class="__vi-row"><label>Size</label><input class="__vi-input" data-prop="fontSize" value="${computed.fontSize}"></div>
+      <div class="__vi-row"><label>Weight</label><input class="__vi-input" data-prop="fontWeight" value="${computed.fontWeight}"></div>
+      <div class="__vi-row"><label>Line Ht</label><input class="__vi-input" data-prop="lineHeight" value="${computed.lineHeight}"></div>
+      <div class="__vi-row"><label>Spacing</label><input class="__vi-input" data-prop="letterSpacing" value="${computed.letterSpacing}"></div>
+      <div class="__vi-row"><label>Word Sp</label><input class="__vi-input" data-prop="wordSpacing" value="${computed.wordSpacing}"></div>
+      <div class="__vi-row"><label>Align</label>
+        <select class="__vi-input" data-prop="textAlign">${['left','center','right','justify'].map(v=>`<option value="${v}" ${computed.textAlign===v?'selected':''}>${v}</option>`).join('')}</select></div>
+      <div class="__vi-row"><label>Transform</label>
+        <select class="__vi-input" data-prop="textTransform">${['none','uppercase','lowercase','capitalize'].map(v=>`<option value="${v}" ${computed.textTransform===v?'selected':''}>${v}</option>`).join('')}</select></div>
+      <div class="__vi-row"><label>Decor</label>
+        <select class="__vi-input" data-prop="textDecorationLine">${['none','underline','overline','line-through'].map(v=>`<option value="${v}" ${computed.textDecorationLine===v?'selected':''}>${v}</option>`).join('')}</select></div>
+      <div class="__vi-row"><label>Color</label><input type="color" class="__vi-input" style="padding:0;height:26px;" data-prop="color" value="${rgb2hex(computed.color)}"></div>
+    </div>`;
+    attachInputHandlers(el);
+  }
+
+  // ---- COLOR TOOL (with eyedropper + gradient) ----
+  function renderColorPanel(el, computed, content) {
+    const hasEyeDropper = typeof window.EyeDropper !== 'undefined';
+    content.innerHTML = `<div class="__vi-panel-body-wrapper">
+      <div class="__vi-section">
+        <div class="__vi-section-title">FILL</div>
+        <div class="__vi-row"><label>Bg Color</label><input type="color" class="__vi-input" style="padding:0;height:26px;" data-prop="backgroundColor" value="${rgb2hex(computed.backgroundColor)}">
+          <button class="__vi-copy-btn" data-copy="${rgb2hex(computed.backgroundColor)}">⧉</button></div>
+        <div class="__vi-row"><label>Text</label><input type="color" class="__vi-input" style="padding:0;height:26px;" data-prop="color" value="${rgb2hex(computed.color)}">
+          <button class="__vi-copy-btn" data-copy="${rgb2hex(computed.color)}">⧉</button></div>
+        <div class="__vi-row"><label>Opacity</label><input type="range" class="__vi-input" data-prop="opacity" min="0" max="1" step="0.05" value="${computed.opacity}"></div>
+        ${hasEyeDropper ? '<button class="__vi-copy-btn" id="__vi-eyedropper" style="width:100%;padding:6px;text-align:center;font-size:11px;cursor:pointer;margin-top:4px;">🔍 Pick Color (Eyedropper)</button>' : ''}
+      </div>
+      <div class="__vi-section">
+        <div class="__vi-section-title">GRADIENT</div>
+        <div class="__vi-row"><label>Background</label><input class="__vi-input" data-prop="background" value="${el.style.background || ''}" placeholder="linear-gradient(135deg, #667eea, #764ba2)"></div>
+        <div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:4px;">
+          ${['linear-gradient(135deg, #667eea 0%, #764ba2 100%)','linear-gradient(135deg, #f093fb 0%, #f5576c 100%)','linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)','linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)','linear-gradient(135deg, #fa709a 0%, #fee140 100%)','linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%)']
+          .map(g => `<div class="__vi-gradient-preset" style="width:32px;height:20px;border-radius:4px;cursor:pointer;background:${g};border:1px solid var(--vi-border);" data-gradient="${g}"></div>`).join('')}
+        </div>
+      </div>
+    </div>`;
+    attachInputHandlers(el);
+    bindCopyButtons(content);
+
+    // Eyedropper
+    if (hasEyeDropper) {
+      const btn = document.getElementById('__vi-eyedropper');
+      if (btn) btn.addEventListener('click', async () => {
+        try {
+          const dropper = new EyeDropper();
+          const result = await dropper.open();
+          showToast('Picked: ' + result.sRGBHex, 'success');
+          copyText(result.sRGBHex);
+        } catch (e) { /* user cancelled */ }
+      });
+    }
+
+    // Gradient presets
+    content.querySelectorAll('.__vi-gradient-preset, [data-gradient]').forEach(preset => {
+      if (!preset.dataset.gradient) return;
+      preset.addEventListener('click', () => {
+        state.selectedEls.forEach(t => applyChange(t, 'background', preset.dataset.gradient));
+        renderPanelForCurrentTool();
+      });
+    });
+  }
+
+  // ---- BORDER TOOL ----
+  function renderBorderPanel(el, computed, content) {
+    content.innerHTML = `<div class="__vi-panel-body-wrapper">
+      <div class="__vi-section">
+        <div class="__vi-section-title">RADIUS</div>
+        <div class="__vi-row"><label>All</label><input class="__vi-input" data-prop="borderRadius" value="${computed.borderRadius}"></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+          <div class="__vi-row" style="margin:0"><label>TL</label><input class="__vi-input" data-prop="borderTopLeftRadius" value="${computed.borderTopLeftRadius}"></div>
+          <div class="__vi-row" style="margin:0"><label>TR</label><input class="__vi-input" data-prop="borderTopRightRadius" value="${computed.borderTopRightRadius}"></div>
+          <div class="__vi-row" style="margin:0"><label>BL</label><input class="__vi-input" data-prop="borderBottomLeftRadius" value="${computed.borderBottomLeftRadius}"></div>
+          <div class="__vi-row" style="margin:0"><label>BR</label><input class="__vi-input" data-prop="borderBottomRightRadius" value="${computed.borderBottomRightRadius}"></div>
+        </div>
+      </div>
+      <div class="__vi-section">
+        <div class="__vi-section-title">BORDER</div>
+        <div class="__vi-row"><label>Width</label><input class="__vi-input" data-prop="borderWidth" value="${computed.borderWidth}"></div>
+        <div class="__vi-row"><label>Style</label>
+          <select class="__vi-input" data-prop="borderStyle">${['none','solid','dashed','dotted','double','groove','ridge','inset','outset'].map(v=>`<option value="${v}" ${computed.borderStyle===v?'selected':''}>${v}</option>`).join('')}</select></div>
+        <div class="__vi-row"><label>Color</label><input type="color" class="__vi-input" style="padding:0;height:26px;" data-prop="borderColor" value="${rgb2hex(computed.borderColor)}"></div>
+      </div>
+      <div class="__vi-section">
+        <div class="__vi-section-title">BOX SHADOW</div>
+        <div class="__vi-row"><label>Shadow</label><input class="__vi-input" data-prop="boxShadow" value="${computed.boxShadow==='none'?'':computed.boxShadow}" placeholder="0px 4px 12px rgba(0,0,0,0.1)"></div>
+        <div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:4px;">
+          ${['0 2px 8px rgba(0,0,0,0.08)','0 4px 16px rgba(0,0,0,0.12)','0 8px 32px rgba(0,0,0,0.16)','0 20px 40px rgba(0,0,0,0.2)','inset 0 2px 4px rgba(0,0,0,0.1)','0 0 0 3px rgba(0,229,204,0.3)']
+          .map((s,i) => `<button class="__vi-copy-btn __vi-shadow-preset" data-shadow="${s}" style="padding:4px 6px;font-size:9px;">S${i+1}</button>`).join('')}
+        </div>
+      </div>
+      <div>
+        <div class="__vi-section-title">TEXT SHADOW</div>
+        <div class="__vi-row"><label>Shadow</label><input class="__vi-input" data-prop="textShadow" value="${computed.textShadow==='none'?'':computed.textShadow}" placeholder="1px 1px 2px rgba(0,0,0,0.3)"></div>
+      </div>
+    </div>`;
+    attachInputHandlers(el);
+    // Shadow presets
+    content.querySelectorAll('.__vi-shadow-preset').forEach(btn => {
+      btn.addEventListener('click', () => {
+        state.selectedEls.forEach(t => applyChange(t, 'boxShadow', btn.dataset.shadow));
+        renderPanelForCurrentTool();
+      });
+    });
+  }
+
+  // ---- EFFECTS TOOL ----
+  function parseFilterValues(filterStr) {
+    const defaults = { blur: 0, brightness: 1, contrast: 1, grayscale: 0, sepia: 0, saturate: 1, 'hue-rotate': 0, invert: 0 };
+    if (!filterStr || filterStr === 'none') return defaults;
+    const regex = /(blur|brightness|contrast|grayscale|sepia|saturate|hue-rotate|invert)\(([^)]+)\)/g;
+    let m;
+    while ((m = regex.exec(filterStr)) !== null) {
+      let val = parseFloat(m[2]);
+      if (m[1] === 'blur') val = parseFloat(m[2]); // px
+      if (m[1] === 'hue-rotate') val = parseFloat(m[2]); // deg
+      defaults[m[1]] = val;
+    }
+    return defaults;
+  }
+
+  function buildFilterString(vals) {
+    const parts = [];
+    if (vals.blur !== 0) parts.push(`blur(${vals.blur}px)`);
+    if (vals.brightness !== 1) parts.push(`brightness(${vals.brightness})`);
+    if (vals.contrast !== 1) parts.push(`contrast(${vals.contrast})`);
+    if (vals.grayscale !== 0) parts.push(`grayscale(${vals.grayscale})`);
+    if (vals.sepia !== 0) parts.push(`sepia(${vals.sepia})`);
+    if (vals.saturate !== 1) parts.push(`saturate(${vals.saturate})`);
+    if (vals['hue-rotate'] !== 0) parts.push(`hue-rotate(${vals['hue-rotate']}deg)`);
+    if (vals.invert !== 0) parts.push(`invert(${vals.invert})`);
+    return parts.length ? parts.join(' ') : 'none';
+  }
+
+  function renderEffectsPanel(el, computed, content) {
+    const fv = parseFilterValues(computed.filter);
+    content.innerHTML = `<div class="__vi-panel-body-wrapper">
+      <div class="__vi-section">
+        <div class="__vi-section-title">TRANSFORM</div>
+        <div class="__vi-row"><label>Transform</label><input class="__vi-input" data-prop="transform" value="${computed.transform==='none'?'':computed.transform}" placeholder="scale(1.1) rotate(5deg)"></div>
+        <div class="__vi-row"><label>Origin</label><input class="__vi-input" data-prop="transformOrigin" value="${computed.transformOrigin}"></div>
+      </div>
+      <div class="__vi-section">
+        <div class="__vi-section-title">FILTER</div>
+        <div class="__vi-row"><label>Filter</label><input class="__vi-input" data-prop="filter" value="${computed.filter==='none'?'':computed.filter}" placeholder="blur(4px) brightness(1.1)"></div>
+        <div class="__vi-row"><label>Backdrop</label><input class="__vi-input" data-prop="backdropFilter" value="${computed.backdropFilter==='none'?'':computed.backdropFilter}" placeholder="blur(10px)"></div>
+        <div class="__vi-section-title" style="margin-top:6px;">FILTER SLIDERS</div>
+        <div class="__vi-row"><label>Blur</label><input type="range" class="__vi-input __vi-filter-slider" data-fname="blur" min="0" max="20" step="0.5" value="${fv.blur}"><span class="__vi-filter-val">${fv.blur}px</span></div>
+        <div class="__vi-row"><label>Bright</label><input type="range" class="__vi-input __vi-filter-slider" data-fname="brightness" min="0" max="3" step="0.05" value="${fv.brightness}"><span class="__vi-filter-val">${fv.brightness}</span></div>
+        <div class="__vi-row"><label>Contrast</label><input type="range" class="__vi-input __vi-filter-slider" data-fname="contrast" min="0" max="3" step="0.05" value="${fv.contrast}"><span class="__vi-filter-val">${fv.contrast}</span></div>
+        <div class="__vi-row"><label>Gray</label><input type="range" class="__vi-input __vi-filter-slider" data-fname="grayscale" min="0" max="1" step="0.05" value="${fv.grayscale}"><span class="__vi-filter-val">${fv.grayscale}</span></div>
+        <div class="__vi-row"><label>Sepia</label><input type="range" class="__vi-input __vi-filter-slider" data-fname="sepia" min="0" max="1" step="0.05" value="${fv.sepia}"><span class="__vi-filter-val">${fv.sepia}</span></div>
+        <div class="__vi-row"><label>Saturate</label><input type="range" class="__vi-input __vi-filter-slider" data-fname="saturate" min="0" max="4" step="0.05" value="${fv.saturate}"><span class="__vi-filter-val">${fv.saturate}</span></div>
+        <div class="__vi-row"><label>Hue</label><input type="range" class="__vi-input __vi-filter-slider" data-fname="hue-rotate" min="0" max="360" step="1" value="${fv['hue-rotate']}"><span class="__vi-filter-val">${fv['hue-rotate']}°</span></div>
+        <div class="__vi-row"><label>Invert</label><input type="range" class="__vi-input __vi-filter-slider" data-fname="invert" min="0" max="1" step="0.05" value="${fv.invert}"><span class="__vi-filter-val">${fv.invert}</span></div>
+      </div>
+      <div class="__vi-section">
+        <div class="__vi-section-title">BLEND</div>
+        <div class="__vi-row"><label>Mix Blend</label>
+          <select class="__vi-input" data-prop="mixBlendMode">${['normal','multiply','screen','overlay','darken','lighten','color-dodge','color-burn','hard-light','soft-light','difference','exclusion','hue','saturation','color','luminosity'].map(v=>`<option value="${v}" ${computed.mixBlendMode===v?'selected':''}>${v}</option>`).join('')}</select></div>
+      </div>
+      <div>
+        <div class="__vi-section-title">VISIBILITY</div>
+        <div class="__vi-row"><label>Overflow</label>
+          <select class="__vi-input" data-prop="overflow">${['visible','hidden','scroll','auto','clip'].map(v=>`<option value="${v}" ${computed.overflow===v?'selected':''}>${v}</option>`).join('')}</select></div>
+        <div class="__vi-row"><label>Cursor</label>
+          <select class="__vi-input" data-prop="cursor">${['auto','default','pointer','move','text','wait','crosshair','not-allowed','grab','grabbing'].map(v=>`<option value="${v}" ${computed.cursor===v?'selected':''}>${v}</option>`).join('')}</select></div>
+      </div>
+    </div>`;
+    attachInputHandlers(el);
+    // Filter sliders
+    content.querySelectorAll('.__vi-filter-slider').forEach(slider => {
+      slider.addEventListener('input', () => {
+        const currentFilter = el.style.filter || computed.filter;
+        const vals = parseFilterValues(currentFilter);
+        vals[slider.dataset.fname] = parseFloat(slider.value);
+        const filterStr = buildFilterString(vals);
+        const unit = slider.dataset.fname === 'blur' ? 'px' : (slider.dataset.fname === 'hue-rotate' ? '°' : '');
+        slider.nextElementSibling.textContent = slider.value + unit;
+        state.selectedEls.forEach(t => t.style.filter = filterStr);
+      });
+      slider.addEventListener('change', () => {
+        const currentFilter = el.style.filter || computed.filter;
+        const vals = parseFilterValues(currentFilter);
+        vals[slider.dataset.fname] = parseFloat(slider.value);
+        const filterStr = buildFilterString(vals);
+        state.selectedEls.forEach(t => applyChange(t, 'filter', filterStr));
+      });
+    });
+  }
+
+  // ---- ANIMATION TOOL ----
+  function renderAnimationPanel(el, computed, content) {
+    const easings = ['ease','ease-in','ease-out','ease-in-out','linear','cubic-bezier(0.25,0.46,0.45,0.94)','cubic-bezier(0.68,-0.55,0.27,1.55)','cubic-bezier(0.22,1,0.36,1)'];
+    content.innerHTML = `<div class="__vi-panel-body-wrapper">
+      <div class="__vi-section">
+        <div class="__vi-section-title">TRANSITION</div>
+        <div class="__vi-row"><label>Property</label><input class="__vi-input" data-prop="transitionProperty" value="${computed.transitionProperty==='all'?'':computed.transitionProperty}" placeholder="all"></div>
+        <div class="__vi-row"><label>Duration</label><input class="__vi-input" data-prop="transitionDuration" value="${computed.transitionDuration==='0s'?'':computed.transitionDuration}" placeholder="0.3s"></div>
+        <div class="__vi-row"><label>Timing</label>
+          <select class="__vi-input" data-prop="transitionTimingFunction">
+            ${easings.map(e => `<option value="${e}" ${computed.transitionTimingFunction===e?'selected':''}>${e.includes('cubic')?'cubic...':e}</option>`).join('')}
+          </select></div>
+        <div class="__vi-row"><label>Delay</label><input class="__vi-input" data-prop="transitionDelay" value="${computed.transitionDelay==='0s'?'':computed.transitionDelay}" placeholder="0s"></div>
+      </div>
+      <div>
+        <div class="__vi-section-title">ANIMATION</div>
+        <div class="__vi-row"><label>Name</label><input class="__vi-input" data-prop="animationName" value="${computed.animationName==='none'?'':computed.animationName}"></div>
+        <div class="__vi-row"><label>Duration</label><input class="__vi-input" data-prop="animationDuration" value="${computed.animationDuration==='0s'?'':computed.animationDuration}" placeholder="1s"></div>
+        <div class="__vi-row"><label>Timing</label>
+          <select class="__vi-input" data-prop="animationTimingFunction">
+            ${easings.map(e => `<option value="${e}" ${computed.animationTimingFunction===e?'selected':''}>${e.includes('cubic')?'cubic...':e}</option>`).join('')}
+          </select></div>
+        <div class="__vi-row"><label>Iteration</label><input class="__vi-input" data-prop="animationIterationCount" value="${computed.animationIterationCount==='1'?'':computed.animationIterationCount}" placeholder="infinite"></div>
+        <div class="__vi-row"><label>Direction</label>
+          <select class="__vi-input" data-prop="animationDirection">${['normal','reverse','alternate','alternate-reverse'].map(v=>`<option value="${v}" ${computed.animationDirection===v?'selected':''}>${v}</option>`).join('')}</select></div>
+        <div class="__vi-row"><label>Fill</label>
+          <select class="__vi-input" data-prop="animationFillMode">${['none','forwards','backwards','both'].map(v=>`<option value="${v}" ${computed.animationFillMode===v?'selected':''}>${v}</option>`).join('')}</select></div>
+      </div>
+    </div>`;
+    attachInputHandlers(el);
+  }
+
+  // ---- TOKENS TOOL (enhanced) ----
+  function renderTokensPanel(content) {
+    const allEls = document.querySelectorAll('*');
+    const colors = new Map(); // color -> count
+    const fonts = new Map();
+    const spacings = new Map();
+    const cssVars = new Map();
+
+    // Extract CSS custom properties from :root
+    const rootStyles = window.getComputedStyle(document.documentElement);
+    for (const sheet of document.styleSheets) {
+      try {
+        for (const rule of sheet.cssRules) {
+          if (rule.selectorText === ':root' || rule.selectorText === 'html') {
+            for (let i = 0; i < rule.style.length; i++) {
+              const prop = rule.style[i];
+              if (prop.startsWith('--') && !prop.startsWith('--vi-')) {
+                cssVars.set(prop, rule.style.getPropertyValue(prop).trim());
+              }
+            }
+          }
+        }
+      } catch (e) { /* cross-origin sheet */ }
+    }
+
+    allEls.forEach(el => {
+      if (el.closest('#__vi-root')) return;
+      const cs = window.getComputedStyle(el);
+      const c = rgb2hex(cs.color);
+      const bg = rgb2hex(cs.backgroundColor);
+      if (cs.color && cs.color !== 'rgba(0, 0, 0, 0)') colors.set(c, (colors.get(c) || 0) + 1);
+      if (cs.backgroundColor && cs.backgroundColor !== 'rgba(0, 0, 0, 0)' && cs.backgroundColor !== 'transparent') colors.set(bg, (colors.get(bg) || 0) + 1);
+      if (cs.fontFamily) {
+        const fam = cs.fontFamily.replace(/"/g, '').split(',')[0].trim();
+        fonts.set(fam, (fonts.get(fam) || 0) + 1);
+      }
+      ['marginTop','marginBottom','paddingTop','paddingBottom','gap'].forEach(p => {
+        const v = cs[p];
+        if (v && v !== '0px' && v !== 'normal') spacings.set(v, (spacings.get(v) || 0) + 1);
+      });
+    });
+
+    const sortedColors = [...colors.entries()].sort((a, b) => b[1] - a[1]);
+    const sortedFonts = [...fonts.entries()].sort((a, b) => b[1] - a[1]);
+    const sortedSpacings = [...spacings.entries()].sort((a, b) => b[1] - a[1]).slice(0, 12);
+
+    let colorHtml = sortedColors.map(([c, n]) => `<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;cursor:pointer;" class="__vi-token-color" data-val="${escAttr(c)}"><div style="width:16px;height:16px;border-radius:50%;background:${c};border:1px solid rgba(255,255,255,0.2);flex-shrink:0;"></div><span>${escAttr(c)}</span><span style="opacity:0.4;font-size:9px;margin-left:auto;">×${n}</span></div>`).join('');
+    let fontHtml = sortedFonts.map(([f, n]) => `<div style="margin-bottom:4px;display:flex;justify-content:space-between;"><span style="font-family:${escAttr(f)};color:var(--vi-text);">${escAttr(f)}</span><span style="opacity:0.4;font-size:9px;">×${n}</span></div>`).join('');
+    let spacingHtml = sortedSpacings.map(([s, n]) => `<div style="display:flex;justify-content:space-between;margin-bottom:2px;"><span>${escAttr(s)}</span><span style="opacity:0.4;font-size:9px;">×${n}</span></div>`).join('');
+    let varsHtml = [...cssVars.entries()].map(([k, v]) => `<div style="display:flex;align-items:center;gap:4px;margin-bottom:4px;font-size:10px;" class="__vi-var-row">
+      <span style="color:var(--vi-accent);flex-shrink:0;min-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${escAttr(k)}">${escAttr(k)}</span>
+      <input class="__vi-input __vi-var-input" data-varname="${escAttr(k)}" value="${escAttr(v)}" style="flex:1;font-size:10px;padding:2px 4px;">
+    </div>`).join('');
+
+    content.innerHTML = `<div class="__vi-panel-body-wrapper">
+      <div class="__vi-section"><div class="__vi-section-title">COLORS (${sortedColors.length})</div><div style="max-height:150px;overflow-y:auto;">${colorHtml || 'None'}</div></div>
+      <div class="__vi-section"><div class="__vi-section-title">FONTS (${sortedFonts.length})</div><div style="max-height:100px;overflow-y:auto;">${fontHtml || 'None'}</div></div>
+      <div class="__vi-section"><div class="__vi-section-title">SPACINGS</div><div style="max-height:100px;overflow-y:auto;">${spacingHtml || 'None'}</div></div>
+      ${varsHtml ? `<div class="__vi-section"><div class="__vi-section-title">CSS VARIABLES (editable)</div><div style="max-height:160px;overflow-y:auto;">${varsHtml}</div></div>` : ''}
+    </div>`;
+
+    // Click to copy color token
+    content.querySelectorAll('.__vi-token-color').forEach(row => {
+      row.addEventListener('click', () => copyText(row.dataset.val));
+    });
+
+    // Editable CSS variables
+    content.querySelectorAll('.__vi-var-input').forEach(input => {
+      input.addEventListener('change', () => {
+        const varName = input.dataset.varname;
+        const newVal = input.value;
+        const el = document.documentElement;
+        const oldVal = el.style.getPropertyValue(varName) || window.getComputedStyle(el).getPropertyValue(varName) || '';
+        if (!state.originalStyles.has(el)) state.originalStyles.set(el, new Map());
+        const origMap = state.originalStyles.get(el);
+        if (!origMap.has(varName)) origMap.set(varName, oldVal);
+        el.style.setProperty(varName, newVal);
+        state.undoStack.push({ el, prop: varName, oldVal, newVal });
+        state.redoStack = [];
+        updateUndoRedoUI();
+        showToast(`${varName} updated`, 'success');
+      });
+    });
+  }
+
+  // ============================================================
+  // INPUT HANDLERS (shared)
+  // ============================================================
+
+  // Returns the display value for a CSS property across multi-selected elements.
+  // If all selected elements have the same value, returns that value.
+  // If values differ, returns '' and sets the placeholder attribute on the input.
+  function multiVal(prop) {
+    if (state.selectedEls.length <= 1) return null; // use normal computed value
+    const vals = state.selectedEls.map(el => window.getComputedStyle(el)[prop]);
+    return vals.every(v => v === vals[0]) ? null : ''; // null = not mixed, '' = mixed
+  }
+
+  function attachInputHandlers(el) {
+    const inputs = state.ui.panelContent.querySelectorAll('input[data-prop], select[data-prop]');
+    inputs.forEach(input => {
+      // Mark mixed-value inputs when multi-selecting
+      if (state.selectedEls.length > 1) {
+        const prop = input.getAttribute('data-prop');
+        const mv = multiVal(prop);
+        if (mv !== null) {
+          if (input.tagName === 'INPUT') {
+            input.value = '';
+            input.placeholder = '(mixed)';
+            input.style.fontStyle = 'italic';
+            input.style.opacity = '0.7';
+          }
+        }
+      }
+      input.addEventListener('change', (e) => {
+        const prop = input.getAttribute('data-prop');
+        const val = e.target.value;
+        if (input.getAttribute('data-googlefont') === 'true' && val.includes("', sans-serif")) {
+          const fontName = val.split("'")[1];
+          if (fontName && !document.getElementById('__vi-font-' + fontName.replace(/\s+/g, ''))) {
+            const s = document.createElement('style');
+            s.id = '__vi-font-' + fontName.replace(/\s+/g, '');
+            s.textContent = `@import url('https://fonts.googleapis.com/css2?family=${fontName.replace(/\s+/g, '+')}:wght@100..900&display=swap');`;
+            document.head.appendChild(s);
+          }
+        }
+        state.selectedEls.forEach(t => applyChange(t, prop, val));
+      });
+      if (input.type === 'range' || input.type === 'color') {
+        let startVals = new Map();
+        const captureStartVals = () => {
+          const prop = input.getAttribute('data-prop');
+          state.selectedEls.forEach(t => {
+            const inline = t.style[prop];
+            const computed = window.getComputedStyle(t)[prop];
+            startVals.set(t, inline || computed || '');
+          });
+        };
+        input.addEventListener('pointerdown', () => {
+          captureStartVals();
+        });
+        input.addEventListener('keydown', (e) => {
+          if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End', 'PageUp', 'PageDown'].includes(e.key) && startVals.size === 0) {
+            captureStartVals();
+          }
+        });
+        input.addEventListener('input', (e) => {
+          state.selectedEls.forEach(t => t.style[input.getAttribute('data-prop')] = e.target.value);
+        });
+        input.addEventListener('change', (e) => {
+          const prop = input.getAttribute('data-prop');
+          if (startVals.size === 0) captureStartVals();
+          state.selectedEls.forEach(t => {
+            const prev = startVals.has(t) ? startVals.get(t) : (t.style[prop] || window.getComputedStyle(t)[prop] || '');
+            t.style[prop] = prev;
+            applyChange(t, prop, e.target.value);
+          });
+          startVals.clear();
+        });
+      }
+    });
+  }
+
+  function bindCopyButtons(container) {
+    container.querySelectorAll('.__vi-copy-btn[data-copy]').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        copyText(btn.dataset.copy);
+      });
+    });
+  }
+
+  // ============================================================
+  // CSS EXPORT
+  // ============================================================
+  function bindExport() {
+    document.getElementById('__vi-btn-export').addEventListener('click', () => generateCSSExport(false));
+  }
+
+  function generateCSSExport(saveOnly = false) {
+    let css = "/* 🔮 StyleSession Export */\n\n";
+    const changes = collectSessionChanges();
+    let count = 0;
+    changes.forEach(change => {
+      const entries = Object.entries(change.styles);
+      if (!entries.length) return;
+      const block = entries.map(([p, v]) => `  ${p}: ${v};`).join('\n');
+      css += `${change.selector} {\n${block}\n}\n\n`;
+      count++;
+    });
+    if (saveOnly) {
+      // Collect annotations
+      const notes = [];
+      document.querySelectorAll('.__vi-note').forEach(note => {
+        const ta = note.querySelector('textarea');
+        if (ta && ta.value.trim()) {
+          notes.push({ x: note.style.left, y: note.style.top, text: ta.value });
+        }
+      });
+      // Collect injected CSS
+      const injectedStyle = document.getElementById('__vi-injected-css');
+      const injectedCSS = injectedStyle ? injectedStyle.textContent : '';
+      // Collect text edits
+      const textChanges = collectTextChanges();
+      const hasData = count > 0 || notes.length > 0 || injectedCSS || textChanges.length > 0;
+      if (hasData) {
+        const payload = {
+          version: 2,
+          date: new Date().toISOString(),
+          changes,
+          css
+        };
+        if (notes.length > 0) payload.notes = notes;
+        if (injectedCSS) payload.injectedCSS = injectedCSS;
+        if (textChanges.length > 0) payload.textChanges = textChanges;
+        localStorage.setItem('__vi_session', JSON.stringify(payload));
+        showToast('Session saved', 'success');
+      }
+      else showToast('Nothing to save', 'warn');
+      return;
+    }
+    if (count === 0) { showToast('No changes to export!', 'warn'); return; }
+    navigator.clipboard.writeText(css).then(() => { showToast('CSS copied to clipboard!', 'success'); }).catch(() => showToast('Copy failed', 'error'));
+  }
+
+  // ============================================================
+  // KEYBOARD SHORTCUTS
+  // ============================================================
+  function bindKeyboardEvents() {
+    window.addEventListener('keydown', (e) => {
+      if (!state.active) {
+        // Allow re-enable with Ctrl+Shift+I
+        if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key.toLowerCase() === 'i') { togglePower(); e.preventDefault(); }
+        return;
+      }
+      // Don't intercept when typing in inputs (except Escape)
+      const inInput = e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT';
+      if (inInput && e.key !== 'Escape') return;
+
+      // Escape: close palette first, then clear selection
+      if (e.key === 'Escape') {
+        if (paletteOpen) { togglePalette(true); e.preventDefault(); e.stopPropagation(); return; }
+        if (state.ui.confirmModal.classList.contains('open')) { closeResetConfirm(); e.preventDefault(); return; }
+        if (state.ui.shortcutsModal.classList.contains('open')) { state.ui.shortcutsModal.classList.remove('open'); e.preventDefault(); return; }
+        if (state.ui.contextMenu.classList.contains('open')) { state.ui.contextMenu.classList.remove('open'); e.preventDefault(); return; }
+        clearSelection();
+        return;
+      }
+
+      // Ctrl+S save
+      if ((e.ctrlKey || e.metaKey) && !e.shiftKey && e.key.toLowerCase() === 's') { e.preventDefault(); generateCSSExport(true); return; }
+      // Ctrl+Shift+E export
+      if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key.toLowerCase() === 'e') { e.preventDefault(); generateCSSExport(false); return; }
+      // Ctrl+Z / Ctrl+Shift+Z
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') { e.preventDefault(); e.shiftKey ? redo() : undo(); return; }
+      // Ctrl+Alt+C copy styles, Ctrl+Alt+V paste styles
+      if ((e.ctrlKey || e.metaKey) && e.altKey && e.key.toLowerCase() === 'c') { e.preventDefault(); copyElementStyles(); return; }
+      if ((e.ctrlKey || e.metaKey) && e.altKey && e.key.toLowerCase() === 'v') { e.preventDefault(); pasteElementStyles(); return; }
+
+      // Shift combos
+      if (e.shiftKey && !e.ctrlKey && !e.metaKey) {
+        const k = e.key.toLowerCase();
+        if (k === 'r') { e.preventDefault(); toggleRulers(); return; }
+        if (k === 'l') { e.preventDefault(); toggleLayoutInspector(); return; }
+        if (k === 'a') { e.preventDefault(); toggleA11yInspector(); return; }
+        if (k === 'd') { e.preventDefault(); toggleDarkMode(); return; }
+        if (k === 'm') { e.preventDefault(); toggleMobileView(); return; }
+        if (k === 'n') { e.preventDefault(); toggleAnnotations(); return; }
+        if (k === 'c') { e.preventDefault(); toggleCompare(); return; }
+        if (k === 'p') { e.preventDefault(); togglePalette(); return; }
+        if (k === 's') { e.preventDefault(); toggleSnapshot(); return; }
+      }
+
+      // ? for shortcuts
+      if (e.key === '?') { e.preventDefault(); toggleShortcutsModal(); return; }
+
+      // Arrow nudge in Move tool
+      if (state.selectedEls.length > 0 && state.currentTool === 'move' && ['ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.key)) {
+        e.preventDefault();
+        const target = state.selectedEls[0];
+        const cs = window.getComputedStyle(target);
+        if (cs.position === 'static') applyChange(target, 'position', 'relative');
+        ensureMoveElevation(target);
+        const t = parseFloat(target.style.top || cs.top) || 0;
+        const l = parseFloat(target.style.left || cs.left) || 0;
+        const step = e.shiftKey ? 10 : 1;
+        if (e.key === 'ArrowUp') applyChange(target, 'top', (t - step) + 'px');
+        if (e.key === 'ArrowDown') applyChange(target, 'top', (t + step) + 'px');
+        if (e.key === 'ArrowLeft') applyChange(target, 'left', (l - step) + 'px');
+        if (e.key === 'ArrowRight') applyChange(target, 'left', (l + step) + 'px');
+        renderPanelForCurrentTool();
+        return;
+      }
+
+      // Delete selected element
+      if ((e.key === 'Delete' || e.key === 'Backspace') && state.selectedEls.length > 0 && !inInput) {
+        e.preventDefault();
+        state.selectedEls.forEach(el => {
+          applyChange(el, 'display', 'none');
+        });
+        showToast('Element(s) hidden (undoable)', 'warn');
+        clearSelection();
+        return;
+      }
+
+      // Tool shortcuts
+      const toolMap = { 'v':'select','q':'browse','m':'move','s':'spacing','t':'typography','f':'color','b':'border','e':'effects','o':'animation','k':'tokens' };
+      if (!e.ctrlKey && !e.metaKey && !e.shiftKey && toolMap[e.key.toLowerCase()]) {
+        setTool(toolMap[e.key.toLowerCase()]);
+        return;
+      }
+    });
+  }
+
+  // ============================================================
+  // SHORTCUTS MODAL
+  // ============================================================
+  function toggleShortcutsModal() {
+    const modal = state.ui.shortcutsModal;
+    modal.classList.toggle('open');
+    if (modal.classList.contains('open')) {
+      const inner = document.getElementById('__vi-shortcuts-inner');
+      inner.innerHTML = `<div class="__vi-shortcuts-header"><h2>⌨️ Keyboard Shortcuts</h2><button id="__vi-shortcuts-close" class="__vi-shortcuts-close" aria-label="Close shortcuts menu" title="Close">×</button></div><div class="__vi-shortcuts-grid">
+        ${shortcutRow('V','Select Tool')}${shortcutRow('Q','Browse Mode')}${shortcutRow('M','Move Tool')}
+        ${shortcutRow('S','Spacing Tool')}${shortcutRow('T','Typography Tool')}${shortcutRow('F','Color Tool')}
+        ${shortcutRow('B','Border Tool')}${shortcutRow('E','Effects Tool')}${shortcutRow('O','Animation Tool')}
+        ${shortcutRow('K','Design Tokens')}${shortcutRow('Ctrl+Z','Undo')}${shortcutRow('Ctrl+Shift+Z','Redo')}
+        ${shortcutRow('Toolbar','Reset to Default')}
+        ${shortcutRow('Shift+R','Rulers')}${shortcutRow('Shift+L','Layout Grid')}${shortcutRow('Shift+A','A11y Scan')}
+        ${shortcutRow('Shift+P','Command Palette')}${shortcutRow('Shift+M','Mobile View')}${shortcutRow('Shift+D','Dark Mode')}
+        ${shortcutRow('Shift+N','Drop Note')}${shortcutRow('Shift+S','Snapshot')}${shortcutRow('Shift+C','Compare')}
+        ${shortcutRow('Ctrl+S','Save Session')}${shortcutRow('Ctrl+Shift+E','Export CSS')}${shortcutRow('?','This Help')}
+        ${shortcutRow('Escape','Deselect / Close')}${shortcutRow('Shift+Click','Multi-select')}
+        ${shortcutRow('Delete','Hide Element')}${shortcutRow('Right-click','Context Menu')}
+        ${shortcutRow('Arrows','Nudge (Move)')}${shortcutRow('Shift+Arrows','Nudge 10px')}
+      </div>`;
+      const closeBtn = document.getElementById('__vi-shortcuts-close');
+      if (closeBtn) closeBtn.onclick = () => modal.classList.remove('open');
+      // Click outside to close
+      modal.onclick = (e) => { if (e.target === modal) modal.classList.remove('open'); };
+    }
+  }
+  function shortcutRow(key, desc) {
+    return `<div class="__vi-shortcut-row"><span>${desc}</span><span class="key">${key}</span></div>`;
+  }
+
+  // ============================================================
+  // CONTEXT MENU (right-click)
+  // ============================================================
+  function bindContextMenu() {
+    window.addEventListener('contextmenu', (e) => {
+      if (!state.active) return;
+      if (e.target.closest('#__vi-root')) return;
+      if (state.selectedEls.length === 0 && !state.hoveredEl) return;
+      e.preventDefault();
+      const target = state.selectedEls[0] || state.hoveredEl;
+      if (!state.selectedEls.includes(target)) selectElement(target);
+      const menu = state.ui.contextMenu;
+      menu.innerHTML = `
+        <button class="__vi-ctx-item" data-action="copy-selector">⧉ Copy Selector</button>
+        <button class="__vi-ctx-item" data-action="copy-styles">📋 Copy Computed Styles</button>
+        <button class="__vi-ctx-item" data-action="copy-html">📄 Copy Outer HTML</button>
+        <div class="__vi-ctx-sep"></div>
+        <button class="__vi-ctx-item" data-action="select-siblings">👥 Select All Siblings</button>
+        <button class="__vi-ctx-item" data-action="select-parent">↑ Select Parent</button>
+        <button class="__vi-ctx-item" data-action="scroll-parent">📍 Scroll Parent Into View</button>
+        <div class="__vi-ctx-sep"></div>
+        <button class="__vi-ctx-item" data-action="hide">🚫 Hide Element</button>
+      `;
+      menu.style.left = e.clientX + 'px';
+      menu.style.top = e.clientY + 'px';
+      menu.classList.add('open');
+
+      menu.querySelectorAll('.__vi-ctx-item').forEach(item => {
+        item.addEventListener('click', () => {
+          const action = item.dataset.action;
+          if (action === 'copy-selector') copyText(generateElementPath(target));
+          else if (action === 'copy-styles') {
+            const cs = window.getComputedStyle(target);
+            const props = ['display','position','width','height','margin','padding','color','background-color','font-family','font-size','font-weight','border','border-radius','box-shadow'];
+            const text = props.map(p => `${p}: ${cs.getPropertyValue(p)};`).join('\n');
+            copyText(text);
+          }
+          else if (action === 'copy-html') copyText(target.outerHTML);
+          else if (action === 'select-siblings') {
+            const parent = target.parentElement;
+            if (parent) {
+              const siblings = Array.from(parent.children).filter(c => !c.closest('#__vi-root'));
+              state.selectedEls = siblings;
+              state.ui.panelTarget.textContent = `${siblings.length} siblings selected`;
+              state.ui.panel.classList.add('open');
+              renderPanelForCurrentTool();
+            }
+          }
+          else if (action === 'select-parent') {
+            if (target.parentElement && target.parentElement !== document.body) selectElement(target.parentElement);
+          }
+          else if (action === 'scroll-parent') {
+            if (target.parentElement) target.parentElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
+          else if (action === 'hide') {
+            applyChange(target, 'display', 'none');
+            showToast('Element hidden (undoable)', 'warn');
+            clearSelection();
+          }
+          menu.classList.remove('open');
+        });
+      });
+    });
+    // Close context menu on click elsewhere
+    window.addEventListener('click', () => state.ui.contextMenu.classList.remove('open'));
+  }
+
+  // ============================================================
+  // DRAGGING (MOVE TOOL)
+  // ============================================================
+  let isDraggingEl = false, dragStart = { x: 0, y: 0 }, initialPos = { top: 0, left: 0 };
+  let _moveRAF = 0, _moveDX = 0, _moveDY = 0;
+  let _moveDragCommitted = false; // true once we exceed the dead-zone threshold
+  let _moveTarget = null;         // cached target during drag
+  let _moveOrigTransform = '';    // preserve existing CSS transform during drag
+  let _moveOrigTransition = '';   // preserve existing CSS transition to restore after drag
+  let _moveOrigAnimation = '';    // preserve existing CSS animation to restore after drag
+
+  function _moveMouseDown(e) {
+    if (!state.active || state.currentTool !== 'move') return;
+    if (e.target.closest('#__vi-root')) return;
+    e.preventDefault();
+
+    // Resolve the drag target: use current selection if click is inside it,
+    // otherwise auto-select the element under cursor (grab-and-drag in one motion).
+    let target;
+    if (state.selectedEls.length > 0 && (e.target === state.selectedEls[0] || state.selectedEls[0].contains(e.target))) {
+      target = state.selectedEls[0];
+    } else {
+      // Auto-select whatever the user pressed on
+      let el = e.target;
+      if (el === document.body || el === document.documentElement) return;
+      selectElement(el);
+      target = el;
+    }
+
+    _moveTarget = target;
+    isDraggingEl = true;
+    _moveDragCommitted = false;
+    _moveDX = 0; _moveDY = 0;
+    dragStart.x = e.clientX; dragStart.y = e.clientY;
+
+    // Read initial position ONCE (single getComputedStyle call)
+    const cs = window.getComputedStyle(target);
+    initialPos.top = parseFloat(target.style.top || cs.top) || 0;
+    initialPos.left = parseFloat(target.style.left || cs.left) || 0;
+
+    window.addEventListener('mousemove', _moveMouseMove);
+    window.addEventListener('mouseup', _moveMouseUp);
+  }
+
+  // Threshold in px before we commit to a drag (avoids accidental micro-drags on click)
+  const _MOVE_DEAD_ZONE = 3;
+
+  function _moveCommitDrag() {
+    if (_moveDragCommitted || !_moveTarget) return;
+    _moveDragCommitted = true;
+    const target = _moveTarget;
+
+    // Prepare the element for GPU-accelerated movement
+    const cs = window.getComputedStyle(target);
+    if (cs.position === 'static') applyChange(target, 'position', 'relative');
+    ensureMoveElevation(target);
+
+    // Capture and neutralize existing transform, transition, AND animation so
+    // the drag is instant. CSS animations override normal inline styles, so we
+    // must freeze them and use !important to guarantee our transform wins.
+    _moveOrigTransform = cs.transform && cs.transform !== 'none' ? cs.transform : '';
+    _moveOrigTransition = target.style.getPropertyValue('transition');
+    _moveOrigAnimation = target.style.getPropertyValue('animation');
+    target.style.setProperty('transition', 'none', 'important');
+    target.style.setProperty('animation', 'none', 'important');
+    target.style.willChange = 'transform';
+    target.style.cursor = 'grabbing';
+
+    // Hide overlays during drag and pause costly hover tracking
+    state.ui.hoverOverlay.classList.remove('active');
+    state.ui.marginOverlay.classList.remove('active');
+    state.ui.paddingOverlay.classList.remove('active');
+    document.querySelectorAll('.__vi-overlay-select').forEach(o => o.classList.remove('active'));
+    state.ui.label.classList.remove('active');
+    clearMeasurements();
+  }
+
+  function _moveMouseMove(e) {
+    if (!isDraggingEl) return;
+    _moveDX = e.clientX - dragStart.x;
+    _moveDY = e.clientY - dragStart.y;
+
+    // Dead-zone: don't start visual drag until threshold is passed
+    if (!_moveDragCommitted) {
+      if (Math.abs(_moveDX) < _MOVE_DEAD_ZONE && Math.abs(_moveDY) < _MOVE_DEAD_ZONE) return;
+      _moveCommitDrag();
+    }
+
+    if (!_moveRAF) {
+      _moveRAF = requestAnimationFrame(() => {
+        _moveRAF = 0;
+        if (!_moveTarget || !isDraggingEl) return;
+        // Compose drag translation with the element's original transform.
+        // Use !important to override CSS animations and stylesheet rules.
+        const drag = `translate(${_moveDX}px, ${_moveDY}px)`;
+        const val = _moveOrigTransform ? drag + ' ' + _moveOrigTransform : drag;
+        _moveTarget.style.setProperty('transform', val, 'important');
+      });
+    }
+  }
+
+  function _moveMouseUp() {
+    window.removeEventListener('mousemove', _moveMouseMove);
+    window.removeEventListener('mouseup', _moveMouseUp);
+    if (!isDraggingEl) return;
+    isDraggingEl = false;
+    if (_moveRAF) { cancelAnimationFrame(_moveRAF); _moveRAF = 0; }
+    const target = _moveTarget;
+    _moveTarget = null;
+    if (!target) return;
+
+    if (_moveDragCommitted) {
+      // Remove !important overrides and restore originals
+      target.style.removeProperty('transform');
+      target.style.removeProperty('transition');
+      target.style.removeProperty('animation');
+      if (_moveOrigTransform) target.style.transform = _moveOrigTransform;
+      if (_moveOrigTransition) target.style.transition = _moveOrigTransition;
+      if (_moveOrigAnimation) target.style.animation = _moveOrigAnimation;
+      target.style.willChange = '';
+      target.style.cursor = '';
+      const nl = (initialPos.left + _moveDX) + 'px';
+      const nt = (initialPos.top + _moveDY) + 'px';
+      applyChange(target, 'left', nl);
+      applyChange(target, 'top', nt);
+    }
+    _moveOrigTransform = '';
+    _moveOrigTransition = '';
+    _moveOrigAnimation = '';
+    _moveDragCommitted = false;
+    renderPanelForCurrentTool();
+  }
+
+  function ensureMoveElevation(el) {
+    // 1. Clear overflow clipping on ancestors (single getComputedStyle per ancestor)
+    let cur = el.parentElement;
+    while (cur && cur !== document.body && cur !== document.documentElement) {
+      const cs = window.getComputedStyle(cur);
+      if (cs.overflow === 'hidden' || cs.overflow === 'clip' || cs.overflow === 'auto' || cs.overflow === 'scroll') {
+        applyChange(cur, 'overflow', 'visible');
+      } else {
+        if (cs.overflowX === 'hidden' || cs.overflowX === 'clip') applyChange(cur, 'overflowX', 'visible');
+        if (cs.overflowY === 'hidden' || cs.overflowY === 'clip') applyChange(cur, 'overflowY', 'visible');
+      }
+      cur = cur.parentElement;
+    }
+
+    // 2. Elevate the element itself
+    const cs = window.getComputedStyle(el);
+    if (cs.zIndex === 'auto' || parseInt(cs.zIndex, 10) < 1) {
+      applyChange(el, 'zIndex', '1');
+    }
+
+    // 3. Elevate nearest top-level ancestor so it stacks above sibling sections
+    let ancestor = el.parentElement;
+    while (ancestor && ancestor !== document.body && ancestor !== document.documentElement) {
+      const parent = ancestor.parentElement;
+      if (!parent || parent === document.body || parent === document.documentElement) {
+        const aCS = window.getComputedStyle(ancestor);
+        if (aCS.position === 'static') applyChange(ancestor, 'position', 'relative');
+        if (aCS.zIndex === 'auto' || parseInt(aCS.zIndex, 10) < 1) applyChange(ancestor, 'zIndex', '1');
+        break;
+      }
+      ancestor = parent;
+    }
+  }
+
+  function bindMoveEvents() {
+    window.addEventListener('mousedown', _moveMouseDown);
+  }
+
+  // ============================================================
+  // RULERS & GUIDES
+  // ============================================================
+  function drawRulers() {
+    if (!state.features.rulers) return;
+    const tc = document.querySelector('#__vi-ruler-top canvas');
+    const lc = document.querySelector('#__vi-ruler-left canvas');
+    if (!tc || !lc) return;
+    tc.width = window.innerWidth; tc.height = 24;
+    lc.width = 24; lc.height = window.innerHeight;
+    const ctxT = tc.getContext('2d'), ctxL = lc.getContext('2d');
+    ctxT.clearRect(0, 0, tc.width, 24); ctxL.clearRect(0, 0, 24, lc.height);
+    ctxT.fillStyle = ctxL.fillStyle = '#8a8a9a';
+    ctxT.font = ctxL.font = '9px sans-serif';
+    const sx = window.scrollX, sy = window.scrollY;
+    for (let x = 0; x < window.innerWidth + sx; x += 10) {
+      const s = x - sx; if (s < 0) continue;
+      if (x % 100 === 0) { ctxT.fillRect(s, 0, 1, 24); ctxT.fillText(x + '', s + 3, 16); }
+      else if (x % 50 === 0) ctxT.fillRect(s, 12, 1, 12);
+      else ctxT.fillRect(s, 18, 1, 6);
+    }
+    for (let y = 0; y < window.innerHeight + sy; y += 10) {
+      const s = y - sy; if (s < 0) continue;
+      if (y % 100 === 0) { ctxL.fillRect(0, s, 24, 1); ctxL.save(); ctxL.translate(16, s + 5); ctxL.rotate(-Math.PI / 2); ctxL.fillText(y + '', 0, 0); ctxL.restore(); }
+      else if (y % 50 === 0) ctxL.fillRect(12, s, 12, 1);
+      else ctxL.fillRect(18, s, 6, 1);
+    }
+  }
+
+  function toggleRulers() {
+    state.features.rulers = !state.features.rulers;
+    const t = document.getElementById('__vi-ruler-top'), l = document.getElementById('__vi-ruler-left');
+    if (state.features.rulers) {
+      t.classList.add('active'); l.classList.add('active');
+      drawRulers();
+      window.addEventListener('scroll', drawRulers, { passive: true });
+      window.addEventListener('resize', drawRulers, { passive: true });
+    } else {
+      t.classList.remove('active'); l.classList.remove('active');
+      window.removeEventListener('scroll', drawRulers);
+      window.removeEventListener('resize', drawRulers);
+    }
+    updateFeatureDots();
+    showToast(state.features.rulers ? 'Rulers On' : 'Rulers Off');
+  }
+
+  function bindGuides() {
+    document.getElementById('__vi-ruler-top').addEventListener('mousedown', (e) => startGuideDrag(e, 'h'));
+    document.getElementById('__vi-ruler-left').addEventListener('mousedown', (e) => startGuideDrag(e, 'v'));
+  }
+
+  function startGuideDrag(e, dir) {
+    if (!state.features.rulers) return;
+    const guide = document.createElement('div');
+    guide.className = `__vi-guide __vi-guide-${dir}`;
+    document.getElementById('__vi-guides-container').appendChild(guide);
+    const move = (me) => { if (dir === 'h') guide.style.top = me.clientY + 'px'; else guide.style.left = me.clientX + 'px'; };
+    move(e);
+    const up = () => {
+      window.removeEventListener('mousemove', move);
+      window.removeEventListener('mouseup', up);
+      guide.addEventListener('mousedown', (ge) => {
+        ge.stopPropagation();
+        const gm = (me) => { if (dir === 'h') guide.style.top = me.clientY + 'px'; else guide.style.left = me.clientX + 'px'; };
+        const gu = () => {
+          window.removeEventListener('mousemove', gm);
+          window.removeEventListener('mouseup', gu);
+          const r = guide.getBoundingClientRect();
+          if ((dir === 'h' && r.top < 24) || (dir === 'v' && r.left < 24)) guide.remove();
+        };
+        window.addEventListener('mousemove', gm);
+        window.addEventListener('mouseup', gu);
+      });
+    };
+    window.addEventListener('mousemove', move);
+    window.addEventListener('mouseup', up);
+  }
+
+  // ============================================================
+  // LAYOUT INSPECTOR
+  // ============================================================
+  let layoutStyleEl = null;
+  function toggleLayoutInspector() {
+    state.features.layout = !state.features.layout;
+    if (state.features.layout) {
+      layoutStyleEl = document.createElement('style');
+      layoutStyleEl.id = '__vi-layout-style';
+      layoutStyleEl.textContent = `.__vi-layout-flex,.__vi-layout-grid{position:relative;outline:1px dashed #D7007F!important}.__vi-layout-flex::before{content:'FLEX';position:absolute;top:-14px;left:0;background:#D7007F;color:#fff;font-size:9px;padding:2px 4px;z-index:2147483600;font-family:sans-serif}.__vi-layout-grid::before{content:'GRID';position:absolute;top:-14px;left:0;background:#00E5CC;color:#000;font-size:9px;padding:2px 4px;z-index:2147483600;font-family:sans-serif}.__vi-layout-grid{outline:1px dashed #00E5CC!important}`;
+      document.head.appendChild(layoutStyleEl);
+      document.querySelectorAll('*').forEach(el => {
+        if (el.closest('#__vi-root')) return;
+        const d = window.getComputedStyle(el).display;
+        if (d === 'flex' || d === 'inline-flex') el.classList.add('__vi-layout-flex');
+        if (d === 'grid' || d === 'inline-grid') el.classList.add('__vi-layout-grid');
+      });
+      showToast('Layout Outlines On');
+    } else {
+      if (layoutStyleEl) layoutStyleEl.remove();
+      document.querySelectorAll('.__vi-layout-flex,.__vi-layout-grid').forEach(el => el.classList.remove('__vi-layout-flex', '__vi-layout-grid'));
+      showToast('Layout Outlines Off');
+    }
+    updateFeatureDots();
+  }
+
+  // ============================================================
+  // A11Y CHECKER (enhanced — contrast + missing attrs)
+  // ============================================================
+  let a11yStyleEl = null;
+  function toggleA11yInspector() {
+    state.features.a11y = !state.features.a11y;
+    if (state.features.a11y) {
+      a11yStyleEl = document.createElement('style');
+      a11yStyleEl.id = '__vi-a11y-style';
+      a11yStyleEl.textContent = `.__vi-a11y-error{outline:2px solid #ff4757!important;position:relative}.__vi-a11y-warn{outline:2px solid #ffa502!important;position:relative}.__vi-a11y-error::after{content:attr(data-vi-a11y);position:absolute;top:-14px;left:0;background:#ff4757;color:#fff;font-size:9px;padding:2px 4px;z-index:2147483600;font-family:sans-serif;white-space:nowrap}.__vi-a11y-warn::after{content:attr(data-vi-a11y);position:absolute;top:-14px;left:0;background:#ffa502;color:#000;font-size:9px;padding:2px 4px;z-index:2147483600;font-family:sans-serif;white-space:nowrap}`;
+      document.head.appendChild(a11yStyleEl);
+      let errors = 0, warnings = 0;
+
+      // Missing alt
+      document.querySelectorAll('img:not([alt]), img[alt=""]').forEach(el => {
+        el.classList.add('__vi-a11y-error'); el.setAttribute('data-vi-a11y', 'Missing alt'); errors++;
+      });
+      // Missing aria-label on interactive elements without text
+      document.querySelectorAll('button:not([aria-label]), a:not([aria-label])').forEach(el => {
+        if (el.closest('#__vi-root')) return;
+        if (!el.textContent.trim() && !el.getAttribute('aria-label')) {
+          el.classList.add('__vi-a11y-warn'); el.setAttribute('data-vi-a11y', 'No label'); warnings++;
+        }
+      });
+      // Low contrast text
+      document.querySelectorAll('p, h1, h2, h3, h4, h5, h6, span, a, li, td, th, label, button').forEach(el => {
+        if (el.closest('#__vi-root')) return;
+        const fg = window.getComputedStyle(el).color;
+        const bg = getEffectiveBgColor(el);
+        const ratio = contrastRatio(fg, bg);
+        if (ratio < 3) {
+          el.classList.add('__vi-a11y-error'); el.setAttribute('data-vi-a11y', `Contrast ${ratio.toFixed(1)}:1`); errors++;
+        } else if (ratio < 4.5) {
+          el.classList.add('__vi-a11y-warn'); el.setAttribute('data-vi-a11y', `Low contrast ${ratio.toFixed(1)}:1`); warnings++;
+        }
+      });
+      showToast(`A11y: ${errors} error(s), ${warnings} warning(s)`, errors > 0 ? 'error' : warnings > 0 ? 'warn' : 'success');
+    } else {
+      if (a11yStyleEl) a11yStyleEl.remove();
+      document.querySelectorAll('.__vi-a11y-error,.__vi-a11y-warn').forEach(el => {
+        el.classList.remove('__vi-a11y-error', '__vi-a11y-warn');
+        el.removeAttribute('data-vi-a11y');
+      });
+      showToast('A11y Off');
+    }
+    updateFeatureDots();
+  }
+
+  // ============================================================
+  // DARK MODE & MOBILE VIEW
+  // ============================================================
+  let _darkModeSavedStyles = null;
+  function toggleDarkMode() {
+    state.features.dark = !state.features.dark;
+    if (state.features.dark) {
+      // Save original inline styles before overriding
+      _darkModeSavedStyles = {
+        colorScheme: document.documentElement.style.colorScheme || '',
+        bodyBg: document.body.style.backgroundColor || '',
+        bodyColor: document.body.style.color || ''
+      };
+      // Inject prefers-color-scheme: dark override
+      let darkStyle = document.getElementById('__vi-dark-override');
+      if (!darkStyle) {
+        darkStyle = document.createElement('style');
+        darkStyle.id = '__vi-dark-override';
+        document.head.appendChild(darkStyle);
+      }
+      // Force dark color-scheme and basic dark fallback
+      darkStyle.textContent = ':root { color-scheme: dark !important; }';
+      document.documentElement.style.colorScheme = 'dark';
+      document.body.style.backgroundColor = '#121212';
+      document.body.style.color = '#ffffff';
+      showToast('Dark Mode On (color-scheme: dark)');
+    } else {
+      const darkStyle = document.getElementById('__vi-dark-override');
+      if (darkStyle) darkStyle.remove();
+      // Restore original inline styles
+      const saved = _darkModeSavedStyles || { colorScheme: '', bodyBg: '', bodyColor: '' };
+      document.documentElement.style.colorScheme = saved.colorScheme;
+      document.body.style.backgroundColor = saved.bodyBg;
+      document.body.style.color = saved.bodyColor;
+      _darkModeSavedStyles = null;
+      showToast('Dark Mode Off');
+    }
+    updateFeatureDots();
+  }
+
+  // ── Mobile Preview ──────────────────────────────────────────
+  const MOBILE_DEVICES = [
+    { id: 'iphone15pro', name: 'iPhone 15 Pro',  w: 393,  h: 852 },
+    { id: 'iphoneSE',    name: 'iPhone SE',      w: 375,  h: 667 },
+    { id: 'pixel8',      name: 'Pixel 8',        w: 412,  h: 915 },
+    { id: 'galaxyS24',   name: 'Galaxy S24',     w: 360,  h: 780 },
+    { id: 'ipadMini',    name: 'iPad Mini',      w: 744,  h: 1133 },
+  ];
+  let mobileLock = null;
+  let mobileShellEl = null;
+  let currentDevice = MOBILE_DEVICES[0];
+
+  function buildMobileSrcdoc() {
+    const clone = document.documentElement.cloneNode(true);
+    // Strip StyleSession UI, styles, and scripts
+    clone.querySelectorAll('#__vi-root, #__vi-styles, #__vi-session-style, #__vi-mobile-style, #__vi-snapshot-overlay').forEach(e => e.remove());
+    clone.querySelectorAll('[id^="__vi"]').forEach(e => e.remove());
+    clone.querySelectorAll('[class*="__vi-"]').forEach(e => {
+      if (e.closest('[id^="__vi"]')) return;
+      e.remove();
+    });
+    clone.querySelectorAll('script').forEach(s => {
+      if (s.textContent.includes('StyleSession')) s.remove();
+      if (s.src && s.src.includes('stylesession')) s.remove();
+    });
+    clone.querySelectorAll('link[href*="fonts.googleapis.com"][href*="Inter"]').forEach(e => e.remove());
+    // Reset body overflow so page scrolls inside iframe
+    const body = clone.querySelector('body');
+    if (body) {
+      body.style.overflow = '';
+      body.style.background = '';
+    }
+    const html = clone.querySelector('html') || clone;
+    if (html.style) html.style.overflow = '';
+    return '<!DOCTYPE html>' + clone.outerHTML;
+  }
+
+  function applyDeviceSize(device) {
+    currentDevice = device;
+    if (!mobileShellEl) return;
+    const vp = mobileShellEl.querySelector('.__vi-mobile-viewport');
+    if (!vp) return;
+
+    // Scale to fit available screen height
+    const availH = window.innerHeight - 110;
+    const availW = window.innerWidth - 120;
+    const scaleH = availH / (device.h + 6);
+    const scaleW = availW / (device.w + 6);
+    const scale = Math.min(scaleH, scaleW, 1);
+
+    vp.style.width  = device.w + 'px';
+    vp.style.height = device.h + 'px';
+    vp.style.transform = scale < 1 ? `scale(${scale.toFixed(3)})` : '';
+    vp.style.transformOrigin = 'top center';
+
+    // Update active button
+    mobileShellEl.querySelectorAll('.__vi-mobile-device-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.deviceId === device.id);
+    });
+    // Update dimension label
+    const label = mobileShellEl.querySelector('.__vi-mobile-device-label');
+    if (label) label.textContent = `${device.w} × ${device.h}`;
+
+    // Reload iframe content at new device size
+    const iframe = vp.querySelector('.__vi-mobile-iframe');
+    if (iframe) {
+      iframe.srcdoc = buildMobileSrcdoc();
+    }
+  }
+
+  function toggleMobileView() {
+    state.features.mobile = !state.features.mobile;
+    if (state.features.mobile) {
+      mobileLock = {
+        htmlOverflow: document.documentElement.style.overflow,
+        bodyOverflow: document.body.style.overflow,
+        bodyBackground: document.body.style.background,
+        scrollX: window.scrollX,
+        scrollY: window.scrollY
+      };
+      document.documentElement.style.overflow = 'hidden';
+      document.body.style.overflow = 'hidden';
+      document.body.style.background = '#0b0d10';
+
+      // Build the shell
+      mobileShellEl = document.createElement('div');
+      mobileShellEl.className = '__vi-mobile-shell';
+
+      // Device selector bar
+      const bar = document.createElement('div');
+      bar.className = '__vi-mobile-device-bar';
+      MOBILE_DEVICES.forEach(d => {
+        const btn = document.createElement('button');
+        btn.className = '__vi-mobile-device-btn';
+        btn.dataset.deviceId = d.id;
+        btn.textContent = d.name;
+        btn.addEventListener('click', () => applyDeviceSize(d));
+        bar.appendChild(btn);
+      });
+      // Custom size inputs
+      const customWrap = document.createElement('span');
+      customWrap.style.cssText = 'display:inline-flex;align-items:center;gap:3px;margin-left:4px;';
+      const wInput = document.createElement('input');
+      wInput.type = 'number';
+      wInput.className = '__vi-input';
+      wInput.style.cssText = 'width:52px;padding:2px 4px;font-size:10px;text-align:center;';
+      wInput.value = currentDevice.w;
+      wInput.placeholder = 'W';
+      const xLabel = document.createElement('span');
+      xLabel.textContent = '×';
+      xLabel.style.cssText = 'color:var(--vi-text-dim);font-size:10px;';
+      const hInput = document.createElement('input');
+      hInput.type = 'number';
+      hInput.className = '__vi-input';
+      hInput.style.cssText = 'width:52px;padding:2px 4px;font-size:10px;text-align:center;';
+      hInput.value = currentDevice.h;
+      hInput.placeholder = 'H';
+      const goBtn = document.createElement('button');
+      goBtn.className = '__vi-mobile-device-btn';
+      goBtn.textContent = 'Go';
+      goBtn.style.cssText = 'padding:2px 8px;font-size:10px;';
+      goBtn.addEventListener('click', () => {
+        const w = parseInt(wInput.value, 10) || 375;
+        const h = parseInt(hInput.value, 10) || 667;
+        const custom = { id: 'custom', name: 'Custom', w: Math.max(200, Math.min(w, 3840)), h: Math.max(200, Math.min(h, 3840)) };
+        applyDeviceSize(custom);
+      });
+      customWrap.appendChild(wInput);
+      customWrap.appendChild(xLabel);
+      customWrap.appendChild(hInput);
+      customWrap.appendChild(goBtn);
+      bar.appendChild(customWrap);
+      const dimLabel = document.createElement('span');
+      dimLabel.className = '__vi-mobile-device-label';
+      bar.appendChild(dimLabel);
+      mobileShellEl.appendChild(bar);
+
+      // Phone frame with iframe
+      const viewport = document.createElement('div');
+      viewport.className = '__vi-mobile-viewport';
+      const iframe = document.createElement('iframe');
+      iframe.className = '__vi-mobile-iframe';
+      iframe.sandbox = 'allow-same-origin allow-scripts';
+      iframe.srcdoc = buildMobileSrcdoc();
+      viewport.appendChild(iframe);
+      mobileShellEl.appendChild(viewport);
+
+      document.body.insertBefore(mobileShellEl, state.ui.root);
+      applyDeviceSize(currentDevice);
+      showToast(`${currentDevice.name} (${currentDevice.w}×${currentDevice.h})`, 'success');
+    } else {
+      // Restore everything
+      if (mobileLock) {
+        if (mobileShellEl) mobileShellEl.remove();
+        mobileShellEl = null;
+
+        document.documentElement.style.overflow = mobileLock.htmlOverflow;
+        document.body.style.overflow = mobileLock.bodyOverflow;
+        document.body.style.background = mobileLock.bodyBackground;
+        window.scrollTo(mobileLock.scrollX, mobileLock.scrollY);
+        mobileLock = null;
+      }
+      showToast('Mobile preview off');
+    }
+    updateFeatureDots();
+    if (state.features.rulers) drawRulers();
+  }
+
+  // ============================================================
+  // ANNOTATIONS
+  // ============================================================
+  let annotationsActive = false;
+  function toggleAnnotations() {
+    annotationsActive = !annotationsActive;
+    if (annotationsActive) {
+      state.ui.root.style.cursor = 'crosshair';
+      showToast('Click to drop a note');
+      const drop = (e) => {
+        if (!annotationsActive) { window.removeEventListener('click', drop, { capture: true }); return; }
+        if (e.target.closest('#__vi-root')) return;
+        const note = document.createElement('div');
+        note.className = '__vi-note';
+        note.style.left = e.clientX + 'px'; note.style.top = (e.clientY + window.scrollY) + 'px';
+        note.innerHTML = `<textarea placeholder="Type note..."></textarea><button>×</button>`;
+        document.getElementById('__vi-guides-container').appendChild(note);
+        note.querySelector('button').onclick = () => note.remove();
+        toggleAnnotations();
+        window.removeEventListener('click', drop, { capture: true });
+      };
+      setTimeout(() => window.addEventListener('click', drop, { capture: true }), 100);
+    } else {
+      state.ui.root.style.cursor = '';
+    }
+  }
+
+  // ============================================================
+  // COMPARISON MODE
+  // ============================================================
+  let compareMode = false, tempCompareStyles = new Map();
+  function toggleCompare() {
+    compareMode = !compareMode;
+    const btn = document.getElementById('__vi-btn-compare');
+    if (compareMode) {
+      btn.classList.add('active');
+      state.originalStyles.forEach((propsMap, el) => {
+        const cur = new Map();
+        propsMap.forEach((oldVal, prop) => { cur.set(prop, el.style[prop]); el.style[prop] = oldVal; });
+        tempCompareStyles.set(el, cur);
+      });
+      showToast('Viewing Original');
+    } else {
+      btn.classList.remove('active');
+      tempCompareStyles.forEach((cur, el) => { cur.forEach((v, p) => { el.style[p] = v; }); });
+      tempCompareStyles.clear();
+      showToast('Viewing Edited');
+    }
+  }
+  function bindCompare() { document.getElementById('__vi-btn-compare').addEventListener('click', toggleCompare); }
+
+  // ============================================================
+  // MORE MENU + FEATURE DOT INDICATORS
+  // ============================================================
+  function bindMoreMenu() {
+    const moreBtn = document.getElementById('__vi-btn-more');
+    const menu = document.getElementById('__vi-more-menu');
+    moreBtn.addEventListener('click', (e) => { e.stopPropagation(); menu.classList.toggle('open'); });
+    document.addEventListener('click', (e) => { if (!e.target.closest('#__vi-more-menu') && e.target !== moreBtn) menu.classList.remove('open'); });
+    menu.querySelectorAll('.__vi-more-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const a = btn.dataset.action;
+        if (a === 'ruler') toggleRulers();
+        else if (a === 'layout') toggleLayoutInspector();
+        else if (a === 'a11y') toggleA11yInspector();
+        else if (a === 'palette') togglePalette();
+        else if (a === 'mobile') toggleMobileView();
+        else if (a === 'dark') toggleDarkMode();
+        else if (a === 'note') toggleAnnotations();
+        else if (a === 'snapshot') toggleSnapshot();
+        else if (a === 'shortcuts') toggleShortcutsModal();
+        else if (a === 'download') downloadSession();
+        else if (a === 'import') importSession();
+        else if (a === 'hidden') showHiddenElements();
+        else if (a === 'csseditor') toggleCSSEditor();
+        else if (a === 'history') showUndoHistory();
+        menu.classList.remove('open');
+      });
+    });
+  }
+
+  function updateFeatureDots() {
+    const map = { ruler: 'rulers', layout: 'layout', a11y: 'a11y', mobile: 'mobile', dark: 'dark', snap: 'snap', hidden: 'hidden', csseditor: 'csseditor' };
+    Object.keys(map).forEach(id => {
+      const dot = document.getElementById('__vi-dot-' + id);
+      if (dot) dot.classList.toggle('on', !!state.features[map[id]]);
+    });
+  }
+
+  // ============================================================
+  // COMMAND PALETTE (enhanced — > for commands)
+  // ============================================================
+  let paletteOpen = false, searchResults = [], selectedResultIdx = 0;
+  const palette = () => document.getElementById('__vi-palette');
+  const paletteInput = () => document.getElementById('__vi-palette-input');
+  const paletteResultsEl = () => document.getElementById('__vi-palette-results');
+
+  function togglePalette(forceClose = false) {
+    paletteOpen = forceClose ? false : !paletteOpen;
+    if (paletteOpen) {
+      palette().classList.add('open');
+      paletteInput().value = ''; paletteResultsEl().innerHTML = '';
+      setTimeout(() => paletteInput().focus(), 50);
+    } else {
+      palette().classList.remove('open');
+      paletteInput().blur();
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const pi = paletteInput();
+    if (!pi) return;
+    pi.addEventListener('input', (e) => {
+      const q = e.target.value;
+      if (q.startsWith('>')) {
+        // Command mode
+        const cq = q.slice(1).trim().toLowerCase();
+        const commands = [
+          { name: 'Toggle Rulers', action: toggleRulers, shortcut: 'Shift+R' },
+          { name: 'Toggle Layout Grid', action: toggleLayoutInspector, shortcut: 'Shift+L' },
+          { name: 'A11y Scan', action: toggleA11yInspector, shortcut: 'Shift+A' },
+          { name: 'Toggle Dark Mode', action: toggleDarkMode, shortcut: 'Shift+D' },
+          { name: 'Toggle Mobile View', action: toggleMobileView, shortcut: 'Shift+M' },
+          { name: 'Drop Note', action: toggleAnnotations, shortcut: 'Shift+N' },
+          { name: 'Snapshot', action: toggleSnapshot, shortcut: 'Shift+S' },
+          { name: 'Export CSS', action: () => generateCSSExport(false), shortcut: 'Ctrl+Shift+E' },
+          { name: 'Save Session', action: () => generateCSSExport(true), shortcut: 'Ctrl+S' },
+          { name: 'Download Session', action: downloadSession },
+          { name: 'Reset to Default', action: resetToDefault },
+          { name: 'Compare Original', action: toggleCompare, shortcut: 'Shift+C' },
+          { name: 'Shortcuts Help', action: toggleShortcutsModal, shortcut: '?' },
+          { name: 'Import Session', action: importSession },
+          { name: 'Hidden Elements', action: showHiddenElements },
+          { name: 'CSS Editor', action: toggleCSSEditor },
+          { name: 'Undo History', action: showUndoHistory },
+          { name: 'Copy Styles', action: copyElementStyles, shortcut: 'Ctrl+Alt+C' },
+          { name: 'Paste Styles', action: pasteElementStyles, shortcut: 'Ctrl+Alt+V' },
+        ];
+        searchResults = commands.filter(c => c.name.toLowerCase().includes(cq));
+        selectedResultIdx = 0;
+        paletteResultsEl().innerHTML = searchResults.map((c, i) =>
+          `<div class="__vi-palette-result ${i === selectedResultIdx ? 'active' : ''}" data-idx="${i}">⚡ ${c.name}${c.shortcut ? `<span class="shortcut">${c.shortcut}</span>` : ''}</div>`
+        ).join('');
+        paletteResultsEl().querySelectorAll('.__vi-palette-result').forEach(el => {
+          el.addEventListener('click', () => {
+            const cmd = searchResults[parseInt(el.dataset.idx, 10)];
+            togglePalette(true);
+            if (cmd && cmd.action) cmd.action();
+          });
+        });
+        return;
+      }
+
+      // Element search mode
+      if (q.length < 1) { paletteResultsEl().innerHTML = ''; return; }
+      const all = Array.from(document.querySelectorAll('*')).filter(el => !el.closest('#__vi-root'));
+      searchResults = all.filter(el => {
+        let s = el.tagName.toLowerCase();
+        if (el.id) s += '#' + el.id;
+        if (el.className && typeof el.className === 'string') s += '.' + el.className.split(' ').join('.');
+        if (el.textContent) s += ' ' + el.textContent.slice(0, 50);
+        return s.toLowerCase().includes(q.toLowerCase());
+      }).slice(0, 15);
+      selectedResultIdx = 0;
+      renderPaletteResults();
+    });
+
+    pi.addEventListener('keydown', (e) => {
+      if (!paletteOpen) return;
+      if (e.key === 'ArrowDown') { e.preventDefault(); selectedResultIdx = Math.min(selectedResultIdx + 1, searchResults.length - 1); renderOrCommandPaletteResults(); }
+      else if (e.key === 'ArrowUp') { e.preventDefault(); selectedResultIdx = Math.max(selectedResultIdx - 1, 0); renderOrCommandPaletteResults(); }
+      else if (e.key === 'Enter') {
+        e.preventDefault();
+        if (pi.value.startsWith('>')) {
+          const cmd = searchResults[selectedResultIdx];
+          togglePalette(true);
+          if (cmd && cmd.action) cmd.action();
+        } else if (searchResults[selectedResultIdx]) {
+          selectElementFromPalette(searchResults[selectedResultIdx]);
+        }
+      }
+      else if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); togglePalette(true); document.body.focus(); }
+    });
+  });
+
+  function renderOrCommandPaletteResults() {
+    if (paletteInput().value.startsWith('>')) {
+      paletteResultsEl().querySelectorAll('.__vi-palette-result').forEach((el, i) => el.classList.toggle('active', i === selectedResultIdx));
+    } else {
+      renderPaletteResults();
+    }
+  }
+
+  function renderPaletteResults() {
+    paletteResultsEl().innerHTML = searchResults.map((el, i) => {
+      let name = el.tagName.toLowerCase();
+      if (el.id) name += `<span style="color:#00E5CC">#${escAttr(el.id)}</span>`;
+      else if (el.className && typeof el.className === 'string') {
+        const c = el.className.split(' ').find(c => !c.startsWith('__vi'));
+        if (c) name += `<span style="color:#eab308">.${escAttr(c)}</span>`;
+      }
+      return `<div class="__vi-palette-result ${i === selectedResultIdx ? 'active' : ''}" data-idx="${i}">${name}</div>`;
+    }).join('');
+    paletteResultsEl().querySelectorAll('.__vi-palette-result').forEach(el => {
+      el.addEventListener('click', () => selectElementFromPalette(searchResults[parseInt(el.dataset.idx, 10)]));
+    });
+  }
+
+  function selectElementFromPalette(el) {
+    togglePalette(true);
+    selectElement(el);
+    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
+  // ============================================================
+  // SNAPSHOT & SESSION PERSISTENCE
+  // ============================================================
+  let snapshotOverlay = null;
+  function toggleSnapshot() {
+    state.features.snap = !state.features.snap;
+    if (!state.features.snap) {
+      if (snapshotOverlay) snapshotOverlay.remove();
+      snapshotOverlay = null;
+      showToast('Snapshot Closed');
+      updateFeatureDots();
+      return;
+    }
+    snapshotOverlay = document.createElement('div');
+    snapshotOverlay.style.cssText = 'position:fixed;top:0;left:0;width:50%;height:100vh;z-index:2147483605;overflow:hidden;border-right:2px solid var(--vi-accent);resize:horizontal;min-width:5%;max-width:95%;background:#fff;transform:translateZ(0);box-shadow:5px 0 15px rgba(0,0,0,0.3);';
+    snapshotOverlay.id = '__vi-snapshot-overlay';
+    const iframe = document.createElement('iframe');
+    iframe.style.cssText = 'width:100vw;height:100vh;border:none;pointer-events:none;';
+    iframe.sandbox = 'allow-same-origin allow-scripts';
+    snapshotOverlay.appendChild(iframe);
+    state.ui.root.appendChild(snapshotOverlay);
+    const clone = document.documentElement.cloneNode(true);
+    clone.querySelectorAll('#__vi-root, #__vi-session-style, #__vi-styles').forEach(e => e.remove());
+    clone.querySelectorAll('[id^="__vi"]').forEach(e => e.remove());
+    clone.querySelectorAll('script').forEach(s => { if (s.textContent.includes('StyleSession')) s.remove(); if (s.src && s.src.includes('stylesession')) s.remove(); });
+    clone.querySelectorAll('link[href*="fonts.googleapis.com"][href*="Inter"]').forEach(e => e.remove());
+    iframe.srcdoc = '<!DOCTYPE html>' + clone.outerHTML;
+    showToast('Split-view Snapshot');
+    updateFeatureDots();
+  }
+
+  function downloadSession() {
+    const data = collectSessionChanges();
+    const textChanges = collectTextChanges();
+    // Collect annotations
+    const notes = [];
+    document.querySelectorAll('.__vi-note').forEach(note => {
+      const ta = note.querySelector('textarea');
+      if (ta && ta.value.trim()) {
+        notes.push({ x: note.style.left, y: note.style.top, text: ta.value });
+      }
+    });
+    // Collect injected CSS
+    const injectedStyle = document.getElementById('__vi-injected-css');
+    const injectedCSS = injectedStyle ? injectedStyle.textContent : '';
+    if (data.length === 0 && notes.length === 0 && !injectedCSS && textChanges.length === 0) { showToast('No data', 'warn'); return; }
+    const payload = { version: 2, date: new Date().toISOString(), changes: data };
+    if (notes.length > 0) payload.notes = notes;
+    if (injectedCSS) payload.injectedCSS = injectedCSS;
+    if (textChanges.length > 0) payload.textChanges = textChanges;
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob); a.download = 'project.stylesession'; a.click();
+    URL.revokeObjectURL(a.href);
+    showToast('Session downloaded', 'success');
+  }
+
+  function loadSession() {
+    const raw = localStorage.getItem('__vi_session');
+    if (!raw) return;
+
+    // Remove any previous legacy style tag to avoid stacking duplicate rules.
+    const prev = document.getElementById('__vi-session-style');
+    if (prev) prev.remove();
+
+    let parsed = null;
+    try { parsed = JSON.parse(raw); } catch (e) { parsed = null; }
+
+    if (parsed && Array.isArray(parsed.changes)) {
+      let applied = 0;
+      parsed.changes.forEach(change => {
+        if (!change || !change.selector || !change.styles) return;
+        const matched = resolveSessionTargets(change);
+        matched.forEach(el => {
+          Object.entries(change.styles).forEach(([kebab, newVal]) => {
+            const isCSSVar = kebab.startsWith('--');
+            const prop = isCSSVar ? kebab : kebab.replace(/-([a-z])/g, (_, c) => c.toUpperCase());
+            const oldVal = isCSSVar
+              ? (el.style.getPropertyValue(prop).trim() || window.getComputedStyle(el).getPropertyValue(prop).trim() || '')
+              : (el.style[prop] || window.getComputedStyle(el)[prop] || '');
+            if (!state.originalStyles.has(el)) state.originalStyles.set(el, new Map());
+            const origMap = state.originalStyles.get(el);
+            if (!origMap.has(prop)) origMap.set(prop, oldVal);
+            if (isCSSVar) el.style.setProperty(prop, newVal);
+            else el.style[prop] = newVal;
+            state.undoStack.push({ el, prop, oldVal, newVal });
+            applied++;
+          });
+        });
+      });
+      // Restore text content changes
+      if (Array.isArray(parsed.textChanges)) {
+        parsed.textChanges.forEach(tc => {
+          const matched = resolveSessionTargets(tc);
+          matched.forEach(el => {
+            const oldText = el.textContent;
+            if (oldText !== tc.text) {
+              el.textContent = tc.text;
+              state.undoStack.push({ el, prop: '__textContent', oldVal: oldText, newVal: tc.text });
+              applied++;
+            }
+          });
+        });
+      }
+      // Restore annotations
+      if (Array.isArray(parsed.notes)) {
+        const container = document.getElementById('__vi-guides-container');
+        if (container) {
+          parsed.notes.forEach(n => {
+            const note = document.createElement('div');
+            note.className = '__vi-note';
+            note.style.left = n.x; note.style.top = n.y;
+            note.innerHTML = `<textarea placeholder="Type note...">${escAttr(n.text)}</textarea><button>×</button>`;
+            container.appendChild(note);
+            note.querySelector('button').onclick = () => note.remove();
+          });
+        }
+      }
+      // Restore injected CSS
+      if (parsed.injectedCSS) {
+        let s = document.getElementById('__vi-injected-css');
+        if (!s) { s = document.createElement('style'); s.id = '__vi-injected-css'; document.head.appendChild(s); }
+        s.textContent = parsed.injectedCSS;
+      }
+      state.redoStack = [];
+      updateUndoRedoUI();
+      if (applied > 0) showToast(`Session restored (${applied} changes)`, 'success');
+      else showToast('Session found but no matching elements', 'warn');
+      return;
+    }
+
+    // Backward compatibility: legacy CSS-only payload.
+    const s = document.createElement('style');
+    s.id = '__vi-session-style';
+    s.textContent = raw;
+    document.head.appendChild(s);
+    showToast('Legacy session restored (history unavailable)', 'warn');
+  }
+
+  // Auto-save debounced
+  let saveTimer = null;
+  function autoSave() {
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(() => generateCSSExport(true), 5000);
+  }
+
+  // ============================================================
+  // SESSION IMPORT
+  // ============================================================
+  function importSession() {
+    const inp = document.createElement('input');
+    inp.type = 'file';
+    inp.accept = '.stylesession,.json';
+    inp.style.display = 'none';
+    document.body.appendChild(inp);
+    inp.addEventListener('change', () => {
+      const file = inp.files[0];
+      if (!file) { inp.remove(); return; }
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          const parsed = JSON.parse(reader.result);
+          if (!parsed || !Array.isArray(parsed.changes)) {
+            showToast('Invalid session file', 'error');
+            return;
+          }
+          let applied = 0;
+          parsed.changes.forEach(change => {
+            if (!change || !change.styles) return;
+            const matched = resolveSessionTargets(change);
+            matched.forEach(el => {
+              Object.entries(change.styles).forEach(([kebab, newVal]) => {
+                const isCSSVar = kebab.startsWith('--');
+                const prop = isCSSVar ? kebab : kebab.replace(/-([a-z])/g, (_, c) => c.toUpperCase());
+                if (isCSSVar) {
+                  const oldVal = el.style.getPropertyValue(prop).trim() || window.getComputedStyle(el).getPropertyValue(prop).trim() || '';
+                  if (!state.originalStyles.has(el)) state.originalStyles.set(el, new Map());
+                  const origMap = state.originalStyles.get(el);
+                  if (!origMap.has(prop)) origMap.set(prop, oldVal);
+                  el.style.setProperty(prop, newVal);
+                  state.undoStack.push({ el, prop, oldVal, newVal });
+                  state.redoStack = [];
+                  updateUndoRedoUI();
+                } else {
+                  applyChange(el, prop, newVal);
+                }
+                applied++;
+              });
+            });
+          });
+          // Restore text changes
+          if (Array.isArray(parsed.textChanges)) {
+            parsed.textChanges.forEach(tc => {
+              const matched = resolveSessionTargets(tc);
+              matched.forEach(el => {
+                const oldText = el.textContent;
+                if (oldText !== tc.text) {
+                  el.textContent = tc.text;
+                  state.undoStack.push({ el, prop: '__textContent', oldVal: oldText, newVal: tc.text });
+                  state.redoStack = [];
+                  applied++;
+                }
+              });
+            });
+          }
+          if (applied > 0) showToast(`Imported ${applied} changes`, 'success');
+          else showToast('No matching elements found', 'warn');
+          // Restore annotations
+          if (Array.isArray(parsed.notes)) {
+            const container = document.getElementById('__vi-guides-container');
+            if (container) {
+              parsed.notes.forEach(n => {
+                const note = document.createElement('div');
+                note.className = '__vi-note';
+                note.style.left = n.x; note.style.top = n.y;
+                note.innerHTML = `<textarea placeholder="Type note...">${escAttr(n.text)}</textarea><button>×</button>`;
+                container.appendChild(note);
+                note.querySelector('button').onclick = () => note.remove();
+              });
+            }
+          }
+          // Restore injected CSS
+          if (parsed.injectedCSS) {
+            let s = document.getElementById('__vi-injected-css');
+            if (!s) { s = document.createElement('style'); s.id = '__vi-injected-css'; document.head.appendChild(s); }
+            s.textContent = parsed.injectedCSS;
+          }
+          renderPanelForCurrentTool();
+        } catch (e) {
+          showToast('Failed to parse session file', 'error');
+        }
+      };
+      reader.readAsText(file);
+      inp.remove();
+    });
+    inp.click();
+  }
+
+  // ============================================================
+  // HIDDEN ELEMENTS PANEL
+  // ============================================================
+  function showHiddenElements() {
+    const hidden = [];
+    state.originalStyles.forEach((propsMap, el) => {
+      if (el.style.display === 'none') {
+        hidden.push(el);
+      }
+    });
+    if (hidden.length === 0) {
+      showToast('No hidden elements', 'warn');
+      return;
+    }
+    state.features.hidden = !state.features.hidden;
+    updateFeatureDots();
+    // Build overlay panel
+    let overlay = document.getElementById('__vi-hidden-panel');
+    if (overlay) { overlay.remove(); state.features.hidden = false; updateFeatureDots(); return; }
+    state.features.hidden = true;
+    updateFeatureDots();
+    overlay = document.createElement('div');
+    overlay.id = '__vi-hidden-panel';
+    overlay.style.cssText = 'position:fixed;top:80px;right:20px;width:260px;max-height:400px;overflow-y:auto;background:rgba(20,20,24,0.96);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:12px;z-index:2147483610;font-family:var(--vi-font);color:var(--vi-text);font-size:11px;pointer-events:auto;backdrop-filter:blur(20px);';
+    let html = '<div style="font-weight:600;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;">Hidden Elements <button id="__vi-hidden-close" style="background:none;border:none;color:var(--vi-text-dim);cursor:pointer;font-size:14px;">✕</button></div>';
+    hidden.forEach((el, i) => {
+      const tag = el.tagName.toLowerCase();
+      const id = el.id ? '#' + el.id : '';
+      const cls = (el.className && typeof el.className === 'string') ? '.' + el.className.split(' ').filter(c => c && !c.startsWith('__vi')).slice(0, 2).join('.') : '';
+      html += `<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 4px;border-bottom:1px solid rgba(255,255,255,0.04);">
+        <span style="color:var(--vi-accent);">${escAttr(tag)}${escAttr(id)}${escAttr(cls)}</span>
+        <button class="__vi-show-el-btn" data-idx="${i}" style="background:var(--vi-accent);color:#000;border:none;border-radius:4px;padding:2px 8px;font-size:9px;cursor:pointer;font-weight:600;">Show</button>
+      </div>`;
+    });
+    html += `<button id="__vi-show-all-btn" style="width:100%;margin-top:8px;padding:6px;background:var(--vi-accent);color:#000;border:none;border-radius:6px;font-size:10px;font-weight:600;cursor:pointer;">Show All</button>`;
+    overlay.innerHTML = html;
+    state.ui.root.appendChild(overlay);
+    overlay.querySelector('#__vi-hidden-close').addEventListener('click', () => { overlay.remove(); state.features.hidden = false; updateFeatureDots(); });
+    overlay.querySelectorAll('.___vi-show-el-btn, .__vi-show-el-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const el = hidden[parseInt(btn.dataset.idx, 10)];
+        if (el) { applyChange(el, 'display', ''); showToast('Element restored'); btn.closest('div').remove(); }
+      });
+    });
+    overlay.querySelector('#__vi-show-all-btn').addEventListener('click', () => {
+      hidden.forEach(el => applyChange(el, 'display', ''));
+      overlay.remove();
+      state.features.hidden = false;
+      updateFeatureDots();
+      showToast(`Restored ${hidden.length} elements`, 'success');
+    });
+  }
+
+  // ============================================================
+  // CSS EDITOR (page-level CSS injection)
+  // ============================================================
+  let cssEditorEl = null;
+  function toggleCSSEditor() {
+    state.features.csseditor = !state.features.csseditor;
+    updateFeatureDots();
+    if (!state.features.csseditor) {
+      if (cssEditorEl) { cssEditorEl.remove(); cssEditorEl = null; }
+      return;
+    }
+    cssEditorEl = document.createElement('div');
+    cssEditorEl.id = '__vi-css-editor';
+    cssEditorEl.style.cssText = 'position:fixed;bottom:20px;right:20px;width:360px;height:280px;background:rgba(20,20,24,0.97);border:1px solid rgba(255,255,255,0.08);border-radius:12px;z-index:2147483610;font-family:var(--vi-font);color:var(--vi-text);pointer-events:auto;display:flex;flex-direction:column;backdrop-filter:blur(20px);box-shadow:0 8px 32px rgba(0,0,0,0.4);resize:both;overflow:hidden;';
+    cssEditorEl.innerHTML = `<div style="padding:8px 12px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(255,255,255,0.06);flex-shrink:0;">
+      <span style="font-weight:600;font-size:11px;">CSS Editor</span>
+      <div style="display:flex;gap:6px;">
+        <button id="__vi-css-apply" style="background:var(--vi-accent);color:#000;border:none;border-radius:4px;padding:3px 10px;font-size:9px;cursor:pointer;font-weight:600;">Apply</button>
+        <button id="__vi-css-close" style="background:none;border:none;color:var(--vi-text-dim);cursor:pointer;font-size:14px;">✕</button>
+      </div>
+    </div>
+    <textarea id="__vi-css-textarea" spellcheck="false" style="flex:1;background:rgba(0,0,0,0.3);color:#e0e0e0;border:none;padding:12px;font-family:var(--vi-mono);font-size:11px;resize:none;outline:none;tab-size:2;" placeholder="/* Write CSS rules here */\n.my-class {\n  color: red;\n}"></textarea>`;
+    state.ui.root.appendChild(cssEditorEl);
+    // Restore previous CSS
+    let injectedStyle = document.getElementById('__vi-injected-css');
+    if (injectedStyle) {
+      cssEditorEl.querySelector('#__vi-css-textarea').value = injectedStyle.textContent;
+    }
+    cssEditorEl.querySelector('#__vi-css-close').addEventListener('click', () => {
+      state.features.csseditor = false;
+      updateFeatureDots();
+      cssEditorEl.remove();
+      cssEditorEl = null;
+    });
+    cssEditorEl.querySelector('#__vi-css-apply').addEventListener('click', () => {
+      const css = cssEditorEl.querySelector('#__vi-css-textarea').value;
+      let s = document.getElementById('__vi-injected-css');
+      if (!s) { s = document.createElement('style'); s.id = '__vi-injected-css'; document.head.appendChild(s); }
+      s.textContent = css;
+      showToast('CSS applied', 'success');
+    });
+    // Tab key support in textarea
+    cssEditorEl.querySelector('#__vi-css-textarea').addEventListener('keydown', (e) => {
+      if (e.key === 'Tab') {
+        e.preventDefault();
+        const ta = e.target;
+        const start = ta.selectionStart, end = ta.selectionEnd;
+        ta.value = ta.value.substring(0, start) + '  ' + ta.value.substring(end);
+        ta.selectionStart = ta.selectionEnd = start + 2;
+      }
+      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+        cssEditorEl.querySelector('#__vi-css-apply').click();
+      }
+      e.stopPropagation();
+    });
+  }
+
+  // ============================================================
+  // UNDO HISTORY PANEL
+  // ============================================================
+  function showUndoHistory() {
+    let overlay = document.getElementById('__vi-history-panel');
+    if (overlay) { overlay.remove(); return; }
+    overlay = document.createElement('div');
+    overlay.id = '__vi-history-panel';
+    overlay.style.cssText = 'position:fixed;top:80px;left:20px;width:300px;max-height:500px;overflow-y:auto;background:rgba(20,20,24,0.96);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:12px;z-index:2147483610;font-family:var(--vi-font);color:var(--vi-text);font-size:11px;pointer-events:auto;backdrop-filter:blur(20px);';
+    const stack = state.undoStack;
+    let html = '<div style="font-weight:600;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;">Undo History (' + stack.length + ')<button id="__vi-history-close" style="background:none;border:none;color:var(--vi-text-dim);cursor:pointer;font-size:14px;">✕</button></div>';
+    if (stack.length === 0) {
+      html += '<div style="color:var(--vi-text-dim);padding:8px 0;">No changes yet</div>';
+    } else {
+      // Show most recent first
+      for (let i = stack.length - 1; i >= 0; i--) {
+        const cmd = stack[i];
+        const tag = cmd.el.tagName ? cmd.el.tagName.toLowerCase() : '?';
+        const id = cmd.el.id ? '#' + cmd.el.id : '';
+        const prop = cmd.prop.replace(/[A-Z]/g, m => '-' + m.toLowerCase());
+        const val = (cmd.newVal || '').slice(0, 30);
+        html += `<div class="__vi-history-item" data-idx="${i}" style="padding:6px 4px;border-bottom:1px solid rgba(255,255,255,0.04);cursor:pointer;display:flex;gap:6px;align-items:baseline;" title="Click to undo to this point">
+          <span style="color:var(--vi-text-dim);font-size:9px;min-width:18px;">${i + 1}</span>
+          <span style="color:var(--vi-accent);flex-shrink:0;">${escAttr(tag)}${escAttr(id)}</span>
+          <span style="color:var(--vi-orange);">${escAttr(prop)}</span>
+          <span style="color:var(--vi-text-dim);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escAttr(val)}</span>
+        </div>`;
+      }
+    }
+    overlay.innerHTML = html;
+    state.ui.root.appendChild(overlay);
+    overlay.querySelector('#__vi-history-close').addEventListener('click', () => overlay.remove());
+    overlay.querySelectorAll('.__vi-history-item').forEach(item => {
+      item.addEventListener('click', () => {
+        const idx = parseInt(item.dataset.idx, 10);
+        // Undo everything after this index
+        while (state.undoStack.length > idx + 1) undo();
+        overlay.remove();
+        showToast(`Reverted to step ${idx + 1}`, 'success');
+      });
+    });
+  }
+
+  // ============================================================
+  // COPY / PASTE STYLES
+  // ============================================================
+  let copiedStyles = null;
+  function copyElementStyles() {
+    if (state.selectedEls.length === 0) { showToast('Select an element first', 'warn'); return; }
+    const el = state.selectedEls[0];
+    const cs = window.getComputedStyle(el);
+    const props = ['color','backgroundColor','fontSize','fontFamily','fontWeight','lineHeight','letterSpacing',
+      'textAlign','textTransform','textDecorationLine','padding','margin','borderRadius','border',
+      'boxShadow','textShadow','opacity','display','gap','width','height','transform','filter',
+      'backdropFilter','mixBlendMode','overflow','cursor','background','position'];
+    copiedStyles = {};
+    let usedComputed = false;
+    props.forEach(p => {
+      const v = el.style[p];
+      if (v) copiedStyles[p] = v;
+    });
+    // Fall back to computed styles if no inline styles found
+    if (Object.keys(copiedStyles).length === 0) {
+      props.forEach(p => {
+        const v = cs[p];
+        if (v && v !== '' && v !== 'none' && v !== 'normal' && v !== 'auto') copiedStyles[p] = v;
+      });
+      usedComputed = true;
+    }
+    if (Object.keys(copiedStyles).length === 0) {
+      showToast('No styles to copy', 'warn');
+      copiedStyles = null;
+      return;
+    }
+    showToast(`Copied ${Object.keys(copiedStyles).length} styles${usedComputed ? ' (computed)' : ''}`, 'success');
+  }
+
+  function pasteElementStyles() {
+    if (!copiedStyles) { showToast('No styles copied', 'warn'); return; }
+    if (state.selectedEls.length === 0) { showToast('Select target element(s)', 'warn'); return; }
+    let count = 0;
+    state.selectedEls.forEach(el => {
+      Object.entries(copiedStyles).forEach(([prop, val]) => {
+        applyChange(el, prop, val);
+        count++;
+      });
+    });
+    showToast(`Pasted ${count} styles`, 'success');
+    renderPanelForCurrentTool();
+  }
+
+  // ============================================================
+  // INLINE TEXT EDITING
+  // ============================================================
+  let inlineEditEl = null;
+  function initInlineTextEditing() {
+    state.ui.root.addEventListener('dblclick', (e) => {
+      if (!state.active) return;
+      const target = e.target;
+      if (target.closest('#__vi-root')) return;
+      // Only edit leaf text nodes
+      if (target.children.length > 0 && target.textContent.trim() !== target.innerText.trim()) return;
+      e.preventDefault();
+      e.stopPropagation();
+      startInlineEdit(target);
+    }, true);
+  }
+
+  function startInlineEdit(el) {
+    if (inlineEditEl) finishInlineEdit();
+    inlineEditEl = el;
+    const oldText = el.textContent;
+    el.contentEditable = 'true';
+    el.focus();
+    el.style.outline = '2px solid var(--vi-accent)';
+    el.style.outlineOffset = '2px';
+    const finish = () => {
+      if (!inlineEditEl) return;
+      el.contentEditable = 'false';
+      el.style.outline = '';
+      el.style.outlineOffset = '';
+      const newText = el.textContent;
+      if (newText !== oldText) {
+        // Track text change in undo stack
+        state.undoStack.push({ el, prop: '__textContent', oldVal: oldText, newVal: newText });
+        state.redoStack = [];
+        updateUndoRedoUI();
+        showToast('Text updated');
+      }
+      inlineEditEl = null;
+    };
+    el.addEventListener('blur', finish, { once: true });
+    el.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') { el.textContent = oldText; el.blur(); }
+      if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); el.blur(); }
+      e.stopPropagation();
+    });
+  }
+
+  function finishInlineEdit() {
+    if (inlineEditEl) {
+      inlineEditEl.contentEditable = 'false';
+      inlineEditEl.style.outline = '';
+      inlineEditEl.style.outlineOffset = '';
+      inlineEditEl = null;
+    }
+  }
+
+  // ============================================================
+  // BOOTSTRAP
+  // ============================================================
+  init();
+
+  // Hook autosave into undo stack changes
+  const origPush = state.undoStack.push;
+  state.undoStack.push = function(...args) {
+    const result = origPush.apply(this, args);
+    autoSave();
+    return result;
+  };
+
+})();
+</script>
+</body>
+</html>
