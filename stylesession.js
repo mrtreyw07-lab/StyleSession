@@ -941,6 +941,39 @@
     loadSession();
     requestAnimationFrame(renderLoop);
     updateUndoRedoUI();
+
+    const observer = new MutationObserver((mutations) => {
+      let removed = false;
+      for (const mut of mutations) {
+        if (mut.removedNodes.length > 0) { removed = true; break; }
+      }
+      if (removed) scheduleMemoryCleanup();
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
+  }
+
+  let cleanupTimer = null;
+  function scheduleMemoryCleanup() {
+    clearTimeout(cleanupTimer);
+    cleanupTimer = setTimeout(cleanupMemory, 2000);
+  }
+
+  function cleanupMemory() {
+    for (const el of state.originalStyles.keys()) {
+      if (!document.documentElement.contains(el)) {
+        state.originalStyles.delete(el);
+      }
+    }
+    state.undoStack = state.undoStack.filter(cmd => document.documentElement.contains(cmd.el));
+    state.redoStack = state.redoStack.filter(cmd => document.documentElement.contains(cmd.el));
+    updateUndoRedoUI();
+
+    if (state.hoveredEl && !document.documentElement.contains(state.hoveredEl)) clearHover();
+    if (state.selectedEls.some(el => !document.documentElement.contains(el))) {
+      state.selectedEls = state.selectedEls.filter(el => document.documentElement.contains(el));
+      if (state.selectedEls.length === 0) clearSelection();
+      else renderPanelForCurrentTool();
+    }
   }
 
   // ============================================================
@@ -979,8 +1012,10 @@
   }
 
   function escAttr(s) {
-    return String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    if (s == null) return '';
+    return String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&#39;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
   }
+
 
   function getElementPath(el) {
     const parts = [];
@@ -1345,7 +1380,7 @@
     const label = state.ui.label;
     const name = getElementLabel(targetEl);
     const dims = `${Math.round(rect.width)}×${Math.round(rect.height)}`;
-    label.innerHTML = `${name} <span class="dim">${dims}</span>`;
+    label.innerHTML = `${escAttr(name)} <span class="dim">${dims}</span>`;
     let top = rect.top + window.scrollY;
     if (top < 24) top += 24;
     label.style.top = top + 'px';
@@ -1653,6 +1688,7 @@
   function getEffectiveBgColor(el) {
     let cur = el, depth = 0;
     while (cur && depth < 50) {
+      if (cur.nodeType !== 1) break;
       const bg = window.getComputedStyle(cur).backgroundColor;
       if (bg && bg !== 'transparent' && bg !== 'rgba(0, 0, 0, 0)') return bg;
       cur = cur.parentElement;
@@ -1699,7 +1735,7 @@
     } else if (state.currentTool === 'tokens') {
       renderTokensPanel(content);
     } else {
-      content.innerHTML = `<div class="__vi-empty"><p>Tool: <strong style="color:var(--vi-accent)">${state.currentTool}</strong></p></div>`;
+      content.innerHTML = `<div class="__vi-empty"><p>Tool: <strong style="color:var(--vi-accent)">${escAttr(state.currentTool)}</strong></p></div>`;
     }
   }
 
@@ -1716,9 +1752,9 @@
         const v1 = c1[k], v2 = c2[k];
         if (v1 !== v2) {
           html += `<div style="display:flex;flex-direction:column;margin-bottom:8px;background:rgba(255,255,255,0.05);padding:6px;border-radius:4px;">
-            <span style="color:var(--vi-accent);font-weight:bold;margin-bottom:4px;">${p}</span>
-            <div style="display:flex;justify-content:space-between;color:#ff4757">El 1: <span>${v1}</span></div>
-            <div style="display:flex;justify-content:space-between;color:#00E5CC">El 2: <span>${v2}</span></div></div>`;
+            <span style="color:var(--vi-accent);font-weight:bold;margin-bottom:4px;">${escAttr(p)}</span>
+            <div style="display:flex;justify-content:space-between;color:#ff4757">El 1: <span>${escAttr(v1)}</span></div>
+            <div style="display:flex;justify-content:space-between;color:#00E5CC">El 2: <span>${escAttr(v2)}</span></div></div>`;
         }
       });
       content.innerHTML = `<div class="__vi-panel-body-wrapper"><div class="__vi-section-title">DIFF MATRIX (2 Elements)</div>${html || '<div style="color:#2ed573">No differences found.</div>'}</div>`;
@@ -1781,10 +1817,10 @@
         <div class="__vi-section">
           <div class="__vi-section-title">LAYOUT</div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px 12px;">
-            <div>Display: <span style="color:var(--vi-text)">${computed.display}</span></div>
-            <div>Position: <span style="color:var(--vi-text)">${computed.position}</span></div>
-            <div>Overflow: <span style="color:var(--vi-text)">${computed.overflow}</span></div>
-            <div>Z-index: <span style="color:var(--vi-text)">${computed.zIndex}</span></div>
+            <div>Display: <span style="color:var(--vi-text)">${escAttr(computed.display)}</span></div>
+            <div>Position: <span style="color:var(--vi-text)">${escAttr(computed.position)}</span></div>
+            <div>Overflow: <span style="color:var(--vi-text)">${escAttr(computed.overflow)}</span></div>
+            <div>Z-index: <span style="color:var(--vi-text)">${escAttr(computed.zIndex)}</span></div>
           </div>
         </div>
         <div class="__vi-section">
@@ -1828,7 +1864,7 @@
       const v = cs[k] || '';
       if (!v) return;
       html += `<div class="__vi-computed-row" data-prop="${p}" style="display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.03);">
-        <span style="color:var(--vi-text-dim);font-size:10px;">${p}</span>
+        <span style="color:var(--vi-text-dim);font-size:10px;">${escAttr(p)}</span>
         <span style="display:flex;align-items:center;gap:4px;"><span style="color:var(--vi-text);font-family:var(--vi-mono);font-size:10px;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${escAttr(v)}">${escAttr(v)}</span><button class="__vi-copy-btn" data-copy="${escAttr(v)}">⧉</button></span>
       </div>`;
     });
@@ -1852,8 +1888,8 @@
     content.innerHTML = `<div class="__vi-panel-body-wrapper"><div class="__vi-section">
       <div class="__vi-section-title">POSITION</div>
       <p style="margin:0 0 12px;line-height:1.5;">Drag the element or use arrow keys to nudge.</p>
-      <div class="__vi-row"><label>Left</label><input class="__vi-input" data-prop="left" value="${el.style.left || computed.left}"></div>
-      <div class="__vi-row"><label>Top</label><input class="__vi-input" data-prop="top" value="${el.style.top || computed.top}"></div>
+      <div class="__vi-row"><label>Left</label><input class="__vi-input" data-prop="left" value="${escAttr(el.style.left || computed.left)}"></div>
+      <div class="__vi-row"><label>Top</label><input class="__vi-input" data-prop="top" value="${escAttr(el.style.top || computed.top)}"></div>
       <div class="__vi-row"><label>Position</label>
         <select class="__vi-input" data-prop="position">
           <option value="static" ${computed.position==='static'?'selected':''}>static</option>
@@ -1877,50 +1913,50 @@
         <div class="__vi-section-title">${isFlex ? 'FLEXBOX' : 'GRID'}</div>
         ${isFlex ? `
         <div class="__vi-row"><label>Direction</label>
-          <select class="__vi-input" data-prop="flexDirection">${['row','row-reverse','column','column-reverse'].map(v=>`<option value="${v}" ${computed.flexDirection===v?'selected':''}>${v}</option>`).join('')}</select></div>
+          <select class="__vi-input" data-prop="flexDirection">${['row','row-reverse','column','column-reverse'].map(v=>`<option value="${escAttr(v)}" ${computed.flexDirection===v?'selected':''}>${v}</option>`).join('')}</select></div>
         <div class="__vi-row"><label>Wrap</label>
-          <select class="__vi-input" data-prop="flexWrap">${['nowrap','wrap','wrap-reverse'].map(v=>`<option value="${v}" ${computed.flexWrap===v?'selected':''}>${v}</option>`).join('')}</select></div>
+          <select class="__vi-input" data-prop="flexWrap">${['nowrap','wrap','wrap-reverse'].map(v=>`<option value="${escAttr(v)}" ${computed.flexWrap===v?'selected':''}>${v}</option>`).join('')}</select></div>
         ` : `
-        <div class="__vi-row"><label>Columns</label><input class="__vi-input" data-prop="gridTemplateColumns" value="${el.style.gridTemplateColumns || ''}" placeholder="1fr 1fr 1fr"></div>
-        <div class="__vi-row"><label>Rows</label><input class="__vi-input" data-prop="gridTemplateRows" value="${el.style.gridTemplateRows || ''}" placeholder="auto"></div>
+        <div class="__vi-row"><label>Columns</label><input class="__vi-input" data-prop="gridTemplateColumns" value="${escAttr(el.style.gridTemplateColumns || '')}" placeholder="1fr 1fr 1fr"></div>
+        <div class="__vi-row"><label>Rows</label><input class="__vi-input" data-prop="gridTemplateRows" value="${escAttr(el.style.gridTemplateRows || '')}" placeholder="auto"></div>
         `}
         <div class="__vi-row"><label>Justify</label>
-          <select class="__vi-input" data-prop="justifyContent">${['flex-start','flex-end','center','space-between','space-around','space-evenly','stretch'].map(v=>`<option value="${v}" ${computed.justifyContent===v?'selected':''}>${v}</option>`).join('')}</select></div>
+          <select class="__vi-input" data-prop="justifyContent">${['flex-start','flex-end','center','space-between','space-around','space-evenly','stretch'].map(v=>`<option value="${escAttr(v)}" ${computed.justifyContent===v?'selected':''}>${v}</option>`).join('')}</select></div>
         <div class="__vi-row"><label>Align</label>
-          <select class="__vi-input" data-prop="alignItems">${['stretch','flex-start','flex-end','center','baseline'].map(v=>`<option value="${v}" ${computed.alignItems===v?'selected':''}>${v}</option>`).join('')}</select></div>
+          <select class="__vi-input" data-prop="alignItems">${['stretch','flex-start','flex-end','center','baseline'].map(v=>`<option value="${escAttr(v)}" ${computed.alignItems===v?'selected':''}>${v}</option>`).join('')}</select></div>
         <div class="__vi-row"><label>Align Content</label>
-          <select class="__vi-input" data-prop="alignContent">${['normal','flex-start','flex-end','center','space-between','space-around','stretch'].map(v=>`<option value="${v}" ${computed.alignContent===v?'selected':''}>${v}</option>`).join('')}</select></div>
+          <select class="__vi-input" data-prop="alignContent">${['normal','flex-start','flex-end','center','space-between','space-around','stretch'].map(v=>`<option value="${escAttr(v)}" ${computed.alignContent===v?'selected':''}>${v}</option>`).join('')}</select></div>
       </div>` : '';
 
     content.innerHTML = `<div class="__vi-panel-body-wrapper">
       <div class="__vi-section">
         <div class="__vi-section-title">MARGIN</div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
-          <label style="display:flex;flex-direction:column;gap:4px;">Top <input class="__vi-input" data-prop="marginTop" value="${computed.marginTop}"></label>
-          <label style="display:flex;flex-direction:column;gap:4px;">Right <input class="__vi-input" data-prop="marginRight" value="${computed.marginRight}"></label>
-          <label style="display:flex;flex-direction:column;gap:4px;">Bottom <input class="__vi-input" data-prop="marginBottom" value="${computed.marginBottom}"></label>
-          <label style="display:flex;flex-direction:column;gap:4px;">Left <input class="__vi-input" data-prop="marginLeft" value="${computed.marginLeft}"></label>
+          <label style="display:flex;flex-direction:column;gap:4px;">Top <input class="__vi-input" data-prop="marginTop" value="${escAttr(computed.marginTop)}"></label>
+          <label style="display:flex;flex-direction:column;gap:4px;">Right <input class="__vi-input" data-prop="marginRight" value="${escAttr(computed.marginRight)}"></label>
+          <label style="display:flex;flex-direction:column;gap:4px;">Bottom <input class="__vi-input" data-prop="marginBottom" value="${escAttr(computed.marginBottom)}"></label>
+          <label style="display:flex;flex-direction:column;gap:4px;">Left <input class="__vi-input" data-prop="marginLeft" value="${escAttr(computed.marginLeft)}"></label>
         </div>
       </div>
       <div class="__vi-section">
         <div class="__vi-section-title">PADDING</div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
-          <label style="display:flex;flex-direction:column;gap:4px;">Top <input class="__vi-input" data-prop="paddingTop" value="${computed.paddingTop}"></label>
-          <label style="display:flex;flex-direction:column;gap:4px;">Right <input class="__vi-input" data-prop="paddingRight" value="${computed.paddingRight}"></label>
-          <label style="display:flex;flex-direction:column;gap:4px;">Bottom <input class="__vi-input" data-prop="paddingBottom" value="${computed.paddingBottom}"></label>
-          <label style="display:flex;flex-direction:column;gap:4px;">Left <input class="__vi-input" data-prop="paddingLeft" value="${computed.paddingLeft}"></label>
+          <label style="display:flex;flex-direction:column;gap:4px;">Top <input class="__vi-input" data-prop="paddingTop" value="${escAttr(computed.paddingTop)}"></label>
+          <label style="display:flex;flex-direction:column;gap:4px;">Right <input class="__vi-input" data-prop="paddingRight" value="${escAttr(computed.paddingRight)}"></label>
+          <label style="display:flex;flex-direction:column;gap:4px;">Bottom <input class="__vi-input" data-prop="paddingBottom" value="${escAttr(computed.paddingBottom)}"></label>
+          <label style="display:flex;flex-direction:column;gap:4px;">Left <input class="__vi-input" data-prop="paddingLeft" value="${escAttr(computed.paddingLeft)}"></label>
         </div>
       </div>
       <div class="__vi-section">
         <div class="__vi-section-title">SIZE</div>
-        <div class="__vi-row"><label>Width</label><input class="__vi-input" data-prop="width" value="${computed.width}"></div>
-        <div class="__vi-row"><label>Height</label><input class="__vi-input" data-prop="height" value="${computed.height}"></div>
+        <div class="__vi-row"><label>Width</label><input class="__vi-input" data-prop="width" value="${escAttr(computed.width)}"></div>
+        <div class="__vi-row"><label>Height</label><input class="__vi-input" data-prop="height" value="${escAttr(computed.height)}"></div>
         <div class="__vi-row"><label>Display</label>
           <select class="__vi-input" data-prop="display">
-            ${['block','inline','inline-block','flex','inline-flex','grid','inline-grid','none'].map(v => `<option value="${v}" ${computed.display===v?'selected':''}>${v}</option>`).join('')}
+            ${['block','inline','inline-block','flex','inline-flex','grid','inline-grid','none'].map(v => `<option value="${escAttr(v)}" ${computed.display===v?'selected':''}>${v}</option>`).join('')}
           </select>
         </div>
-        <div class="__vi-row"><label>Gap</label><input class="__vi-input" data-prop="gap" value="${computed.gap === 'normal' ? '' : computed.gap}" placeholder="e.g. 16px"></div>
+        <div class="__vi-row"><label>Gap</label><input class="__vi-input" data-prop="gap" value="${escAttr(computed.gap === 'normal' ? '' : computed.gap)}" placeholder="e.g. 16px"></div>
       </div>
       ${flexGridSection}
     </div>`;
@@ -1930,7 +1966,7 @@
   // ---- TYPOGRAPHY TOOL ----
   function renderTypographyPanel(el, computed, content) {
     const googleFonts = ['Inter','Roboto','Open Sans','Lato','Montserrat','Oswald','Raleway','PT Sans','Merriweather','Nunito','Ubuntu','Playfair Display','Rubik','Work Sans','Poppins','Fira Sans','Quicksand','Karla','Barlow','Mulish','DM Sans','Space Grotesk','Outfit','Cinzel','Bebas Neue','Josefin Sans','Cabin','Anton','Dancing Script','Pacifico','Caveat','Abril Fatface'];
-    let fontOpts = `<option value="${computed.fontFamily.replace(/"/g, '&quot;')}">${computed.fontFamily.split(',')[0].replace(/"/g, '')}</option>
+    let fontOpts = `<option value="${escAttr(computed.fontFamily.replace(/"/g, '&quot;'))}">${computed.fontFamily.split(',')[0].replace(/"/g, '')}</option>
       <option value="inherit">Inherit</option><option disabled>── System ──</option>
       <option value="Arial, sans-serif">Arial</option><option value="'Helvetica Neue', sans-serif">Helvetica Neue</option>
       <option value="'Segoe UI', sans-serif">Segoe UI</option><option value="Georgia, serif">Georgia</option>
@@ -1940,18 +1976,18 @@
 
     content.innerHTML = `<div class="__vi-panel-body-wrapper">
       <div class="__vi-row"><label>Family</label><select class="__vi-input" data-prop="fontFamily" data-googlefont="true">${fontOpts}</select></div>
-      <div class="__vi-row"><label>Size</label><input class="__vi-input" data-prop="fontSize" value="${computed.fontSize}"></div>
-      <div class="__vi-row"><label>Weight</label><input class="__vi-input" data-prop="fontWeight" value="${computed.fontWeight}"></div>
-      <div class="__vi-row"><label>Line Ht</label><input class="__vi-input" data-prop="lineHeight" value="${computed.lineHeight}"></div>
-      <div class="__vi-row"><label>Spacing</label><input class="__vi-input" data-prop="letterSpacing" value="${computed.letterSpacing}"></div>
-      <div class="__vi-row"><label>Word Sp</label><input class="__vi-input" data-prop="wordSpacing" value="${computed.wordSpacing}"></div>
+      <div class="__vi-row"><label>Size</label><input class="__vi-input" data-prop="fontSize" value="${escAttr(computed.fontSize)}"></div>
+      <div class="__vi-row"><label>Weight</label><input class="__vi-input" data-prop="fontWeight" value="${escAttr(computed.fontWeight)}"></div>
+      <div class="__vi-row"><label>Line Ht</label><input class="__vi-input" data-prop="lineHeight" value="${escAttr(computed.lineHeight)}"></div>
+      <div class="__vi-row"><label>Spacing</label><input class="__vi-input" data-prop="letterSpacing" value="${escAttr(computed.letterSpacing)}"></div>
+      <div class="__vi-row"><label>Word Sp</label><input class="__vi-input" data-prop="wordSpacing" value="${escAttr(computed.wordSpacing)}"></div>
       <div class="__vi-row"><label>Align</label>
-        <select class="__vi-input" data-prop="textAlign">${['left','center','right','justify'].map(v=>`<option value="${v}" ${computed.textAlign===v?'selected':''}>${v}</option>`).join('')}</select></div>
+        <select class="__vi-input" data-prop="textAlign">${['left','center','right','justify'].map(v=>`<option value="${escAttr(v)}" ${computed.textAlign===v?'selected':''}>${v}</option>`).join('')}</select></div>
       <div class="__vi-row"><label>Transform</label>
-        <select class="__vi-input" data-prop="textTransform">${['none','uppercase','lowercase','capitalize'].map(v=>`<option value="${v}" ${computed.textTransform===v?'selected':''}>${v}</option>`).join('')}</select></div>
+        <select class="__vi-input" data-prop="textTransform">${['none','uppercase','lowercase','capitalize'].map(v=>`<option value="${escAttr(v)}" ${computed.textTransform===v?'selected':''}>${v}</option>`).join('')}</select></div>
       <div class="__vi-row"><label>Decor</label>
-        <select class="__vi-input" data-prop="textDecorationLine">${['none','underline','overline','line-through'].map(v=>`<option value="${v}" ${computed.textDecorationLine===v?'selected':''}>${v}</option>`).join('')}</select></div>
-      <div class="__vi-row"><label>Color</label><input type="color" class="__vi-input" style="padding:0;height:26px;" data-prop="color" value="${rgb2hex(computed.color)}"></div>
+        <select class="__vi-input" data-prop="textDecorationLine">${['none','underline','overline','line-through'].map(v=>`<option value="${escAttr(v)}" ${computed.textDecorationLine===v?'selected':''}>${v}</option>`).join('')}</select></div>
+      <div class="__vi-row"><label>Color</label><input type="color" class="__vi-input" style="padding:0;height:26px;" data-prop="color" value="${escAttr(rgb2hex(computed.color))}"></div>
     </div>`;
     attachInputHandlers(el);
   }
@@ -1962,16 +1998,16 @@
     content.innerHTML = `<div class="__vi-panel-body-wrapper">
       <div class="__vi-section">
         <div class="__vi-section-title">FILL</div>
-        <div class="__vi-row"><label>Bg Color</label><input type="color" class="__vi-input" style="padding:0;height:26px;" data-prop="backgroundColor" value="${rgb2hex(computed.backgroundColor)}">
+        <div class="__vi-row"><label>Bg Color</label><input type="color" class="__vi-input" style="padding:0;height:26px;" data-prop="backgroundColor" value="${escAttr(rgb2hex(computed.backgroundColor))}">
           <button class="__vi-copy-btn" data-copy="${rgb2hex(computed.backgroundColor)}">⧉</button></div>
-        <div class="__vi-row"><label>Text</label><input type="color" class="__vi-input" style="padding:0;height:26px;" data-prop="color" value="${rgb2hex(computed.color)}">
+        <div class="__vi-row"><label>Text</label><input type="color" class="__vi-input" style="padding:0;height:26px;" data-prop="color" value="${escAttr(rgb2hex(computed.color))}">
           <button class="__vi-copy-btn" data-copy="${rgb2hex(computed.color)}">⧉</button></div>
-        <div class="__vi-row"><label>Opacity</label><input type="range" class="__vi-input" data-prop="opacity" min="0" max="1" step="0.05" value="${computed.opacity}"></div>
+        <div class="__vi-row"><label>Opacity</label><input type="range" class="__vi-input" data-prop="opacity" min="0" max="1" step="0.05" value="${escAttr(computed.opacity)}"></div>
         ${hasEyeDropper ? '<button class="__vi-copy-btn" id="__vi-eyedropper" style="width:100%;padding:6px;text-align:center;font-size:11px;cursor:pointer;margin-top:4px;">🔍 Pick Color (Eyedropper)</button>' : ''}
       </div>
       <div class="__vi-section">
         <div class="__vi-section-title">GRADIENT</div>
-        <div class="__vi-row"><label>Background</label><input class="__vi-input" data-prop="background" value="${el.style.background || ''}" placeholder="linear-gradient(135deg, #667eea, #764ba2)"></div>
+        <div class="__vi-row"><label>Background</label><input class="__vi-input" data-prop="background" value="${escAttr(el.style.background || '')}" placeholder="linear-gradient(135deg, #667eea, #764ba2)"></div>
         <div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:4px;">
           ${['linear-gradient(135deg, #667eea 0%, #764ba2 100%)','linear-gradient(135deg, #f093fb 0%, #f5576c 100%)','linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)','linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)','linear-gradient(135deg, #fa709a 0%, #fee140 100%)','linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%)']
           .map(g => `<div class="__vi-gradient-preset" style="width:32px;height:20px;border-radius:4px;cursor:pointer;background:${g};border:1px solid var(--vi-border);" data-gradient="${g}"></div>`).join('')}
@@ -2009,24 +2045,24 @@
     content.innerHTML = `<div class="__vi-panel-body-wrapper">
       <div class="__vi-section">
         <div class="__vi-section-title">RADIUS</div>
-        <div class="__vi-row"><label>All</label><input class="__vi-input" data-prop="borderRadius" value="${computed.borderRadius}"></div>
+        <div class="__vi-row"><label>All</label><input class="__vi-input" data-prop="borderRadius" value="${escAttr(computed.borderRadius)}"></div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
-          <div class="__vi-row" style="margin:0"><label>TL</label><input class="__vi-input" data-prop="borderTopLeftRadius" value="${computed.borderTopLeftRadius}"></div>
-          <div class="__vi-row" style="margin:0"><label>TR</label><input class="__vi-input" data-prop="borderTopRightRadius" value="${computed.borderTopRightRadius}"></div>
-          <div class="__vi-row" style="margin:0"><label>BL</label><input class="__vi-input" data-prop="borderBottomLeftRadius" value="${computed.borderBottomLeftRadius}"></div>
-          <div class="__vi-row" style="margin:0"><label>BR</label><input class="__vi-input" data-prop="borderBottomRightRadius" value="${computed.borderBottomRightRadius}"></div>
+          <div class="__vi-row" style="margin:0"><label>TL</label><input class="__vi-input" data-prop="borderTopLeftRadius" value="${escAttr(computed.borderTopLeftRadius)}"></div>
+          <div class="__vi-row" style="margin:0"><label>TR</label><input class="__vi-input" data-prop="borderTopRightRadius" value="${escAttr(computed.borderTopRightRadius)}"></div>
+          <div class="__vi-row" style="margin:0"><label>BL</label><input class="__vi-input" data-prop="borderBottomLeftRadius" value="${escAttr(computed.borderBottomLeftRadius)}"></div>
+          <div class="__vi-row" style="margin:0"><label>BR</label><input class="__vi-input" data-prop="borderBottomRightRadius" value="${escAttr(computed.borderBottomRightRadius)}"></div>
         </div>
       </div>
       <div class="__vi-section">
         <div class="__vi-section-title">BORDER</div>
-        <div class="__vi-row"><label>Width</label><input class="__vi-input" data-prop="borderWidth" value="${computed.borderWidth}"></div>
+        <div class="__vi-row"><label>Width</label><input class="__vi-input" data-prop="borderWidth" value="${escAttr(computed.borderWidth)}"></div>
         <div class="__vi-row"><label>Style</label>
-          <select class="__vi-input" data-prop="borderStyle">${['none','solid','dashed','dotted','double','groove','ridge','inset','outset'].map(v=>`<option value="${v}" ${computed.borderStyle===v?'selected':''}>${v}</option>`).join('')}</select></div>
-        <div class="__vi-row"><label>Color</label><input type="color" class="__vi-input" style="padding:0;height:26px;" data-prop="borderColor" value="${rgb2hex(computed.borderColor)}"></div>
+          <select class="__vi-input" data-prop="borderStyle">${['none','solid','dashed','dotted','double','groove','ridge','inset','outset'].map(v=>`<option value="${escAttr(v)}" ${computed.borderStyle===v?'selected':''}>${v}</option>`).join('')}</select></div>
+        <div class="__vi-row"><label>Color</label><input type="color" class="__vi-input" style="padding:0;height:26px;" data-prop="borderColor" value="${escAttr(rgb2hex(computed.borderColor))}"></div>
       </div>
       <div class="__vi-section">
         <div class="__vi-section-title">BOX SHADOW</div>
-        <div class="__vi-row"><label>Shadow</label><input class="__vi-input" data-prop="boxShadow" value="${computed.boxShadow==='none'?'':computed.boxShadow}" placeholder="0px 4px 12px rgba(0,0,0,0.1)"></div>
+        <div class="__vi-row"><label>Shadow</label><input class="__vi-input" data-prop="boxShadow" value="${escAttr(computed.boxShadow==='none'?'':computed.boxShadow)}" placeholder="0px 4px 12px rgba(0,0,0,0.1)"></div>
         <div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:4px;">
           ${['0 2px 8px rgba(0,0,0,0.08)','0 4px 16px rgba(0,0,0,0.12)','0 8px 32px rgba(0,0,0,0.16)','0 20px 40px rgba(0,0,0,0.2)','inset 0 2px 4px rgba(0,0,0,0.1)','0 0 0 3px rgba(0,229,204,0.3)']
           .map((s,i) => `<button class="__vi-copy-btn __vi-shadow-preset" data-shadow="${s}" style="padding:4px 6px;font-size:9px;">S${i+1}</button>`).join('')}
@@ -2034,7 +2070,7 @@
       </div>
       <div>
         <div class="__vi-section-title">TEXT SHADOW</div>
-        <div class="__vi-row"><label>Shadow</label><input class="__vi-input" data-prop="textShadow" value="${computed.textShadow==='none'?'':computed.textShadow}" placeholder="1px 1px 2px rgba(0,0,0,0.3)"></div>
+        <div class="__vi-row"><label>Shadow</label><input class="__vi-input" data-prop="textShadow" value="${escAttr(computed.textShadow==='none'?'':computed.textShadow)}" placeholder="1px 1px 2px rgba(0,0,0,0.3)"></div>
       </div>
     </div>`;
     attachInputHandlers(el);
@@ -2080,34 +2116,34 @@
     content.innerHTML = `<div class="__vi-panel-body-wrapper">
       <div class="__vi-section">
         <div class="__vi-section-title">TRANSFORM</div>
-        <div class="__vi-row"><label>Transform</label><input class="__vi-input" data-prop="transform" value="${computed.transform==='none'?'':computed.transform}" placeholder="scale(1.1) rotate(5deg)"></div>
-        <div class="__vi-row"><label>Origin</label><input class="__vi-input" data-prop="transformOrigin" value="${computed.transformOrigin}"></div>
+        <div class="__vi-row"><label>Transform</label><input class="__vi-input" data-prop="transform" value="${escAttr(computed.transform==='none'?'':computed.transform)}" placeholder="scale(1.1) rotate(5deg)"></div>
+        <div class="__vi-row"><label>Origin</label><input class="__vi-input" data-prop="transformOrigin" value="${escAttr(computed.transformOrigin)}"></div>
       </div>
       <div class="__vi-section">
         <div class="__vi-section-title">FILTER</div>
-        <div class="__vi-row"><label>Filter</label><input class="__vi-input" data-prop="filter" value="${computed.filter==='none'?'':computed.filter}" placeholder="blur(4px) brightness(1.1)"></div>
-        <div class="__vi-row"><label>Backdrop</label><input class="__vi-input" data-prop="backdropFilter" value="${computed.backdropFilter==='none'?'':computed.backdropFilter}" placeholder="blur(10px)"></div>
+        <div class="__vi-row"><label>Filter</label><input class="__vi-input" data-prop="filter" value="${escAttr(computed.filter==='none'?'':computed.filter)}" placeholder="blur(4px) brightness(1.1)"></div>
+        <div class="__vi-row"><label>Backdrop</label><input class="__vi-input" data-prop="backdropFilter" value="${escAttr(computed.backdropFilter==='none'?'':computed.backdropFilter)}" placeholder="blur(10px)"></div>
         <div class="__vi-section-title" style="margin-top:6px;">FILTER SLIDERS</div>
-        <div class="__vi-row"><label>Blur</label><input type="range" class="__vi-input __vi-filter-slider" data-fname="blur" min="0" max="20" step="0.5" value="${fv.blur}"><span class="__vi-filter-val">${fv.blur}px</span></div>
-        <div class="__vi-row"><label>Bright</label><input type="range" class="__vi-input __vi-filter-slider" data-fname="brightness" min="0" max="3" step="0.05" value="${fv.brightness}"><span class="__vi-filter-val">${fv.brightness}</span></div>
-        <div class="__vi-row"><label>Contrast</label><input type="range" class="__vi-input __vi-filter-slider" data-fname="contrast" min="0" max="3" step="0.05" value="${fv.contrast}"><span class="__vi-filter-val">${fv.contrast}</span></div>
-        <div class="__vi-row"><label>Gray</label><input type="range" class="__vi-input __vi-filter-slider" data-fname="grayscale" min="0" max="1" step="0.05" value="${fv.grayscale}"><span class="__vi-filter-val">${fv.grayscale}</span></div>
-        <div class="__vi-row"><label>Sepia</label><input type="range" class="__vi-input __vi-filter-slider" data-fname="sepia" min="0" max="1" step="0.05" value="${fv.sepia}"><span class="__vi-filter-val">${fv.sepia}</span></div>
-        <div class="__vi-row"><label>Saturate</label><input type="range" class="__vi-input __vi-filter-slider" data-fname="saturate" min="0" max="4" step="0.05" value="${fv.saturate}"><span class="__vi-filter-val">${fv.saturate}</span></div>
-        <div class="__vi-row"><label>Hue</label><input type="range" class="__vi-input __vi-filter-slider" data-fname="hue-rotate" min="0" max="360" step="1" value="${fv['hue-rotate']}"><span class="__vi-filter-val">${fv['hue-rotate']}°</span></div>
-        <div class="__vi-row"><label>Invert</label><input type="range" class="__vi-input __vi-filter-slider" data-fname="invert" min="0" max="1" step="0.05" value="${fv.invert}"><span class="__vi-filter-val">${fv.invert}</span></div>
+        <div class="__vi-row"><label>Blur</label><input type="range" class="__vi-input __vi-filter-slider" data-fname="blur" min="0" max="20" step="0.5" value="${escAttr(fv.blur)}"><span class="__vi-filter-val">${fv.blur}px</span></div>
+        <div class="__vi-row"><label>Bright</label><input type="range" class="__vi-input __vi-filter-slider" data-fname="brightness" min="0" max="3" step="0.05" value="${escAttr(fv.brightness)}"><span class="__vi-filter-val">${fv.brightness}</span></div>
+        <div class="__vi-row"><label>Contrast</label><input type="range" class="__vi-input __vi-filter-slider" data-fname="contrast" min="0" max="3" step="0.05" value="${escAttr(fv.contrast)}"><span class="__vi-filter-val">${fv.contrast}</span></div>
+        <div class="__vi-row"><label>Gray</label><input type="range" class="__vi-input __vi-filter-slider" data-fname="grayscale" min="0" max="1" step="0.05" value="${escAttr(fv.grayscale)}"><span class="__vi-filter-val">${fv.grayscale}</span></div>
+        <div class="__vi-row"><label>Sepia</label><input type="range" class="__vi-input __vi-filter-slider" data-fname="sepia" min="0" max="1" step="0.05" value="${escAttr(fv.sepia)}"><span class="__vi-filter-val">${fv.sepia}</span></div>
+        <div class="__vi-row"><label>Saturate</label><input type="range" class="__vi-input __vi-filter-slider" data-fname="saturate" min="0" max="4" step="0.05" value="${escAttr(fv.saturate)}"><span class="__vi-filter-val">${fv.saturate}</span></div>
+        <div class="__vi-row"><label>Hue</label><input type="range" class="__vi-input __vi-filter-slider" data-fname="hue-rotate" min="0" max="360" step="1" value="${escAttr(fv['hue-rotate'])}"><span class="__vi-filter-val">${fv['hue-rotate']}°</span></div>
+        <div class="__vi-row"><label>Invert</label><input type="range" class="__vi-input __vi-filter-slider" data-fname="invert" min="0" max="1" step="0.05" value="${escAttr(fv.invert)}"><span class="__vi-filter-val">${fv.invert}</span></div>
       </div>
       <div class="__vi-section">
         <div class="__vi-section-title">BLEND</div>
         <div class="__vi-row"><label>Mix Blend</label>
-          <select class="__vi-input" data-prop="mixBlendMode">${['normal','multiply','screen','overlay','darken','lighten','color-dodge','color-burn','hard-light','soft-light','difference','exclusion','hue','saturation','color','luminosity'].map(v=>`<option value="${v}" ${computed.mixBlendMode===v?'selected':''}>${v}</option>`).join('')}</select></div>
+          <select class="__vi-input" data-prop="mixBlendMode">${['normal','multiply','screen','overlay','darken','lighten','color-dodge','color-burn','hard-light','soft-light','difference','exclusion','hue','saturation','color','luminosity'].map(v=>`<option value="${escAttr(v)}" ${computed.mixBlendMode===v?'selected':''}>${v}</option>`).join('')}</select></div>
       </div>
       <div>
         <div class="__vi-section-title">VISIBILITY</div>
         <div class="__vi-row"><label>Overflow</label>
-          <select class="__vi-input" data-prop="overflow">${['visible','hidden','scroll','auto','clip'].map(v=>`<option value="${v}" ${computed.overflow===v?'selected':''}>${v}</option>`).join('')}</select></div>
+          <select class="__vi-input" data-prop="overflow">${['visible','hidden','scroll','auto','clip'].map(v=>`<option value="${escAttr(v)}" ${computed.overflow===v?'selected':''}>${v}</option>`).join('')}</select></div>
         <div class="__vi-row"><label>Cursor</label>
-          <select class="__vi-input" data-prop="cursor">${['auto','default','pointer','move','text','wait','crosshair','not-allowed','grab','grabbing'].map(v=>`<option value="${v}" ${computed.cursor===v?'selected':''}>${v}</option>`).join('')}</select></div>
+          <select class="__vi-input" data-prop="cursor">${['auto','default','pointer','move','text','wait','crosshair','not-allowed','grab','grabbing'].map(v=>`<option value="${escAttr(v)}" ${computed.cursor===v?'selected':''}>${v}</option>`).join('')}</select></div>
       </div>
     </div>`;
     attachInputHandlers(el);
@@ -2138,27 +2174,27 @@
     content.innerHTML = `<div class="__vi-panel-body-wrapper">
       <div class="__vi-section">
         <div class="__vi-section-title">TRANSITION</div>
-        <div class="__vi-row"><label>Property</label><input class="__vi-input" data-prop="transitionProperty" value="${computed.transitionProperty==='all'?'':computed.transitionProperty}" placeholder="all"></div>
-        <div class="__vi-row"><label>Duration</label><input class="__vi-input" data-prop="transitionDuration" value="${computed.transitionDuration==='0s'?'':computed.transitionDuration}" placeholder="0.3s"></div>
+        <div class="__vi-row"><label>Property</label><input class="__vi-input" data-prop="transitionProperty" value="${escAttr(computed.transitionProperty==='all'?'':computed.transitionProperty)}" placeholder="all"></div>
+        <div class="__vi-row"><label>Duration</label><input class="__vi-input" data-prop="transitionDuration" value="${escAttr(computed.transitionDuration==='0s'?'':computed.transitionDuration)}" placeholder="0.3s"></div>
         <div class="__vi-row"><label>Timing</label>
           <select class="__vi-input" data-prop="transitionTimingFunction">
-            ${easings.map(e => `<option value="${e}" ${computed.transitionTimingFunction===e?'selected':''}>${e.includes('cubic')?'cubic...':e}</option>`).join('')}
+            ${easings.map(e => `<option value="${escAttr(e)}" ${computed.transitionTimingFunction===e?'selected':''}>${e.includes('cubic')?'cubic...':e}</option>`).join('')}
           </select></div>
-        <div class="__vi-row"><label>Delay</label><input class="__vi-input" data-prop="transitionDelay" value="${computed.transitionDelay==='0s'?'':computed.transitionDelay}" placeholder="0s"></div>
+        <div class="__vi-row"><label>Delay</label><input class="__vi-input" data-prop="transitionDelay" value="${escAttr(computed.transitionDelay==='0s'?'':computed.transitionDelay)}" placeholder="0s"></div>
       </div>
       <div>
         <div class="__vi-section-title">ANIMATION</div>
-        <div class="__vi-row"><label>Name</label><input class="__vi-input" data-prop="animationName" value="${computed.animationName==='none'?'':computed.animationName}"></div>
-        <div class="__vi-row"><label>Duration</label><input class="__vi-input" data-prop="animationDuration" value="${computed.animationDuration==='0s'?'':computed.animationDuration}" placeholder="1s"></div>
+        <div class="__vi-row"><label>Name</label><input class="__vi-input" data-prop="animationName" value="${escAttr(computed.animationName==='none'?'':computed.animationName)}"></div>
+        <div class="__vi-row"><label>Duration</label><input class="__vi-input" data-prop="animationDuration" value="${escAttr(computed.animationDuration==='0s'?'':computed.animationDuration)}" placeholder="1s"></div>
         <div class="__vi-row"><label>Timing</label>
           <select class="__vi-input" data-prop="animationTimingFunction">
-            ${easings.map(e => `<option value="${e}" ${computed.animationTimingFunction===e?'selected':''}>${e.includes('cubic')?'cubic...':e}</option>`).join('')}
+            ${easings.map(e => `<option value="${escAttr(e)}" ${computed.animationTimingFunction===e?'selected':''}>${e.includes('cubic')?'cubic...':e}</option>`).join('')}
           </select></div>
-        <div class="__vi-row"><label>Iteration</label><input class="__vi-input" data-prop="animationIterationCount" value="${computed.animationIterationCount==='1'?'':computed.animationIterationCount}" placeholder="infinite"></div>
+        <div class="__vi-row"><label>Iteration</label><input class="__vi-input" data-prop="animationIterationCount" value="${escAttr(computed.animationIterationCount==='1'?'':computed.animationIterationCount)}" placeholder="infinite"></div>
         <div class="__vi-row"><label>Direction</label>
-          <select class="__vi-input" data-prop="animationDirection">${['normal','reverse','alternate','alternate-reverse'].map(v=>`<option value="${v}" ${computed.animationDirection===v?'selected':''}>${v}</option>`).join('')}</select></div>
+          <select class="__vi-input" data-prop="animationDirection">${['normal','reverse','alternate','alternate-reverse'].map(v=>`<option value="${escAttr(v)}" ${computed.animationDirection===v?'selected':''}>${v}</option>`).join('')}</select></div>
         <div class="__vi-row"><label>Fill</label>
-          <select class="__vi-input" data-prop="animationFillMode">${['none','forwards','backwards','both'].map(v=>`<option value="${v}" ${computed.animationFillMode===v?'selected':''}>${v}</option>`).join('')}</select></div>
+          <select class="__vi-input" data-prop="animationFillMode">${['none','forwards','backwards','both'].map(v=>`<option value="${escAttr(v)}" ${computed.animationFillMode===v?'selected':''}>${v}</option>`).join('')}</select></div>
       </div>
     </div>`;
     attachInputHandlers(el);
@@ -2405,6 +2441,7 @@
 
       // Escape: close palette first, then clear selection
       if (e.key === 'Escape') {
+        if (isDraggingEl) { _moveCancelDrag(); return; }
         if (paletteOpen) { togglePalette(true); e.preventDefault(); e.stopPropagation(); return; }
         if (state.ui.confirmModal.classList.contains('open')) { closeResetConfirm(); e.preventDefault(); return; }
         if (state.ui.shortcutsModal.classList.contains('open')) { state.ui.shortcutsModal.classList.remove('open'); e.preventDefault(); return; }
@@ -2678,6 +2715,30 @@
     }
   }
 
+  function _moveCancelDrag() {
+    if (!isDraggingEl) return;
+    isDraggingEl = false;
+    if (_moveRAF) { cancelAnimationFrame(_moveRAF); _moveRAF = 0; }
+    const target = _moveTarget;
+    _moveTarget = null;
+    if (!target) return;
+    target.style.removeProperty('transform');
+    target.style.removeProperty('transition');
+    target.style.removeProperty('animation');
+    if (_moveOrigTransform) target.style.transform = _moveOrigTransform;
+    if (_moveOrigTransition) target.style.transition = _moveOrigTransition;
+    if (_moveOrigAnimation) target.style.animation = _moveOrigAnimation;
+    target.style.willChange = '';
+    target.style.cursor = '';
+    _moveOrigTransform = '';
+    _moveOrigTransition = '';
+    _moveOrigAnimation = '';
+    _moveDragCommitted = false;
+    window.removeEventListener('mousemove', _moveMouseMove);
+    window.removeEventListener('mouseup', _moveMouseUp);
+    renderPanelForCurrentTool();
+  }
+
   function _moveMouseUp() {
     window.removeEventListener('mousemove', _moveMouseMove);
     window.removeEventListener('mouseup', _moveMouseUp);
@@ -2777,18 +2838,28 @@
     }
   }
 
+  let _rulerRAF = 0;
+  function scheduleDrawRulers() {
+    if (!_rulerRAF) {
+      _rulerRAF = requestAnimationFrame(() => {
+        drawRulers();
+        _rulerRAF = 0;
+      });
+    }
+  }
+
   function toggleRulers() {
     state.features.rulers = !state.features.rulers;
     const t = document.getElementById('__vi-ruler-top'), l = document.getElementById('__vi-ruler-left');
     if (state.features.rulers) {
       t.classList.add('active'); l.classList.add('active');
       drawRulers();
-      window.addEventListener('scroll', drawRulers, { passive: true });
-      window.addEventListener('resize', drawRulers, { passive: true });
+      window.addEventListener('scroll', scheduleDrawRulers, { passive: true });
+      window.addEventListener('resize', scheduleDrawRulers, { passive: true });
     } else {
       t.classList.remove('active'); l.classList.remove('active');
-      window.removeEventListener('scroll', drawRulers);
-      window.removeEventListener('resize', drawRulers);
+      window.removeEventListener('scroll', scheduleDrawRulers);
+      window.removeEventListener('resize', scheduleDrawRulers);
     }
     updateFeatureDots();
     showToast(state.features.rulers ? 'Rulers On' : 'Rulers Off');
@@ -3105,7 +3176,7 @@
       showToast('Mobile preview off');
     }
     updateFeatureDots();
-    if (state.features.rulers) drawRulers();
+    if (state.features.rulers) scheduleDrawRulers();
   }
 
   // ============================================================
