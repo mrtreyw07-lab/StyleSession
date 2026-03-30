@@ -1,0 +1,28 @@
+stylesession.html:33:    z-index: var(--vi-z);
+stylesession.html:47:    z-index: var(--vi-z);
+stylesession.html:63:    position: absolute; pointer-events: none; display: none; z-index: calc(var(--vi-z) - 1);
+stylesession.html:68:    position: absolute; pointer-events: none; display: none; z-index: calc(var(--vi-z) - 1);
+stylesession.html:75:    position: absolute; pointer-events: none; z-index: calc(var(--vi-z) + 2);
+stylesession.html:79:    position: absolute; pointer-events: none; z-index: calc(var(--vi-z) + 3);
+stylesession.html:97:    z-index: calc(var(--vi-z) + 1);
+stylesession.html:122:    z-index: var(--vi-z);
+stylesession.html:188:    z-index: calc(var(--vi-z) + 15);
+stylesession.html:262:    z-index: var(--vi-z);
+stylesession.html:301:    cursor: ew-resize; z-index: 1;
+stylesession.html:453:    z-index: calc(var(--vi-z) + 20); pointer-events: none;
+stylesession.html:467:  .__vi-ruler { position: fixed; background: var(--vi-bg); z-index: calc(var(--vi-z) - 5); display: none; }
+stylesession.html:473:  .__vi-guide { position: fixed; background: var(--vi-accent); z-index: calc(var(--vi-z) - 4); transition: background 0.2s; }
+stylesession.html:483:    z-index: calc(var(--vi-z) + 10); display: none; flex-direction: column; opacity: 0; transition: all 0.2s;
+stylesession.html:501:    padding: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); z-index: calc(var(--vi-z) + 15);
+stylesession.html:523:    z-index: calc(var(--vi-z) + 50); display: none; align-items: center; justify-content: center;
+stylesession.html:564:    z-index: calc(var(--vi-z) + 55); display: none; align-items: center; justify-content: center;
+stylesession.html:607:    z-index: calc(var(--vi-z) - 10);
+stylesession.html:661:    z-index: 2;
+stylesession.html:692:    position: fixed; z-index: calc(var(--vi-z) + 30);
+stylesession.html:1814:      'margin','padding','border','border-radius','overflow','z-index','opacity',
+stylesession.html:2838:      layoutStyleEl.textContent = `.__vi-layout-flex,.__vi-layout-grid{position:relative;outline:1px dashed #D7007F!important}.__vi-layout-flex::before{content:'FLEX';position:absolute;top:-14px;left:0;background:#D7007F;color:#fff;font-size:9px;padding:2px 4px;z-index:2147483600;font-family:sans-serif}.__vi-layout-grid::before{content:'GRID';position:absolute;top:-14px;left:0;background:#00E5CC;color:#000;font-size:9px;padding:2px 4px;z-index:2147483600;font-family:sans-serif}.__vi-layout-grid{outline:1px dashed #00E5CC!important}`;
+stylesession.html:2864:      a11yStyleEl.textContent = `.__vi-a11y-error{outline:2px solid #ff4757!important;position:relative}.__vi-a11y-warn{outline:2px solid #ffa502!important;position:relative}.__vi-a11y-error::after{content:attr(data-vi-a11y);position:absolute;top:-14px;left:0;background:#ff4757;color:#fff;font-size:9px;padding:2px 4px;z-index:2147483600;font-family:sans-serif;white-space:nowrap}.__vi-a11y-warn::after{content:attr(data-vi-a11y);position:absolute;top:-14px;left:0;background:#ffa502;color:#000;font-size:9px;padding:2px 4px;z-index:2147483600;font-family:sans-serif;white-space:nowrap}`;
+stylesession.html:3369:    snapshotOverlay.style.cssText = 'position:fixed;top:0;left:0;width:50%;height:100vh;z-index:2147483605;overflow:hidden;border-right:2px solid var(--vi-accent);resize:horizontal;min-width:5%;max-width:95%;background:#fff;transform:translateZ(0);box-shadow:5px 0 15px rgba(0,0,0,0.3);';
+stylesession.html:3611:    overlay.style.cssText = 'position:fixed;top:80px;right:20px;width:260px;max-height:400px;overflow-y:auto;background:rgba(20,20,24,0.96);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:12px;z-index:2147483610;font-family:var(--vi-font);color:var(--vi-text);font-size:11px;pointer-events:auto;backdrop-filter:blur(20px);';
+stylesession.html:3654:    cssEditorEl.style.cssText = 'position:fixed;bottom:20px;right:20px;width:360px;height:280px;background:rgba(20,20,24,0.97);border:1px solid rgba(255,255,255,0.08);border-radius:12px;z-index:2147483610;font-family:var(--vi-font);color:var(--vi-text);pointer-events:auto;display:flex;flex-direction:column;backdrop-filter:blur(20px);box-shadow:0 8px 32px rgba(0,0,0,0.4);resize:both;overflow:hidden;';
+stylesession.html:3706:    overlay.style.cssText = 'position:fixed;top:80px;left:20px;width:300px;max-height:500px;overflow-y:auto;background:rgba(20,20,24,0.96);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:12px;z-index:2147483610;font-family:var(--vi-font);color:var(--vi-text);font-size:11px;pointer-events:auto;backdrop-filter:blur(20px);';

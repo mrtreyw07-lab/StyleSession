@@ -143,7 +143,7 @@
     gap: clamp(6px, 1vh, 8px);
     pointer-events: auto;
     box-shadow: 0 20px 40px rgba(0,0,0,0.3);
-    z-index: var(--vi-z);
+    z-index: calc(var(--vi-z) + 100);
     user-select: none;
   }
   .__vi-toolbar-drag {
@@ -283,7 +283,7 @@
     border-top: 1px solid rgba(255, 255, 255, 0.12);
     border-radius: 12px;
     box-shadow: -8px 0 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05);
-    z-index: var(--vi-z);
+    z-index: calc(var(--vi-z) + 100);
     pointer-events: auto;
     display: flex; flex-direction: column;
     transition: right 0.4s cubic-bezier(0.16, 1, 0.3, 1);
@@ -525,11 +525,16 @@
     padding: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); z-index: calc(var(--vi-z) + 15);
     width: 200px; display: flex; flex-direction: column; gap: 8px; pointer-events: auto;
   }
+  .__vi-note-drag {
+    height: 12px; width: 100%; cursor: grab; background: rgba(0,0,0,0.05); border-radius: 4px;
+    margin-top: -4px; flex-shrink: 0;
+  }
+  .__vi-note-drag:active { cursor: grabbing; }
   .__vi-note textarea {
     background: transparent; border: none; outline: none; resize: vertical; min-height: 60px;
     font-family: var(--vi-font); font-size: 13px; color: #664D03;
   }
-  .__vi-note button {
+  .__vi-note-close {
     position: absolute; top: -8px; right: -8px; width: 24px; height: 24px; border-radius: 12px;
     background: #ff4757; color: white; border: none; cursor: pointer; font-size: 14px;
     display: flex; align-items: center; justify-content: center;
@@ -941,6 +946,20 @@
     loadSession();
     requestAnimationFrame(renderLoop);
     updateUndoRedoUI();
+
+    let _memTimeout = null;
+    const obs = new MutationObserver(() => {
+      if (_memTimeout) clearTimeout(_memTimeout);
+      _memTimeout = setTimeout(() => {
+        state.originalStyles.forEach((_, el) => {
+          if (!document.body.contains(el)) state.originalStyles.delete(el);
+        });
+        state.undoStack = state.undoStack.filter(cmd => document.body.contains(cmd.el));
+        state.redoStack = state.redoStack.filter(cmd => document.body.contains(cmd.el));
+        updateUndoRedoUI();
+      }, 2000);
+    });
+    obs.observe(document.body, { childList: true, subtree: true });
   }
 
   // ============================================================
@@ -979,6 +998,7 @@
   }
 
   function escAttr(s) {
+    if (s == null) return '';
     return String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
   }
 
@@ -1249,9 +1269,9 @@
   function getElementLabel(el) {
     let name = el.tagName.toLowerCase();
     if (el.id) name += '#' + el.id;
-    else if (el.className && typeof el.className === 'string' && !el.className.includes('__vi')) {
-      const first = el.className.trim().split(' ')[0];
-      if (first) name += '.' + first;
+    else if (el.className && typeof el.className === 'string') {
+      const cls = el.className.trim().split(' ').find(c => !c.startsWith('__vi'));
+      if (cls) name += '.' + cls;
     }
     return name;
   }
@@ -1343,7 +1363,7 @@
   function updateLabel(targetEl) {
     const rect = targetEl.getBoundingClientRect();
     const label = state.ui.label;
-    const name = getElementLabel(targetEl);
+    const name = escAttr(getElementLabel(targetEl));
     const dims = `${Math.round(rect.width)}×${Math.round(rect.height)}`;
     label.innerHTML = `${name} <span class="dim">${dims}</span>`;
     let top = rect.top + window.scrollY;
@@ -1382,8 +1402,8 @@
     const bwl = parseFloat(cs.borderLeftWidth) || 0;
     po.style.top = (rect.top + window.scrollY + bwt) + 'px';
     po.style.left = (rect.left + window.scrollX + bwl) + 'px';
-    po.style.width = (rect.width - parseFloat(cs.borderLeftWidth || 0) - parseFloat(cs.borderRightWidth || 0)) + 'px';
-    po.style.height = (rect.height - parseFloat(cs.borderTopWidth || 0) - parseFloat(cs.borderBottomWidth || 0)) + 'px';
+    po.style.width = Math.max(0, rect.width - bwl - (parseFloat(cs.borderRightWidth) || 0)) + 'px';
+    po.style.height = Math.max(0, rect.height - bwt - (parseFloat(cs.borderBottomWidth) || 0)) + 'px';
     if (pt || pr || pb || pl) po.classList.add('active'); else po.classList.remove('active');
   }
 
@@ -1493,8 +1513,8 @@
       isDragging = true;
       startX = e.clientX; startY = e.clientY;
       const rect = state.ui.toolbar.getBoundingClientRect();
-      startLeft = rect.left + window.scrollX;
-      startTop = rect.top + window.scrollY;
+      startLeft = rect.left;
+      startTop = rect.top;
       state.ui.toolbar.style.left = startLeft + 'px';
       state.ui.toolbar.style.top = startTop + 'px';
       state.ui.toolbar.style.transform = 'none';
@@ -1652,7 +1672,7 @@
 
   function getEffectiveBgColor(el) {
     let cur = el, depth = 0;
-    while (cur && depth < 50) {
+    while (cur && cur.nodeType === 1 && depth < 50) {
       const bg = window.getComputedStyle(cur).backgroundColor;
       if (bg && bg !== 'transparent' && bg !== 'rgba(0, 0, 0, 0)') return bg;
       cur = cur.parentElement;
@@ -2751,8 +2771,11 @@
   // ============================================================
   // RULERS & GUIDES
   // ============================================================
+  let _rulersRAF = 0;
   function drawRulers() {
     if (!state.features.rulers) return;
+    if (_rulersRAF) return;
+    _rulersRAF = requestAnimationFrame(() => {
     const tc = document.querySelector('#__vi-ruler-top canvas');
     const lc = document.querySelector('#__vi-ruler-left canvas');
     if (!tc || !lc) return;
@@ -2775,6 +2798,7 @@
       else if (y % 50 === 0) ctxL.fillRect(12, s, 12, 1);
       else ctxL.fillRect(18, s, 6, 1);
     }
+    });
   }
 
   function toggleRulers() {
@@ -3111,6 +3135,40 @@
   // ============================================================
   // ANNOTATIONS
   // ============================================================
+  function makeNote(x, y, text = '') {
+    const note = document.createElement('div');
+    note.className = '__vi-note';
+    note.style.left = typeof x === 'number' ? x + 'px' : x;
+    note.style.top = typeof y === 'number' ? y + 'px' : y;
+    note.innerHTML = `<div class="__vi-note-drag" title="Drag to move"></div><textarea placeholder="Type note...">${escAttr(text)}</textarea><button class="__vi-note-close" title="Delete note">×</button>`;
+    
+    note.querySelector('.__vi-note-close').onclick = () => { note.remove(); autoSave(); };
+    note.querySelector('textarea').addEventListener('input', autoSave);
+    
+    const drag = note.querySelector('.__vi-note-drag');
+    drag.addEventListener('mousedown', (e) => {
+      e.preventDefault(); e.stopPropagation();
+      let startX = e.clientX, startY = e.clientY;
+      let initLeft = parseFloat(note.style.left) || 0;
+      let initTop = parseFloat(note.style.top) || 0;
+      
+      const move = (me) => {
+        note.style.left = (initLeft + me.clientX - startX) + 'px';
+        note.style.top = (initTop + me.clientY - startY) + 'px';
+      };
+      const up = () => {
+        window.removeEventListener('mousemove', move);
+        window.removeEventListener('mouseup', up, true);
+        autoSave();
+      };
+      window.addEventListener('mousemove', move);
+      window.addEventListener('mouseup', up, true);
+    });
+    
+    document.getElementById('__vi-guides-container').appendChild(note);
+    return note;
+  }
+
   let annotationsActive = false;
   function toggleAnnotations() {
     annotationsActive = !annotationsActive;
@@ -3120,14 +3178,10 @@
       const drop = (e) => {
         if (!annotationsActive) { window.removeEventListener('click', drop, { capture: true }); return; }
         if (e.target.closest('#__vi-root')) return;
-        const note = document.createElement('div');
-        note.className = '__vi-note';
-        note.style.left = e.clientX + 'px'; note.style.top = (e.clientY + window.scrollY) + 'px';
-        note.innerHTML = `<textarea placeholder="Type note..."></textarea><button>×</button>`;
-        document.getElementById('__vi-guides-container').appendChild(note);
-        note.querySelector('button').onclick = () => note.remove();
+        makeNote(e.clientX, e.clientY + window.scrollY);
         toggleAnnotations();
         window.removeEventListener('click', drop, { capture: true });
+        autoSave();
       };
       setTimeout(() => window.addEventListener('click', drop, { capture: true }), 100);
     } else {
@@ -3436,12 +3490,7 @@
         const container = document.getElementById('__vi-guides-container');
         if (container) {
           parsed.notes.forEach(n => {
-            const note = document.createElement('div');
-            note.className = '__vi-note';
-            note.style.left = n.x; note.style.top = n.y;
-            note.innerHTML = `<textarea placeholder="Type note...">${escAttr(n.text)}</textarea><button>×</button>`;
-            container.appendChild(note);
-            note.querySelector('button').onclick = () => note.remove();
+            makeNote(n.x, n.y, n.text);
           });
         }
       }
