@@ -722,6 +722,26 @@
   }
   .__vi-a11y-pass { background: rgba(46,213,115,0.2); color: #2ed573; }
   .__vi-a11y-fail { background: rgba(255,71,87,0.2); color: #ff4757; }
+
+  /* Shape Tool */
+  [data-vi-tool="shape"] { cursor: crosshair !important; }
+  [data-vi-tool="shape"] * { cursor: crosshair !important; }
+  .__vi-shape-preview {
+    position: absolute; pointer-events: none; z-index: calc(var(--vi-z) - 2);
+    border: 2px dashed var(--vi-accent); background: rgba(0, 229, 204, 0.06);
+    display: none;
+  }
+  .__vi-shape-preview.active { display: block; }
+  .__vi-shape {
+    box-sizing: border-box;
+    pointer-events: auto;
+  }
+  .__vi-shape-css-output {
+    width: 100%; background: rgba(0,0,0,0.3); border: 1px solid var(--vi-border);
+    border-radius: 4px; padding: 8px; font-family: var(--vi-mono); font-size: 10px;
+    color: var(--vi-text); resize: vertical; min-height: 60px; max-height: 200px;
+    line-height: 1.5;
+  }
 </style>
 </head>
 <body>
@@ -746,6 +766,7 @@
       <button class="__vi-btn" data-tool="effects" data-tooltip="Effects (E)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg></button>
       <button class="__vi-btn" data-tool="animation" data-tooltip="Animation (O)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg></button>
       <button class="__vi-btn" data-tool="tokens" data-tooltip="Design Tokens (K)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg></button>
+      <button class="__vi-btn" data-tool="shape" data-tooltip="Shape Tool (G)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg></button>
     </div>
     <div class="__vi-tb-group">
       <button class="__vi-btn" id="__vi-btn-undo" data-tooltip="Undo (Ctrl+Z)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg></button>
@@ -914,6 +935,7 @@
     bindCompare();
     bindMoreMenu();
     bindMoveEvents();
+    bindShapeEvents();
     bindGuides();
     bindExport();
     bindContextMenu();
@@ -1518,6 +1540,10 @@
   }
 
   function setTool(toolName) {
+    // If leaving shape tool, clean up drawing state
+    if (state.currentTool === 'shape' && toolName !== 'shape') {
+      _shapeCleanup();
+    }
     state.currentTool = toolName;
     state.ui.toolbar.querySelectorAll('button[data-tool]').forEach(b => {
       b.classList.toggle('active', b.getAttribute('data-tool') === toolName);
@@ -1528,6 +1554,12 @@
     // Set page-wide cursor based on active tool
     document.documentElement.setAttribute('data-vi-tool', toolName);
     if (toolName === 'browse') { clearHover(); clearSelection(); state.ui.panel.classList.remove('open'); return; }
+    if (toolName === 'shape' && state.selectedEls.length === 0) {
+      // Show shape instructions in panel
+      state.ui.panel.classList.add('open');
+      state.ui.panelContent.innerHTML = `<div class="__vi-panel-body-wrapper"><div class="__vi-empty"><p>Click and drag on the page to draw a shape.<br><br>The shape becomes a real <code>&lt;div&gt;</code> you can style, move, and export as CSS.</p></div></div>`;
+      return;
+    }
     if (state.selectedEls.length > 0) renderPanelForCurrentTool();
   }
 
@@ -1694,6 +1726,8 @@
       renderAnimationPanel(el, computed, content);
     } else if (state.currentTool === 'tokens') {
       renderTokensPanel(content);
+    } else if (state.currentTool === 'shape') {
+      renderShapePanel(el, computed, content);
     } else {
       content.innerHTML = `<div class="__vi-empty"><p>Tool: <strong style="color:var(--vi-accent)">${state.currentTool}</strong></p></div>`;
     }
@@ -2466,7 +2500,7 @@
       }
 
       // Tool shortcuts
-      const toolMap = { 'v':'select','q':'browse','m':'move','s':'spacing','t':'typography','f':'color','b':'border','e':'effects','o':'animation','k':'tokens' };
+      const toolMap = { 'v':'select','q':'browse','m':'move','s':'spacing','t':'typography','f':'color','b':'border','e':'effects','o':'animation','k':'tokens','g':'shape' };
       if (!e.ctrlKey && !e.metaKey && !e.shiftKey && toolMap[e.key.toLowerCase()]) {
         setTool(toolMap[e.key.toLowerCase()]);
         return;
@@ -2486,7 +2520,7 @@
         ${shortcutRow('V','Select Tool')}${shortcutRow('Q','Browse Mode')}${shortcutRow('M','Move Tool')}
         ${shortcutRow('S','Spacing Tool')}${shortcutRow('T','Typography Tool')}${shortcutRow('F','Color Tool')}
         ${shortcutRow('B','Border Tool')}${shortcutRow('E','Effects Tool')}${shortcutRow('O','Animation Tool')}
-        ${shortcutRow('K','Design Tokens')}${shortcutRow('Ctrl+Z','Undo')}${shortcutRow('Ctrl+Shift+Z','Redo')}
+        ${shortcutRow('K','Design Tokens')}${shortcutRow('G','Shape Tool')}${shortcutRow('Ctrl+Z','Undo')}${shortcutRow('Ctrl+Shift+Z','Redo')}
         ${shortcutRow('Toolbar','Reset to Default')}
         ${shortcutRow('Shift+R','Rulers')}${shortcutRow('Shift+L','Layout Grid')}${shortcutRow('Shift+A','A11y Scan')}
         ${shortcutRow('Shift+P','Command Palette')}${shortcutRow('Shift+M','Mobile View')}${shortcutRow('Shift+D','Dark Mode')}
@@ -2745,6 +2779,245 @@
   }
 
   // ============================================================
+  // SHAPE TOOL
+  // ============================================================
+  let _shapeDrawing = false, _shapeStart = { x: 0, y: 0 };
+  let _shapePreview = null;
+  let _shapeCount = 0;
+
+  function _shapeCleanup() {
+    _shapeDrawing = false;
+    if (_shapePreview) { _shapePreview.classList.remove('active'); }
+  }
+
+  function bindShapeEvents() {
+    // Create the preview element once
+    _shapePreview = document.createElement('div');
+    _shapePreview.className = '__vi-shape-preview';
+    state.ui.root.appendChild(_shapePreview);
+
+    window.addEventListener('mousedown', (e) => {
+      if (!state.active || state.currentTool !== 'shape') return;
+      if (e.target.closest('#__vi-root')) return;
+      // If clicking on an existing shape, select it instead of drawing
+      if (e.target.classList.contains('__vi-shape')) {
+        selectElement(e.target);
+        setTool('shape');
+        e.preventDefault();
+        return;
+      }
+      e.preventDefault();
+      _shapeDrawing = true;
+      _shapeStart.x = e.clientX + window.scrollX;
+      _shapeStart.y = e.clientY + window.scrollY;
+      _shapePreview.style.left = _shapeStart.x + 'px';
+      _shapePreview.style.top = _shapeStart.y + 'px';
+      _shapePreview.style.width = '0px';
+      _shapePreview.style.height = '0px';
+      _shapePreview.classList.add('active');
+    });
+
+    window.addEventListener('mousemove', (e) => {
+      if (!_shapeDrawing) return;
+      const cx = e.clientX + window.scrollX;
+      const cy = e.clientY + window.scrollY;
+      const x = Math.min(_shapeStart.x, cx);
+      const y = Math.min(_shapeStart.y, cy);
+      const w = Math.abs(cx - _shapeStart.x);
+      const h = Math.abs(cy - _shapeStart.y);
+      _shapePreview.style.left = x + 'px';
+      _shapePreview.style.top = y + 'px';
+      _shapePreview.style.width = w + 'px';
+      _shapePreview.style.height = h + 'px';
+    });
+
+    window.addEventListener('mouseup', (e) => {
+      if (!_shapeDrawing) return;
+      _shapeDrawing = false;
+      _shapePreview.classList.remove('active');
+
+      const cx = e.clientX + window.scrollX;
+      const cy = e.clientY + window.scrollY;
+      const x = Math.min(_shapeStart.x, cx);
+      const y = Math.min(_shapeStart.y, cy);
+      const w = Math.abs(cx - _shapeStart.x);
+      const h = Math.abs(cy - _shapeStart.y);
+
+      // Minimum size threshold to avoid accidental micro-shapes
+      if (w < 10 || h < 10) return;
+
+      _shapeCount++;
+      const shape = document.createElement('div');
+      shape.className = '__vi-shape';
+      shape.dataset.stylesessionShape = 'true';
+      shape.dataset.shapeId = 'shape-' + _shapeCount;
+      shape.style.cssText = `
+        position: absolute;
+        left: ${x}px;
+        top: ${y}px;
+        width: ${w}px;
+        height: ${h}px;
+        background: rgba(0, 229, 204, 0.08);
+        border: 2px dashed rgba(0, 229, 204, 0.5);
+        border-radius: 0px;
+        box-sizing: border-box;
+        z-index: 10;
+      `;
+      document.body.appendChild(shape);
+
+      // Track in undo system so it can be removed
+      applyChange(shape, 'position', 'absolute');
+
+      // Auto-select the new shape and show its panel
+      selectElement(shape);
+      showToast(`Shape #${_shapeCount} created`, 'success');
+    });
+  }
+
+  // ---- SHAPE TOOL PANEL ----
+  function renderShapePanel(el, computed, content) {
+    const isShape = el.classList.contains('__vi-shape');
+    const shapeId = el.dataset.shapeId || getElementLabel(el);
+    const rect = el.getBoundingClientRect();
+    const w = Math.round(rect.width);
+    const h = Math.round(rect.height);
+
+    content.innerHTML = `<div class="__vi-panel-body-wrapper">
+      <div class="__vi-section">
+        <div class="__vi-section-title">${isShape ? '⬡ SHAPE: ' + shapeId : 'ELEMENT SHAPE CONTROLS'}</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+          <div class="__vi-row" style="margin:0"><label>Width</label><input class="__vi-input" data-prop="width" value="${computed.width}"></div>
+          <div class="__vi-row" style="margin:0"><label>Height</label><input class="__vi-input" data-prop="height" value="${computed.height}"></div>
+        </div>
+      </div>
+      <div class="__vi-section">
+        <div class="__vi-section-title">POSITION</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+          <div class="__vi-row" style="margin:0"><label>Left</label><input class="__vi-input" data-prop="left" value="${el.style.left || computed.left}"></div>
+          <div class="__vi-row" style="margin:0"><label>Top</label><input class="__vi-input" data-prop="top" value="${el.style.top || computed.top}"></div>
+        </div>
+        <div class="__vi-row"><label>Position</label>
+          <select class="__vi-input" data-prop="position">
+            <option value="absolute" ${computed.position==='absolute'?'selected':''}>absolute</option>
+            <option value="fixed" ${computed.position==='fixed'?'selected':''}>fixed</option>
+            <option value="relative" ${computed.position==='relative'?'selected':''}>relative</option>
+            <option value="static" ${computed.position==='static'?'selected':''}>static</option>
+          </select>
+        </div>
+        <div class="__vi-row"><label>Z-Index</label><input class="__vi-input" data-prop="zIndex" value="${el.style.zIndex || computed.zIndex}"></div>
+      </div>
+      <div class="__vi-section">
+        <div class="__vi-section-title">FILL & BORDER</div>
+        <div class="__vi-row"><label>Background</label><input class="__vi-input" data-prop="background" value="${el.style.background || ''}" placeholder="rgba(0,0,0,0.1) or gradient"></div>
+        <div class="__vi-row"><label>Bg Color</label><input type="color" class="__vi-input" style="padding:0;height:26px;" data-prop="backgroundColor" value="${rgb2hex(computed.backgroundColor)}"></div>
+        <div class="__vi-row"><label>Opacity</label><input type="range" class="__vi-input" data-prop="opacity" min="0" max="1" step="0.05" value="${computed.opacity}"></div>
+        <div class="__vi-row"><label>Border W</label><input class="__vi-input" data-prop="borderWidth" value="${computed.borderWidth}"></div>
+        <div class="__vi-row"><label>Border Style</label>
+          <select class="__vi-input" data-prop="borderStyle">${['none','solid','dashed','dotted','double','groove','ridge'].map(v=>`<option value="${v}" ${computed.borderStyle===v?'selected':''}>${v}</option>`).join('')}</select>
+        </div>
+        <div class="__vi-row"><label>Border Color</label><input type="color" class="__vi-input" style="padding:0;height:26px;" data-prop="borderColor" value="${rgb2hex(computed.borderColor)}"></div>
+        <div class="__vi-row"><label>Radius</label><input class="__vi-input" data-prop="borderRadius" value="${computed.borderRadius}"></div>
+        <div class="__vi-row"><label>Shadow</label><input class="__vi-input" data-prop="boxShadow" value="${computed.boxShadow==='none'?'':computed.boxShadow}" placeholder="0 4px 12px rgba(0,0,0,0.1)"></div>
+      </div>
+      <div class="__vi-section">
+        <div class="__vi-section-title">QUICK PRESETS</div>
+        <div style="display:flex;gap:4px;flex-wrap:wrap;">
+          <button class="__vi-copy-btn __vi-shape-preset" data-preset="card" style="padding:4px 8px;font-size:9px;">Card</button>
+          <button class="__vi-copy-btn __vi-shape-preset" data-preset="pill" style="padding:4px 8px;font-size:9px;">Pill</button>
+          <button class="__vi-copy-btn __vi-shape-preset" data-preset="circle" style="padding:4px 8px;font-size:9px;">Circle</button>
+          <button class="__vi-copy-btn __vi-shape-preset" data-preset="glass" style="padding:4px 8px;font-size:9px;">Glass</button>
+          <button class="__vi-copy-btn __vi-shape-preset" data-preset="outline" style="padding:4px 8px;font-size:9px;">Outline</button>
+          <button class="__vi-copy-btn __vi-shape-preset" data-preset="shadow" style="padding:4px 8px;font-size:9px;">Shadow</button>
+        </div>
+      </div>
+      <div class="__vi-section">
+        <div class="__vi-section-title">CSS OUTPUT <button class="__vi-copy-btn" id="__vi-shape-copy-css" style="float:right;padding:2px 8px;font-size:9px;">📋 Copy</button></div>
+        <textarea class="__vi-shape-css-output" id="__vi-shape-css-out" readonly></textarea>
+      </div>
+    </div>`;
+
+    attachInputHandlers(el);
+
+    // Generate CSS output
+    _updateShapeCSSOutput(el);
+
+    // Copy CSS button
+    const copyBtn = document.getElementById('__vi-shape-copy-css');
+    if (copyBtn) {
+      copyBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const textarea = document.getElementById('__vi-shape-css-out');
+        if (textarea) copyText(textarea.value);
+      });
+    }
+
+    // Presets
+    content.querySelectorAll('.__vi-shape-preset').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const p = btn.dataset.preset;
+        if (p === 'card') {
+          applyChange(el, 'background', 'rgba(255,255,255,0.06)');
+          applyChange(el, 'borderRadius', '12px');
+          applyChange(el, 'border', '1px solid rgba(255,255,255,0.1)');
+          applyChange(el, 'boxShadow', '0 4px 24px rgba(0,0,0,0.12)');
+        } else if (p === 'pill') {
+          applyChange(el, 'borderRadius', '999px');
+          applyChange(el, 'background', 'rgba(0,229,204,0.15)');
+          applyChange(el, 'border', '1px solid rgba(0,229,204,0.3)');
+        } else if (p === 'circle') {
+          const size = Math.min(w, h) + 'px';
+          applyChange(el, 'width', size);
+          applyChange(el, 'height', size);
+          applyChange(el, 'borderRadius', '50%');
+          applyChange(el, 'background', 'rgba(99,102,241,0.2)');
+          applyChange(el, 'border', '2px solid rgba(99,102,241,0.5)');
+        } else if (p === 'glass') {
+          applyChange(el, 'background', 'rgba(255,255,255,0.08)');
+          applyChange(el, 'backdropFilter', 'blur(12px)');
+          applyChange(el, 'border', '1px solid rgba(255,255,255,0.15)');
+          applyChange(el, 'borderRadius', '16px');
+          applyChange(el, 'boxShadow', '0 8px 32px rgba(0,0,0,0.12)');
+        } else if (p === 'outline') {
+          applyChange(el, 'background', 'transparent');
+          applyChange(el, 'border', '2px solid #00E5CC');
+          applyChange(el, 'borderRadius', '8px');
+          applyChange(el, 'boxShadow', 'none');
+        } else if (p === 'shadow') {
+          applyChange(el, 'background', 'rgba(0,0,0,0.04)');
+          applyChange(el, 'border', 'none');
+          applyChange(el, 'borderRadius', '12px');
+          applyChange(el, 'boxShadow', '0 20px 60px rgba(0,0,0,0.15), 0 4px 12px rgba(0,0,0,0.08)');
+        }
+        renderPanelForCurrentTool();
+      });
+    });
+  }
+
+  function _updateShapeCSSOutput(el) {
+    const textarea = document.getElementById('__vi-shape-css-out');
+    if (!textarea) return;
+    const cs = window.getComputedStyle(el);
+    const props = [
+      'position', 'left', 'top', 'width', 'height',
+      'background', 'background-color', 'border', 'border-radius',
+      'box-shadow', 'opacity', 'z-index', 'backdrop-filter'
+    ];
+    let css = '.my-container {\n';
+    props.forEach(p => {
+      const k = p.replace(/-([a-z])/g, (_, c) => c.toUpperCase());
+      let v = el.style[k];
+      if (!v || v === 'none' || v === 'auto') {
+        v = cs.getPropertyValue(p);
+      }
+      if (v && v !== 'none' && v !== 'auto' && v !== '' && v !== 'rgba(0, 0, 0, 0)') {
+        css += `  ${p}: ${v};\n`;
+      }
+    });
+    css += '}';
+    textarea.value = css;
+  }
+
+  // ============================================================
   // RULERS & GUIDES
   // ============================================================
   let _rulersRAF = 0;
@@ -2959,7 +3232,9 @@
     clone.querySelectorAll('[id^="__vi"]').forEach(e => e.remove());
     clone.querySelectorAll('[class*="__vi-"]').forEach(e => {
       if (e.closest('[id^="__vi"]')) return;
-      e.remove();
+      const stripped = Array.from(e.classList).filter(c => !c.startsWith('__vi-')).join(' ');
+      if (stripped) e.className = stripped;
+      else e.removeAttribute('class');
     });
     clone.querySelectorAll('script').forEach(s => {
       if (s.textContent.includes('StyleSession')) s.remove();
@@ -3275,6 +3550,7 @@
           { name: 'Undo History', action: showUndoHistory },
           { name: 'Copy Styles', action: copyElementStyles, shortcut: 'Ctrl+Alt+C' },
           { name: 'Paste Styles', action: pasteElementStyles, shortcut: 'Ctrl+Alt+V' },
+          { name: 'Shape Tool', action: () => setTool('shape'), shortcut: 'G' },
         ];
         searchResults = commands.filter(c => c.name.toLowerCase().includes(cq));
         selectedResultIdx = 0;
@@ -3297,7 +3573,7 @@
       searchResults = all.filter(el => {
         let s = el.tagName.toLowerCase();
         if (el.id) s += '#' + el.id;
-        if (el.className && typeof el.className === 'string') s += '.' + el.className.split(' ').join('.');
+        if (el.className && typeof el.className === 'string') s += '.' + el.className.split(/\s+/).join('.');
         if (el.textContent) s += ' ' + el.textContent.slice(0, 50);
         return s.toLowerCase().includes(q.toLowerCase());
       }).slice(0, 15);
@@ -3336,7 +3612,7 @@
       let name = el.tagName.toLowerCase();
       if (el.id) name += `<span style="color:#00E5CC">#${escAttr(el.id)}</span>`;
       else if (el.className && typeof el.className === 'string') {
-        const c = el.className.split(' ').find(c => !c.startsWith('__vi'));
+        const c = el.className.split(/\s+/).find(c => !c.startsWith('__vi'));
         if (c) name += `<span style="color:#eab308">.${escAttr(c)}</span>`;
       }
       return `<div class="__vi-palette-result ${i === selectedResultIdx ? 'active' : ''}" data-idx="${i}">${name}</div>`;
@@ -3376,6 +3652,12 @@
     const clone = document.documentElement.cloneNode(true);
     clone.querySelectorAll('#__vi-root, #__vi-session-style, #__vi-styles').forEach(e => e.remove());
     clone.querySelectorAll('[id^="__vi"]').forEach(e => e.remove());
+    clone.querySelectorAll('[class*="__vi-"]').forEach(e => {
+      if (e.closest('[id^="__vi"]')) return;
+      const stripped = Array.from(e.classList).filter(c => !c.startsWith('__vi-')).join(' ');
+      if (stripped) e.className = stripped;
+      else e.removeAttribute('class');
+    });
     clone.querySelectorAll('script').forEach(s => { if (s.textContent.includes('StyleSession')) s.remove(); if (s.src && s.src.includes('stylesession')) s.remove(); });
     clone.querySelectorAll('link[href*="fonts.googleapis.com"][href*="Inter"]').forEach(e => e.remove());
     iframe.srcdoc = '<!DOCTYPE html>' + clone.outerHTML;
@@ -3811,8 +4093,15 @@
     el.focus();
     el.style.outline = '2px solid var(--vi-accent)';
     el.style.outlineOffset = '2px';
+    const onKeyDown = (e) => {
+      if (e.key === 'Escape') { el.textContent = oldText; el.blur(); }
+      if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); el.blur(); }
+      e.stopPropagation();
+    };
+    
     const finish = () => {
       if (!inlineEditEl) return;
+      el.removeEventListener('keydown', onKeyDown);
       el.contentEditable = 'false';
       el.style.outline = '';
       el.style.outlineOffset = '';
@@ -3827,11 +4116,7 @@
       inlineEditEl = null;
     };
     el.addEventListener('blur', finish, { once: true });
-    el.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') { el.textContent = oldText; el.blur(); }
-      if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); el.blur(); }
-      e.stopPropagation();
-    });
+    el.addEventListener('keydown', onKeyDown);
   }
 
   function finishInlineEdit() {
