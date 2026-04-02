@@ -1042,6 +1042,7 @@
   }
 
   function getElementSelector(el) {
+    if (el.dataset.stylesessionShape) return '.' + cssEscape(el.dataset.shapeId);
     if (el.id) return '#' + cssEscape(el.id);
     if (el.className && typeof el.className === 'string') {
       const classes = el.className.split(' ').filter(c => c && !c.startsWith('__vi'));

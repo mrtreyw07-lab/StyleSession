@@ -734,6 +734,11 @@
   .__vi-shape-preview.active { display: block; }
   .__vi-shape {
     box-sizing: border-box;
+    pointer-events: none;
+  }
+  [data-vi-tool="shape"] .__vi-shape,
+  [data-vi-tool="select"] .__vi-shape,
+  [data-vi-tool="move"] .__vi-shape {
     pointer-events: auto;
   }
   .__vi-shape-css-output {
@@ -1040,6 +1045,7 @@
   }
 
   function getElementSelector(el) {
+    if (el.dataset.stylesessionShape) return '.' + cssEscape(el.dataset.shapeId);
     if (el.id) return '#' + cssEscape(el.id);
     if (el.className && typeof el.className === 'string') {
       const classes = el.className.split(' ').filter(c => c && !c.startsWith('__vi'));
@@ -1159,6 +1165,8 @@
     if (state.features.rulers) toggleRulers();
     if (annotationsActive) toggleAnnotations();
 
+    document.querySelectorAll('.__vi-shape').forEach(s => s.remove());
+
     state.originalStyles.clear();
     state.undoStack.length = 0;
     state.redoStack.length = 0;
@@ -1187,6 +1195,7 @@
     state.active = !state.active;
 
     if (!state.active) {
+      if (typeof _shapeCleanup === 'function' && state.currentTool === 'shape') _shapeCleanup();
       // Turn off active feature overlays so the page is fully restored.
       if (state.features.snap) toggleSnapshot();
       if (state.features.mobile) toggleMobileView();
@@ -2342,6 +2351,7 @@
         });
         input.addEventListener('input', (e) => {
           state.selectedEls.forEach(t => t.style[input.getAttribute('data-prop')] = e.target.value);
+          if (state.currentTool === 'shape') _updateShapeCSSOutput(el);
         });
         input.addEventListener('change', (e) => {
           const prop = input.getAttribute('data-prop');
@@ -2352,6 +2362,7 @@
             applyChange(t, prop, e.target.value);
           });
           startVals.clear();
+          if (state.currentTool === 'shape') _updateShapeCSSOutput(el);
         });
       }
     });
@@ -2435,6 +2446,7 @@
 
       // Escape: close palette first, then clear selection
       if (e.key === 'Escape') {
+        if (typeof _shapeCleanup === 'function' && state.currentTool === 'shape') _shapeCleanup();
         if (paletteOpen) { togglePalette(true); e.preventDefault(); e.stopPropagation(); return; }
         if (state.ui.confirmModal.classList.contains('open')) { closeResetConfirm(); e.preventDefault(); return; }
         if (state.ui.shortcutsModal.classList.contains('open')) { state.ui.shortcutsModal.classList.remove('open'); e.preventDefault(); return; }
@@ -2796,6 +2808,9 @@
     _shapePreview.className = '__vi-shape-preview';
     state.ui.root.appendChild(_shapePreview);
 
+    window.addEventListener('blur', _shapeCleanup);
+    document.addEventListener('mouseleave', _shapeCleanup);
+
     window.addEventListener('mousedown', (e) => {
       if (!state.active || state.currentTool !== 'shape') return;
       if (e.target.closest('#__vi-root')) return;
@@ -2818,7 +2833,7 @@
     });
 
     window.addEventListener('mousemove', (e) => {
-      if (!_shapeDrawing) return;
+      if (!state.active || !_shapeDrawing) return;
       const cx = e.clientX + window.scrollX;
       const cy = e.clientY + window.scrollY;
       const x = Math.min(_shapeStart.x, cx);
@@ -2832,7 +2847,7 @@
     });
 
     window.addEventListener('mouseup', (e) => {
-      if (!_shapeDrawing) return;
+      if (!state.active || !_shapeDrawing) return;
       _shapeDrawing = false;
       _shapePreview.classList.remove('active');
 
@@ -2862,11 +2877,12 @@
         border-radius: 0px;
         box-sizing: border-box;
         z-index: 10;
+        display: none;
       `;
       document.body.appendChild(shape);
 
       // Track in undo system so it can be removed
-      applyChange(shape, 'position', 'absolute');
+      applyChange(shape, 'display', 'block');
 
       // Auto-select the new shape and show its panel
       selectElement(shape);
@@ -2884,7 +2900,7 @@
 
     content.innerHTML = `<div class="__vi-panel-body-wrapper">
       <div class="__vi-section">
-        <div class="__vi-section-title">${isShape ? '⬡ SHAPE: ' + shapeId : 'ELEMENT SHAPE CONTROLS'}</div>
+        <div class="__vi-section-title">${isShape ? '⬡ SHAPE: ' + escAttr(shapeId) : 'ELEMENT SHAPE CONTROLS'}</div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
           <div class="__vi-row" style="margin:0"><label>Width</label><input class="__vi-input" data-prop="width" value="${computed.width}"></div>
           <div class="__vi-row" style="margin:0"><label>Height</label><input class="__vi-input" data-prop="height" value="${computed.height}"></div>
