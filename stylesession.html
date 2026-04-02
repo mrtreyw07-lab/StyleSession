@@ -1484,9 +1484,9 @@
     window.addEventListener('click', (e) => {
       if (!state.active || state.currentTool === 'browse') return;
       if (e.target.closest('#__vi-root')) return;
-      // Move tool handles its own selection via mousedown — skip click handler
-      // to avoid re-selecting and panel flicker after a drag ends.
-      if (state.currentTool === 'move') { e.preventDefault(); e.stopPropagation(); return; }
+      // Move and Shape tools handle their own selection via mousedown/mouseup — 
+      // skip click handler to avoid re-selecting and panel flicker after a drag ends.
+      if (state.currentTool === 'move' || state.currentTool === 'shape') { e.preventDefault(); e.stopPropagation(); return; }
       e.preventDefault();
       e.stopPropagation();
       if (state.hoveredEl) {

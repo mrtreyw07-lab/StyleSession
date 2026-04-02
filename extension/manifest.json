@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "StyleSession",
   "description": "Visual CSS inspector with real undo/redo, session persistence, and clean CSS export. Point-and-click style editing on any website.",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "author": "Charles Wright",
   "icons": {
     "16": "icons/icon16.png",

@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://img.shields.io/badge/StyleSession-v1.0.0-00E5CC?style=for-the-badge&labelColor=14141a" alt="StyleSession v1.0.0"/>
+  <img src="https://img.shields.io/badge/StyleSession-v1.0.1-00E5CC?style=for-the-badge&labelColor=14141a" alt="StyleSession v1.0.1"/>
   <img src="https://img.shields.io/badge/license-MIT-blue?style=for-the-badge&labelColor=14141a" alt="MIT License"/>
   <img src="https://img.shields.io/badge/zero_dependencies-vanilla_JS-ffa502?style=for-the-badge&labelColor=14141a" alt="Zero Dependencies"/>
   <img src="https://img.shields.io/badge/self--injecting-~193_KB-3b82f6?style=for-the-badge&labelColor=14141a" alt="Self-Injecting"/>
@@ -94,6 +94,7 @@ Born out of frustration with [VisBug](https://github.com/GoogleChromeLabs/Projec
 - **Border & Shadow** — Border width/style/color, per-corner radius editing, box-shadow with 6 presets, text-shadow
 - **Effects** — Transform (with origin), CSS filter with 8 presets (blur, brightness, contrast, grayscale, sepia, saturate, hue-rotate, invert), backdrop-filter, mix-blend-mode, overflow, and cursor type
 - **Animation** — Transition property/duration/timing/delay, animation name/duration/timing/iteration/direction/fill-mode with 8 easing presets including cubic-bezier
+- **Shape Tool** — Click-drag to draw isolated `<div>` containers directly on the page. Style with fill, border, and 6 quick presets (Card, Pill, Circle, Glass, Outline, Shadow). Generates live, production-ready CSS output with one-click copy
 
 ### 🔎 Element Diffing & Batch Editing
 - **2-element diff matrix** — Select exactly 2 elements to see a side-by-side property comparison highlighting differences across 15 key CSS properties
@@ -168,6 +169,7 @@ Auto-scans the entire page and extracts:
 | `E` | Effects tool |
 | `O` | Animation tool |
 | `K` | Design Tokens |
+| `G` | Shape Tool |
 
 ### Actions
 | Key | Action |
@@ -253,7 +255,7 @@ stylesession.js (~3,840 lines, ~193 KB)
     ├── State Management   — Central state object with Map-based original style tracking
     ├── Command System     — applyChange() → undo stack → redo stack (auto-save hooked)
     ├── Render Loop        — 60fps requestAnimationFrame for overlays
-    ├── Tool Renderers     — Per-tool panel UI generators (9 tools + computed tab)
+    ├── Tool Renderers     — Per-tool panel UI generators (10 tools + computed tab)
     ├── Session System     — JSON v2 with selector + DOM path persistence + legacy compat
     ├── Security           — escAttr() sanitization, CSS.escape() selectors
     ├── A11y Engine        — WCAG luminance-based contrast ratio calculations
@@ -398,6 +400,7 @@ Contributions are welcome! Please note that this project uses a **non-commercial
 - [x] Mobile viewport simulation
 - [x] Dark mode toggle
 - [x] Annotation sticky notes
+- [x] Shape Tool — layout prototyping with CSS export
 - [x] Split-view snapshot comparison
 - [x] Command palette with element search and command mode
 - [x] Context menu (7 actions)
