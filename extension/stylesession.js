@@ -747,6 +747,20 @@
   .__vi-a11y-pass { background: rgba(46,213,115,0.2); color: #2ed573; }
   .__vi-a11y-fail { background: rgba(255,71,87,0.2); color: #ff4757; }
 
+  /* Draw Canvas */
+  .__vi-draw-canvas {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    pointer-events: none; z-index: calc(var(--vi-z) - 1);
+    overflow: visible;
+  }
+  [data-vi-tool="draw"], [data-vi-tool="draw"] * { cursor: var(--vi-draw-cursor, url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJ3aGl0ZSIgc3Ryb2tlPSJibGFjayIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwYXRoIGQ9Ik0xNyAzYTIuODI4IDIuODI4IDAgMSAxIDQgNEw3LjUgMjAuNSAyIDIybDEuNS01LjVMMTcgM3oiLz48cGF0aCBkPSJtMTUgNSA0IDQiLz48L3N2Zz4=') 2 22, crosshair) !important; }
+
+  /* ═══ DRAW TOOL ENHANCEMENTS ═══ */
+  .__vi-draw-mode-row { display: flex; gap: 4px; margin-bottom: 10px; }
+  .__vi-draw-mode-btn { flex: 1; padding: 5px 2px; font-size: 9px; text-align: center; background: rgba(255,255,255,0.06); border: 1px solid var(--vi-border); border-radius: 4px; color: var(--vi-muted); cursor: pointer; transition: all 0.15s ease; font-family: var(--vi-mono); }
+  .__vi-draw-mode-btn:hover { border-color: var(--vi-accent); color: var(--vi-text); }
+  .__vi-draw-mode-btn.active { background: rgba(0, 229, 204, 0.15); border-color: var(--vi-accent); color: var(--vi-accent); }
+
   /* Shape Tool */
   [data-vi-tool="shape"] { cursor: crosshair !important; }
   [data-vi-tool="shape"] * { cursor: crosshair !important; }
@@ -797,6 +811,7 @@
       <button class="__vi-btn" data-tool="animation" data-tooltip="Animation (O)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg></button>
       <button class="__vi-btn" data-tool="tokens" data-tooltip="Design Tokens (K)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg></button>
       <button class="__vi-btn" data-tool="shape" data-tooltip="Shape Tool (G)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg></button>
+      <button class="__vi-btn" data-tool="draw" data-tooltip="Draw/Mark (P)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/><path d="m15 5 4 4"/></svg></button>
     </div>
     <div class="__vi-tb-group">
       <button class="__vi-btn" id="__vi-btn-undo" data-tooltip="Undo (Ctrl+Z)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg></button>
@@ -823,6 +838,7 @@
       <button class="__vi-more-btn" data-action="snapshot"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="18" rx="2"/><line x1="12" y1="3" x2="12" y2="21"/></svg>Snapshot<span class="status-dot" id="__vi-dot-snap"></span></button>
       <button class="__vi-more-btn" data-action="shortcuts"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M6 8h.01M10 8h.01M14 8h.01M18 8h.01M8 12h.01M12 12h.01M16 12h.01M8 16h8"/></svg>Shortcuts</button>
       <button class="__vi-more-btn" data-action="download"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Download Session</button>
+      
       <button class="__vi-more-btn" data-action="import"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>Import Session</button>
       <button class="__vi-more-btn" data-action="hidden"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg>Hidden Elements<span class="status-dot" id="__vi-dot-hidden"></span></button>
       <button class="__vi-more-btn" data-action="csseditor"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>CSS Editor<span class="status-dot" id="__vi-dot-csseditor"></span></button>
@@ -862,6 +878,7 @@
   <div id="__vi-padding-overlay" class="__vi-padding-overlay"></div>
   <div id="__vi-label" class="__vi-label">tag <span class="dim">0x0</span></div>
   <div id="__vi-measure-container"></div>
+  <svg id="__vi-draw-canvas" class="__vi-draw-canvas"></svg>
 
   <!-- Toast Stack -->
   <div id="__vi-toast-container" class="__vi-toast-container"></div>
@@ -915,8 +932,10 @@
     selectedEls: [],
     undoStack: [],
     redoStack: [],
+    draw: { color: '#ff4757', size: 4, mode: 'freehand', paths: [], isDrawing: false, currentPath: null, currentPathData: '' },
     originalStyles: new Map(),
     features: { rulers: false, layout: false, a11y: false, dark: false, mobile: false, snap: false },
+    bookmarks: [],
     ui: {}
   };
 
@@ -934,6 +953,7 @@
       selectOverlay: document.getElementById('__vi-select-overlay'),
       marginOverlay: document.getElementById('__vi-margin-overlay'),
       paddingOverlay: document.getElementById('__vi-padding-overlay'),
+      drawCanvas: document.getElementById('__vi-draw-canvas'),
       label: document.getElementById('__vi-label'),
       panelTarget: document.getElementById('__vi-panel-target'),
       panelToolName: document.getElementById('__vi-panel-tool-name'),
@@ -970,6 +990,7 @@
     bindContextMenu();
     bindConfirmModal();
     initInlineTextEditing();
+    bindDrawEvents();
     loadSession();
     requestAnimationFrame(renderLoop);
     updateUndoRedoUI();
@@ -981,8 +1002,12 @@
         state.originalStyles.forEach((_, el) => {
           if (!document.body.contains(el)) state.originalStyles.delete(el);
         });
-        state.undoStack = state.undoStack.filter(cmd => document.body.contains(cmd.el));
-        state.redoStack = state.redoStack.filter(cmd => document.body.contains(cmd.el));
+        for (let i = state.undoStack.length - 1; i >= 0; i--) {
+          if (!document.body.contains(state.undoStack[i].el)) state.undoStack.splice(i, 1);
+        }
+        for (let i = state.redoStack.length - 1; i >= 0; i--) {
+          if (!document.body.contains(state.redoStack[i].el)) state.redoStack.splice(i, 1);
+        }
         updateUndoRedoUI();
       }, 2000);
     });
@@ -1089,9 +1114,9 @@
         } else {
           curVal = el.style[prop];
         }
-        if (curVal) {
+        if (curVal !== undefined && curVal !== origVal) {
           const kebab = prop.startsWith('--') ? prop : prop.replace(/[A-Z]/g, m => '-' + m.toLowerCase());
-          styles[kebab] = curVal;
+          styles[kebab] = curVal || '';
         }
       });
       if (Object.keys(styles).length > 0) {
@@ -1110,7 +1135,7 @@
       if (cmd.prop !== '__textContent') continue;
       if (seen.has(cmd.el)) continue;
       seen.add(cmd.el);
-      textChanges.push({ selector: getElementSelector(cmd.el), path: getElementPath(cmd.el), text: cmd.el.textContent });
+      textChanges.push({ selector: getElementSelector(cmd.el), path: getElementPath(cmd.el), text: cmd.el.textContent, oldText: cmd.oldVal || '' });
     }
     return textChanges;
   }
@@ -1191,6 +1216,15 @@
 
     document.querySelectorAll('.__vi-shape').forEach(s => s.remove());
 
+    // Clear all drawing paths from the SVG canvas
+    if (state.draw && state.draw.paths) {
+      state.draw.paths.forEach(p => { if (p.el && p.el.parentNode) p.el.parentNode.removeChild(p.el); });
+      state.draw.paths = [];
+    }
+    if (state.ui.drawCanvas) state.ui.drawCanvas.innerHTML = '';
+    state.draw.mode = 'freehand';
+    state.draw.isDrawing = false;
+
     state.originalStyles.clear();
     state.undoStack.length = 0;
     state.redoStack.length = 0;
@@ -1220,6 +1254,9 @@
 
     if (!state.active) {
       if (typeof _shapeCleanup === 'function' && state.currentTool === 'shape') _shapeCleanup();
+      // Cancel any in-progress drawing so pointer events don't fire while hidden
+      state.draw.isDrawing = false;
+      state.currentTool = 'browse';
       // Turn off active feature overlays so the page is fully restored.
       if (state.features.snap) toggleSnapshot();
       if (state.features.mobile) toggleMobileView();
@@ -1498,7 +1535,7 @@
   // ============================================================
   function bindMouseEvents() {
     window.addEventListener('mousemove', (e) => {
-      if (!state.active || state.currentTool === 'browse') return;
+      if (!state.active || state.currentTool === 'browse' || state.currentTool === 'draw') return;
       // Suppress hover tracking while dragging to avoid layout thrashing
       if (isDraggingEl) return;
       if (e.target.closest('#__vi-root')) { clearHover(); return; }
@@ -1506,7 +1543,7 @@
     }, { passive: true });
 
     window.addEventListener('click', (e) => {
-      if (!state.active || state.currentTool === 'browse') return;
+      if (!state.active || state.currentTool === 'browse' || state.currentTool === 'draw') return;
       if (e.target.closest('#__vi-root')) return;
       // Move and Shape tools handle their own selection via mousedown/mouseup — 
       // skip click handler to avoid re-selecting and panel flicker after a drag ends.
@@ -1577,6 +1614,12 @@
     if (state.currentTool === 'shape' && toolName !== 'shape') {
       _shapeCleanup();
     }
+    // If leaving draw tool, clean up draw state
+    if (state.currentTool === 'draw' && toolName !== 'draw') {
+      state.draw.isDrawing = false;
+      document.documentElement.style.removeProperty('--vi-draw-cursor');
+      if (state.ui.panelTabs) state.ui.panelTabs.style.display = 'flex';
+    }
     state.currentTool = toolName;
     state.ui.toolbar.querySelectorAll('button[data-tool]').forEach(b => {
       b.classList.toggle('active', b.getAttribute('data-tool') === toolName);
@@ -1586,11 +1629,18 @@
     updateTabUI();
     // Set page-wide cursor based on active tool
     document.documentElement.setAttribute('data-vi-tool', toolName);
-    if (toolName === 'browse') { clearHover(); clearSelection(); state.ui.panel.classList.remove('open'); return; }
+    if (toolName === 'browse' || toolName === 'draw') { clearHover(); clearSelection(); }
+    if (toolName === 'browse') { state.ui.panel.classList.remove('open'); return; }
     if (toolName === 'shape' && state.selectedEls.length === 0) {
       // Show shape instructions in panel
       state.ui.panel.classList.add('open');
       state.ui.panelContent.innerHTML = `<div class="__vi-panel-body-wrapper"><div class="__vi-empty"><p>Click and drag on the page to draw a shape.<br><br>The shape becomes a real <code>&lt;div&gt;</code> you can style, move, and export as CSS.</p></div></div>`;
+      return;
+    }
+    if (toolName === 'draw') {
+      state.ui.panel.classList.add('open');
+      state.ui.panelTabs.style.display = 'none';
+      renderDrawPanel(state.ui.panelContent);
       return;
     }
     if (state.selectedEls.length > 0) renderPanelForCurrentTool();
@@ -2433,7 +2483,11 @@
       const injectedCSS = injectedStyle ? injectedStyle.textContent : '';
       // Collect text edits
       const textChanges = collectTextChanges();
-      const hasData = count > 0 || notes.length > 0 || injectedCSS || textChanges.length > 0;
+      const drawings = [];
+      if (state.draw && state.draw.paths && state.draw.paths.length > 0) {
+        state.draw.paths.forEach(p => drawings.push({ d: p.d, color: p.color, size: p.size }));
+      }
+      const hasData = count > 0 || notes.length > 0 || injectedCSS || textChanges.length > 0 || drawings.length > 0 || state.bookmarks.length > 0;
       if (hasData) {
         const payload = {
           version: 2,
@@ -2444,6 +2498,8 @@
         if (notes.length > 0) payload.notes = notes;
         if (injectedCSS) payload.injectedCSS = injectedCSS;
         if (textChanges.length > 0) payload.textChanges = textChanges;
+        if (drawings.length > 0) payload.drawings = drawings;
+        if (state.bookmarks.length > 0) payload.bookmarks = state.bookmarks;
         localStorage.setItem('__vi_session', JSON.stringify(payload));
         showToast('Session saved', 'success');
       }
@@ -2452,6 +2508,308 @@
     }
     if (count === 0) { showToast('No changes to export!', 'warn'); return; }
     navigator.clipboard.writeText(css).then(() => { showToast('CSS copied to clipboard!', 'success'); }).catch(() => showToast('Copy failed', 'error'));
+  }
+
+  // ============================================================
+  // STRUCTURED CHANGE REPORT (Markdown Clipboard Export)
+  // ============================================================
+  function generateChangeReport() {
+    const changes = collectSessionChanges();
+    const textChanges = collectTextChanges();
+    if (changes.length === 0 && textChanges.length === 0) {
+      showToast('No changes to report', 'warn');
+      return;
+    }
+
+    let md = `# StyleSession Change Report\n`;
+    md += `**Page:** ${window.location.href}\n`;
+    md += `**Date:** ${new Date().toISOString()}\n`;
+    md += `**Changes:** ${changes.length} element(s) modified`;
+    if (textChanges.length > 0) md += `, ${textChanges.length} text edit(s)`;
+    md += `\n\n---\n`;
+
+    let idx = 1;
+    changes.forEach(change => {
+      md += `\n## ${idx}. \`${change.selector}\`\n`;
+      md += `**Path:** \`${change.path}\`\n\n`;
+      md += `| Property | Before | After |\n`;
+      md += `|----------|--------|-------|\n`;
+
+      // Look up original values from state.originalStyles
+      const matchedEls = resolveSessionTargets(change);
+      const el = matchedEls.length > 0 ? matchedEls[0] : null;
+      const origMap = el && state.originalStyles.has(el) ? state.originalStyles.get(el) : null;
+
+      Object.entries(change.styles).forEach(([kebab, afterVal]) => {
+        const camelProp = kebab.startsWith('--') ? kebab : kebab.replace(/-([a-z])/g, (_, c) => c.toUpperCase());
+        const beforeVal = origMap && origMap.has(camelProp) ? origMap.get(camelProp) : '(default)';
+        const displayAfter = afterVal || '(removed)';
+        md += `| \`${kebab}\` | \`${beforeVal}\` | \`${displayAfter}\` |\n`;
+      });
+      idx++;
+    });
+
+    if (textChanges.length > 0) {
+      md += `\n---\n\n## Text Changes\n\n`;
+      textChanges.forEach(tc => {
+        md += `- **\`${tc.selector}\`**: "${tc.oldText ? tc.oldText.slice(0, 60) : ''}" → "${tc.text ? tc.text.slice(0, 60) : ''}"\n`;
+      });
+    }
+
+    navigator.clipboard.writeText(md).then(() => {
+      showToast(`Change Report copied (${changes.length + textChanges.length} items)`, 'success');
+    }).catch(() => showToast('Copy failed', 'error'));
+  }
+
+  // ============================================================
+  // COMPONENT TREE EXPORT (CSS Nesting)
+  // ============================================================
+  function exportComponentCSS(rootEl) {
+    if (!rootEl) { showToast('No element selected', 'warn'); return; }
+
+    const rootSelector = getElementSelector(rootEl);
+    const rootChanges = [];
+    const childChanges = [];
+
+    state.originalStyles.forEach((propsMap, el) => {
+      // Check if el is rootEl or within rootEl's subtree
+      if (el !== rootEl && !rootEl.contains(el)) return;
+
+      const styles = {};
+      propsMap.forEach((origVal, prop) => {
+        let curVal;
+        if (prop.startsWith('--')) {
+          curVal = el.style.getPropertyValue(prop).trim();
+        } else {
+          curVal = el.style[prop];
+        }
+        if (curVal !== undefined && curVal !== origVal) {
+          const kebab = prop.startsWith('--') ? prop : prop.replace(/[A-Z]/g, m => '-' + m.toLowerCase());
+          styles[kebab] = curVal || '';
+        }
+      });
+
+      if (Object.keys(styles).length === 0) return;
+
+      if (el === rootEl) {
+        rootChanges.push(styles);
+      } else {
+        // Build a relative selector from root to child
+        let childSelector = getElementSelector(el);
+        // Try to make it relative (strip root portion if matching)
+        const rootParts = rootSelector.split(' ');
+        const childParts = childSelector.split(' ');
+        if (childParts.length > rootParts.length) {
+          childSelector = childParts.slice(rootParts.length).join(' ');
+        } else {
+          childSelector = getElementLabel(el);
+        }
+        childChanges.push({ selector: childSelector, styles });
+      }
+    });
+
+    if (rootChanges.length === 0 && childChanges.length === 0) {
+      showToast('No changes in this component subtree', 'warn');
+      return;
+    }
+
+    let css = `/* Component: ${rootSelector} */\n`;
+    css += `${rootSelector} {\n`;
+
+    // Root-level properties
+    rootChanges.forEach(styles => {
+      Object.entries(styles).forEach(([prop, val]) => {
+        css += `  ${prop}: ${val};\n`;
+      });
+    });
+
+    // Nested children
+    childChanges.forEach(child => {
+      css += `\n  ${child.selector} {\n`;
+      Object.entries(child.styles).forEach(([prop, val]) => {
+        css += `    ${prop}: ${val};\n`;
+      });
+      css += `  }\n`;
+    });
+
+    css += `}\n`;
+
+    navigator.clipboard.writeText(css).then(() => {
+      showToast(`Component CSS copied (${rootChanges.length > 0 ? 1 : 0} root + ${childChanges.length} children)`, 'success');
+    }).catch(() => showToast('Copy failed', 'error'));
+  }
+
+  // ============================================================
+  // ELEMENT BOOKMARKS
+  // ============================================================
+  function toggleBookmark() {
+    if (state.selectedEls.length === 0) { showToast('Select an element first', 'warn'); return; }
+    const el = state.selectedEls[0];
+    const selector = getElementSelector(el);
+    const label = getElementLabel(el);
+
+    // Check if already bookmarked
+    const existingIdx = state.bookmarks.findIndex(b => b.selector === selector);
+    if (existingIdx !== -1) {
+      state.bookmarks.splice(existingIdx, 1);
+      showToast(`Bookmark removed: ${label}`, 'warn');
+    } else {
+      if (state.bookmarks.length >= 8) {
+        showToast('Max 8 bookmarks — remove one first', 'warn');
+        return;
+      }
+      state.bookmarks.push({ selector, path: getElementPath(el), label });
+      showToast(`Bookmarked: ${label}`, 'success');
+    }
+    renderBookmarks();
+    autoSave();
+  }
+
+  function renderBookmarks() {
+    let container = document.getElementById('__vi-bookmarks');
+    if (!container) {
+      container = document.createElement('div');
+      container.id = '__vi-bookmarks';
+      container.style.cssText = 'display:flex;flex-wrap:wrap;gap:4px;padding:4px 12px;border-bottom:1px solid var(--vi-border);';
+      // Insert after breadcrumb, with fallback to panel or root
+      const bc = state.ui.breadcrumb;
+      if (bc && bc.parentElement) {
+        bc.parentElement.insertBefore(container, bc.nextSibling);
+      } else {
+        const fallback = state.ui.panel || state.ui.root;
+        if (fallback) fallback.prepend(container);
+      }
+    }
+    if (state.bookmarks.length === 0) {
+      container.style.display = 'none';
+      container.innerHTML = '';
+      return;
+    }
+    container.style.display = 'flex';
+    container.innerHTML = state.bookmarks.map((b, i) =>
+      `<button class="__vi-bookmark-chip" data-bm-sel="${escAttr(b.selector)}" title="${escAttr(b.selector)}" style="
+        background:rgba(0,229,204,0.1);border:1px solid rgba(0,229,204,0.3);color:var(--vi-accent);
+        font-size:9px;padding:2px 8px;border-radius:10px;cursor:pointer;font-family:var(--vi-mono);
+        white-space:nowrap;max-width:120px;overflow:hidden;text-overflow:ellipsis;
+        transition:all 0.15s ease;pointer-events:auto;
+      ">${escAttr(b.label)}</button>`
+    ).join('');
+    container.querySelectorAll('.__vi-bookmark-chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        const sel = chip.dataset.bmSel;
+        const bm = state.bookmarks.find(b => b.selector === sel);
+        if (!bm) return;
+        const el = resolveSessionTargets(bm)[0];
+        if (el) {
+          selectElement(el);
+          el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        } else {
+          showToast(`Bookmark target not found: ${escAttr(bm.label)}`, 'error');
+        }
+      });
+      chip.addEventListener('contextmenu', (e) => {
+        e.preventDefault();
+        const sel = chip.dataset.bmSel;
+        const bmIdx = state.bookmarks.findIndex(b => b.selector === sel);
+        if (bmIdx !== -1) {
+          state.bookmarks.splice(bmIdx, 1);
+          renderBookmarks();
+          showToast('Bookmark removed', 'warn');
+          autoSave();
+        }
+      });
+    });
+  }
+
+  // ============================================================
+  // ANNOTATED SCREENSHOT EXPORT (html2canvas)
+  // ============================================================
+  let _html2canvasLoaded = false;
+  function loadHtml2Canvas() {
+    return new Promise((resolve, reject) => {
+      if (_html2canvasLoaded && window.html2canvas) { resolve(window.html2canvas); return; }
+      const script = document.createElement('script');
+      script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+      script.onload = () => { _html2canvasLoaded = true; resolve(window.html2canvas); };
+      script.onerror = () => reject(new Error('Failed to load html2canvas'));
+      document.head.appendChild(script);
+    });
+  }
+
+  async function captureAnnotatedScreenshot() {
+    showToast('Capturing screenshot...', '');
+    try {
+      const h2c = await loadHtml2Canvas();
+
+      // Hide StyleSession UI elements (toolbar, panel, toasts, label, overlays)
+      const root = state.ui.root;
+      const originalDisplay = root.style.display;
+      // Instead of hiding root entirely, selectively hide non-annotation children
+      const uiChildren = root.querySelectorAll(
+        '#__vi-toolbar, #__vi-panel, #__vi-toast-container, #__vi-label, ' +
+        '#__vi-hover-overlay, .__vi-overlay-select, #__vi-margin-overlay, ' +
+        '#__vi-padding-overlay, #__vi-measure-container, #__vi-context-menu, ' +
+        '#__vi-shortcuts-modal, #__vi-confirm-modal, #__vi-more-menu, ' +
+        '#__vi-rulers-h, #__vi-rulers-v, #__vi-bookmarks'
+      );
+      const hiddenEls = [];
+      uiChildren.forEach(el => {
+        if (el && el.style.display !== 'none') {
+          hiddenEls.push({ el, prev: el.style.display });
+          el.style.display = 'none';
+        }
+      });
+
+      // Capture the page + annotations/draw marks
+      const canvas = await h2c(document.documentElement, {
+        useCORS: true,
+        allowTaint: true,
+        backgroundColor: null,
+        scrollX: -window.scrollX,
+        scrollY: -window.scrollY,
+        x: window.scrollX,
+        y: window.scrollY,
+        width: window.innerWidth,
+        height: window.innerHeight,
+        ignoreElements: (el) => {
+          // Ignore toolbar, panel, toasts, but keep draw canvas and annotations
+          if (el.id === '__vi-toolbar' || el.id === '__vi-panel' ||
+              el.id === '__vi-toast-container' || el.id === '__vi-label' ||
+              el.id === '__vi-shortcuts-modal' || el.id === '__vi-confirm-modal' ||
+              el.id === '__vi-more-menu' || el.id === '__vi-bookmarks') return true;
+          return false;
+        }
+      });
+
+      // Restore hidden UI elements
+      hiddenEls.forEach(({ el, prev }) => { el.style.display = prev; });
+
+      // Convert to blob and download
+      canvas.toBlob(async (blob) => {
+        if (!blob) { showToast('Screenshot failed', 'error'); return; }
+
+        // Download as PNG
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `stylesession-capture-${Date.now()}.png`;
+        a.click();
+        URL.revokeObjectURL(url);
+
+        // Also copy to clipboard if supported
+        try {
+          await navigator.clipboard.write([
+            new ClipboardItem({ 'image/png': blob })
+          ]);
+          showToast('Screenshot saved & copied to clipboard', 'success');
+        } catch {
+          showToast('Screenshot saved (clipboard copy unavailable)', 'success');
+        }
+      }, 'image/png');
+
+    } catch (err) {
+      showToast('Screenshot failed: ' + err.message, 'error');
+    }
   }
 
   // ============================================================
@@ -2483,6 +2841,10 @@
       if ((e.ctrlKey || e.metaKey) && !e.shiftKey && e.key.toLowerCase() === 's') { e.preventDefault(); generateCSSExport(true); return; }
       // Ctrl+Shift+E export
       if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key.toLowerCase() === 'e') { e.preventDefault(); generateCSSExport(false); return; }
+      // Ctrl+Shift+R change report
+      if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key.toLowerCase() === 'r') { e.preventDefault(); generateChangeReport(); return; }
+      // Ctrl+Shift+B toggle bookmark
+      if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key.toLowerCase() === 'b') { e.preventDefault(); toggleBookmark(); return; }
       // Ctrl+Z / Ctrl+Shift+Z
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') { e.preventDefault(); e.shiftKey ? redo() : undo(); return; }
       // Ctrl+Alt+C copy styles, Ctrl+Alt+V paste styles
@@ -2501,6 +2863,7 @@
         if (k === 'c') { e.preventDefault(); toggleCompare(); return; }
         if (k === 'p') { e.preventDefault(); togglePalette(); return; }
         if (k === 's') { e.preventDefault(); toggleSnapshot(); return; }
+        if (k === 'x') { e.preventDefault(); captureAnnotatedScreenshot(); return; }
       }
 
       // ? for shortcuts
@@ -2536,7 +2899,7 @@
       }
 
       // Tool shortcuts
-      const toolMap = { 'v':'select','q':'browse','m':'move','s':'spacing','t':'typography','f':'color','b':'border','e':'effects','o':'animation','k':'tokens','g':'shape' };
+      const toolMap = { 'v':'select','q':'browse','m':'move','s':'spacing','t':'typography','f':'color','b':'border','e':'effects','r':'transform','o':'animation','k':'tokens','g':'shape','p':'draw' };
       if (!e.ctrlKey && !e.metaKey && !e.shiftKey && toolMap[e.key.toLowerCase()]) {
         setTool(toolMap[e.key.toLowerCase()]);
         return;
@@ -2598,10 +2961,19 @@
         <button class="__vi-ctx-item" data-action="scroll-parent">📍 Scroll Parent Into View</button>
         <div class="__vi-ctx-sep"></div>
         <button class="__vi-ctx-item" data-action="hide">🚫 Hide Element</button>
+        <div class="__vi-ctx-sep"></div>
+        <button class="__vi-ctx-item" data-action="export-component">🌳 Export Component CSS</button>
+        <button class="__vi-ctx-item" data-action="change-report">📋 Copy Change Report</button>
+        <button class="__vi-ctx-item" data-action="toggle-bookmark">🔖 Toggle Bookmark</button>
       `;
-      menu.style.left = e.clientX + 'px';
-      menu.style.top = e.clientY + 'px';
       menu.classList.add('open');
+      const rect = menu.getBoundingClientRect();
+      let left = e.clientX;
+      let top = e.clientY;
+      if (left + rect.width > document.documentElement.clientWidth) left = document.documentElement.clientWidth - rect.width - 5;
+      if (top + rect.height > document.documentElement.clientHeight) top = document.documentElement.clientHeight - rect.height - 5;
+      menu.style.left = Math.max(5, left) + 'px';
+      menu.style.top = Math.max(5, top) + 'px';
 
       menu.querySelectorAll('.__vi-ctx-item').forEach(item => {
         item.addEventListener('click', () => {
@@ -2634,6 +3006,12 @@
             applyChange(target, 'display', 'none');
             showToast('Element hidden (undoable)', 'warn');
             clearSelection();
+          }
+          else if (action === 'export-component') exportComponentCSS(target);
+          else if (action === 'change-report') generateChangeReport();
+          else if (action === 'toggle-bookmark') {
+            if (!state.selectedEls.includes(target)) selectElement(target);
+            toggleBookmark();
           }
           menu.classList.remove('open');
         });
@@ -2847,8 +3225,8 @@
       }
       e.preventDefault();
       _shapeDrawing = true;
-      _shapeStart.x = e.clientX + window.scrollX;
-      _shapeStart.y = e.clientY + window.scrollY;
+      _shapeStart.x = e.clientX;
+      _shapeStart.y = e.clientY;
       _shapePreview.style.left = _shapeStart.x + 'px';
       _shapePreview.style.top = _shapeStart.y + 'px';
       _shapePreview.style.width = '0px';
@@ -2858,8 +3236,8 @@
 
     window.addEventListener('mousemove', (e) => {
       if (!state.active || !_shapeDrawing) return;
-      const cx = e.clientX + window.scrollX;
-      const cy = e.clientY + window.scrollY;
+      const cx = e.clientX;
+      const cy = e.clientY;
       const x = Math.min(_shapeStart.x, cx);
       const y = Math.min(_shapeStart.y, cy);
       const w = Math.abs(cx - _shapeStart.x);
@@ -2875,8 +3253,8 @@
       _shapeDrawing = false;
       _shapePreview.classList.remove('active');
 
-      const cx = e.clientX + window.scrollX;
-      const cy = e.clientY + window.scrollY;
+      const cx = e.clientX;
+      const cy = e.clientY;
       const x = Math.min(_shapeStart.x, cx);
       const y = Math.min(_shapeStart.y, cy);
       const w = Math.abs(cx - _shapeStart.x);
@@ -3525,6 +3903,7 @@
         else if (a === 'snapshot') toggleSnapshot();
         else if (a === 'shortcuts') toggleShortcutsModal();
         else if (a === 'download') downloadSession();
+        
         else if (a === 'import') importSession();
         else if (a === 'hidden') showHiddenElements();
         else if (a === 'csseditor') toggleCSSEditor();
@@ -3591,6 +3970,11 @@
           { name: 'Copy Styles', action: copyElementStyles, shortcut: 'Ctrl+Alt+C' },
           { name: 'Paste Styles', action: pasteElementStyles, shortcut: 'Ctrl+Alt+V' },
           { name: 'Shape Tool', action: () => setTool('shape'), shortcut: 'G' },
+          { name: 'Change Report', action: generateChangeReport, shortcut: 'Ctrl+Shift+R' },
+          { name: 'Export Component CSS', action: () => exportComponentCSS(state.selectedEls[0]) },
+          { name: 'Toggle Bookmark', action: toggleBookmark, shortcut: 'Ctrl+Shift+B' },
+          { name: 'Capture Screenshot', action: captureAnnotatedScreenshot, shortcut: 'Shift+X' },
+          
         ];
         searchResults = commands.filter(c => c.name.toLowerCase().includes(cq));
         selectedResultIdx = 0;
@@ -3647,6 +4031,8 @@
   function renderOrCommandPaletteResults() {
     if (paletteInput().value.startsWith('>')) {
       paletteResultsEl().querySelectorAll('.__vi-palette-result').forEach((el, i) => el.classList.toggle('active', i === selectedResultIdx));
+      const active = paletteResultsEl().querySelector('.__vi-palette-result.active');
+      if (active) active.scrollIntoView({ block: 'nearest' });
     } else {
       renderPaletteResults();
     }
@@ -3665,6 +4051,8 @@
     paletteResultsEl().querySelectorAll('.__vi-palette-result').forEach(el => {
       el.addEventListener('click', () => selectElementFromPalette(searchResults[parseInt(el.dataset.idx, 10)]));
     });
+    const active = paletteResultsEl().querySelector('.__vi-palette-result.active');
+    if (active) active.scrollIntoView({ block: 'nearest' });
   }
 
   function selectElementFromPalette(el) {
@@ -3713,6 +4101,10 @@
   function downloadSession() {
     const data = collectSessionChanges();
     const textChanges = collectTextChanges();
+    const drawings = [];
+    if (state.draw && state.draw.paths && state.draw.paths.length > 0) {
+      state.draw.paths.forEach(p => drawings.push({ d: p.d, color: p.color, size: p.size }));
+    }
     // Collect annotations
     const notes = [];
     document.querySelectorAll('.__vi-note').forEach(note => {
@@ -3724,11 +4116,13 @@
     // Collect injected CSS
     const injectedStyle = document.getElementById('__vi-injected-css');
     const injectedCSS = injectedStyle ? injectedStyle.textContent : '';
-    if (data.length === 0 && notes.length === 0 && !injectedCSS && textChanges.length === 0) { showToast('No data', 'warn'); return; }
+    if (data.length === 0 && notes.length === 0 && !injectedCSS && textChanges.length === 0 && drawings.length === 0) { showToast('No data', 'warn'); return; }
     const payload = { version: 2, date: new Date().toISOString(), changes: data };
+    if (state.bookmarks.length > 0) payload.bookmarks = state.bookmarks;
     if (notes.length > 0) payload.notes = notes;
     if (injectedCSS) payload.injectedCSS = injectedCSS;
     if (textChanges.length > 0) payload.textChanges = textChanges;
+    if (drawings.length > 0) payload.drawings = drawings;
     const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob); a.download = 'project.stylesession'; a.click();
@@ -3747,6 +4141,26 @@
     let parsed = null;
     try { parsed = JSON.parse(raw); } catch (e) { parsed = null; }
 
+    if (parsed && Array.isArray(parsed.drawings)) {
+      parsed.drawings.forEach(d => {
+        // Validate SVG path data before restoring — skip corrupted entries
+        if (!d.d || typeof d.d !== 'string' || !/^[MmLlHhVvCcSsQqTtAaZz0-9\s.,eE+-]+$/.test(d.d.trim())) return;
+        const p = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        p.setAttribute('d', d.d);
+        p.setAttribute('stroke', d.color);
+        p.setAttribute('stroke-width', d.size);
+        p.setAttribute('stroke-linecap', 'round');
+        p.setAttribute('stroke-linejoin', 'round');
+        p.setAttribute('fill', 'none');
+        if (state.ui.drawCanvas) {
+          state.ui.drawCanvas.appendChild(p);
+          if (state.draw) {
+            state.draw.paths.push({ el: p, d: d.d, color: d.color, size: d.size });
+          }
+        }
+      });
+    }
+    
     if (parsed && Array.isArray(parsed.changes)) {
       let applied = 0;
       parsed.changes.forEach(change => {
@@ -3797,6 +4211,11 @@
         let s = document.getElementById('__vi-injected-css');
         if (!s) { s = document.createElement('style'); s.id = '__vi-injected-css'; document.head.appendChild(s); }
         s.textContent = parsed.injectedCSS;
+      }
+      // Restore bookmarks
+      if (Array.isArray(parsed.bookmarks)) {
+        state.bookmarks = parsed.bookmarks;
+        renderBookmarks();
       }
       state.redoStack = [];
       updateUndoRedoUI();
@@ -4172,6 +4591,222 @@
       inlineEditEl = null;
     }
   }
+
+  // ============================================================
+    // DRAW/MARK TOOL
+  // ============================================================
+  function bindDrawEvents() {
+    let currentPathEl = null;
+
+    window.addEventListener('pointerdown', (e) => {
+      if (state.currentTool !== 'draw') return;
+      if (e.target.closest('#__vi-root') && e.target !== state.ui.drawCanvas) return;
+      e.preventDefault();
+      e.stopPropagation();
+      
+      const x = e.clientX;
+      const y = e.clientY;
+
+      if (state.draw.mode === 'eraser') {
+        state.ui.drawCanvas.style.pointerEvents = 'auto'; // allow hit testing
+        // Temporarily thicken strokes for easier hit detection
+        state.draw.paths.forEach(p => {
+          if (!p.el) return;
+          p.originalStrokeWidth = p.el.getAttribute('stroke-width');
+          p.el.setAttribute('stroke-width', '20');
+          p.el.style.pointerEvents = 'stroke';
+        });
+
+        const hit = document.elementFromPoint(e.clientX, e.clientY);
+
+        // Restore strokes
+        state.draw.paths.forEach(p => {
+          if (!p.el) return;
+          p.el.setAttribute('stroke-width', p.originalStrokeWidth);
+          p.el.style.pointerEvents = '';
+        });
+        state.ui.drawCanvas.style.pointerEvents = 'none'; // reset
+
+        if (hit && hit.tagName === 'path' && hit.parentNode === state.ui.drawCanvas) {
+          state.draw.paths = state.draw.paths.filter(p => p.el !== hit);
+          hit.remove();
+        }
+        state.draw.isDrawing = true;
+        return;
+      }
+
+      state.draw.isDrawing = true;
+      state.draw.startX = x;
+      state.draw.startY = y;
+      state.draw.currentPathData = `M ${x} ${y}`;
+      
+      currentPathEl = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      currentPathEl.setAttribute('d', state.draw.currentPathData);
+      currentPathEl.setAttribute('stroke', state.draw.color);
+      currentPathEl.setAttribute('stroke-width', state.draw.size);
+      currentPathEl.setAttribute('stroke-linecap', 'round');
+      currentPathEl.setAttribute('stroke-linejoin', 'round');
+      currentPathEl.setAttribute('fill', 'none');
+      
+      state.ui.drawCanvas.appendChild(currentPathEl);
+      if(state.ui.hoverOverlay) state.ui.hoverOverlay.style.border = 'none';
+      if(state.ui.panel) state.ui.panel.style.pointerEvents = 'none';
+    }, { capture: true });
+
+    window.addEventListener('pointermove', (e) => {
+      if (!state.draw.isDrawing || state.currentTool !== 'draw') return;
+      e.preventDefault();
+      e.stopPropagation();
+      
+      if (state.draw.mode === 'eraser') {
+        state.ui.drawCanvas.style.pointerEvents = 'auto'; // allow hit testing
+        // Thicken for hit testing
+        state.draw.paths.forEach(p => {
+          if (!p.el) return;
+          p.originalStrokeWidth = p.el.getAttribute('stroke-width');
+          p.el.setAttribute('stroke-width', '20');
+          p.el.style.pointerEvents = 'stroke';
+        });
+
+        const hit = document.elementFromPoint(e.clientX, e.clientY);
+
+        // Restore
+        state.draw.paths.forEach(p => {
+          if (!p.el) return;
+          p.el.setAttribute('stroke-width', p.originalStrokeWidth);
+          p.el.style.pointerEvents = '';
+        });
+        state.ui.drawCanvas.style.pointerEvents = 'none'; // reset
+
+        if (hit && hit.tagName === 'path' && hit.parentNode === state.ui.drawCanvas) {
+          state.draw.paths = state.draw.paths.filter(p => p.el !== hit);
+          hit.remove();
+        }
+        return;
+      }
+
+      if (!currentPathEl) return;
+      
+      let x = e.clientX;
+      let y = e.clientY;
+
+      if (state.draw.mode === 'line') {
+        if (e.shiftKey) {
+          // Snap horizontal or vertical
+          const dx = Math.abs(x - state.draw.startX);
+          const dy = Math.abs(y - state.draw.startY);
+          if (dx > dy) y = state.draw.startY;
+          else x = state.draw.startX;
+        }
+        state.draw.currentPathData = `M ${state.draw.startX} ${state.draw.startY} L ${x} ${y}`;
+      } else {
+        // freehand
+        state.draw.currentPathData += ` L ${x} ${y}`;
+      }
+      
+      currentPathEl.setAttribute('d', state.draw.currentPathData);
+    }, { capture: true });
+
+    window.addEventListener('pointerup', (e) => {
+      if (!state.draw.isDrawing) return;
+      e.preventDefault();
+      e.stopPropagation();
+      state.draw.isDrawing = false;
+      if (state.draw.mode === 'eraser') return; // nothing to save
+      
+      if (currentPathEl) {
+        state.draw.paths.push({ el: currentPathEl, d: state.draw.currentPathData, color: state.draw.color, size: state.draw.size });
+      }
+      currentPathEl = null;
+      if(state.ui.hoverOverlay) state.ui.hoverOverlay.style.border = '';
+      if(state.ui.panel) state.ui.panel.style.pointerEvents = 'auto';
+    }, { capture: true });
+  }
+
+  function renderDrawPanel(content) {
+    const html = `
+      <div class="__vi-panel-body-wrapper">
+        <div class="__vi-section-title">DRAW SETTINGS</div>
+        <div class="__vi-draw-mode-row">
+          <button class="__vi-draw-mode-btn ${state.draw.mode==='freehand'?'active':''}" data-draw-mode="freehand">✏️ Draw</button>
+          <button class="__vi-draw-mode-btn ${state.draw.mode==='line'?'active':''}" data-draw-mode="line">📏 Line</button>
+          <button class="__vi-draw-mode-btn ${state.draw.mode==='eraser'?'active':''}" data-draw-mode="eraser">🧹 Eraser</button>
+        </div>
+        
+        <label class="__vi-label-row">Color</label>
+        <div class="__vi-color-swatches" style="display:flex; gap:8px; margin-bottom: 12px;">
+          <div class="__vi-swatch" style="background:#ff4757; width:24px; height:24px; border-radius:4px; cursor:pointer; border: ${state.draw.color === '#ff4757' ? '2px solid white' : '1px solid #444'};" data-color="#ff4757"></div>
+          <div class="__vi-swatch" style="background:#2ed573; width:24px; height:24px; border-radius:4px; cursor:pointer; border: ${state.draw.color === '#2ed573' ? '2px solid white' : '1px solid #444'};" data-color="#2ed573"></div>
+          <div class="__vi-swatch" style="background:#1e90ff; width:24px; height:24px; border-radius:4px; cursor:pointer; border: ${state.draw.color === '#1e90ff' ? '2px solid white' : '1px solid #444'};" data-color="#1e90ff"></div>
+          <div class="__vi-swatch" style="background:#ffa502; width:24px; height:24px; border-radius:4px; cursor:pointer; border: ${state.draw.color === '#ffa502' ? '2px solid white' : '1px solid #444'};" data-color="#ffa502"></div>
+          <div class="__vi-swatch" style="background:#00E5CC; width:24px; height:24px; border-radius:4px; cursor:pointer; border: ${state.draw.color === '#00E5CC' ? '2px solid white' : '1px solid #444'};" data-color="#00E5CC"></div>
+        </div>
+
+        <label class="__vi-label-row">Brush Size</label>
+        <div class="__vi-controls-row">
+          <input type="range" class="__vi-slider" min="1" max="20" value="${state.draw.size}" id="draw-size-slider">
+          <span class="__vi-val" style="width: 30px">${state.draw.size}px</span>
+        </div>
+
+        <div style="display:flex; gap: 8px; margin-top: 16px;">
+          <button id="draw-btn-undo" class="__vi-btn-secondary" style="flex:1">Undo Stroke</button>
+          <button id="draw-btn-clear" class="__vi-btn-secondary" style="flex:1; border-color: rgba(255, 71, 87, 0.5); color: #ff4757;">Clear All</button>
+        </div>
+      </div>
+    `;
+    content.innerHTML = html;
+
+    // Draw mode listeners
+    content.querySelectorAll('[data-draw-mode]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        state.draw.mode = btn.dataset.drawMode;
+        content.querySelectorAll('[data-draw-mode]').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        
+        // Ensure cursor updates depending on the mode
+        if (state.draw.mode === 'eraser') {
+            document.documentElement.style.setProperty('--vi-draw-cursor', 'crosshair');
+        } else {
+            document.documentElement.style.setProperty('--vi-draw-cursor', "url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJ3aGl0ZSIgc3Ryb2tlPSJibGFjayIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwYXRoIGQ9Ik0xNyAzYTIuODI4IDIuODI4IDAgMSAxIDQgNEw3LjUgMjAuNSAyIDIybDEuNS01LjVMMTcgM3oiLz48L3N2Zz4=') 2 22, crosshair");
+        }
+      });
+    });
+
+    content.querySelectorAll('.__vi-swatch').forEach(sw => {
+      sw.addEventListener('click', (e) => {
+        state.draw.color = e.target.dataset.color;
+        renderDrawPanel(content);
+      });
+    });
+
+    const sizeSlider = content.querySelector('#draw-size-slider');
+    sizeSlider.addEventListener('input', (e) => {
+      state.draw.size = parseInt(e.target.value);
+      e.target.nextElementSibling.textContent = state.draw.size + 'px';
+    });
+
+    content.querySelector('#draw-btn-undo').addEventListener('click', () => {
+      if (state.draw.paths.length > 0) {
+        const last = state.draw.paths.pop();
+        if (last && last.el && last.el.parentNode) {
+          last.el.parentNode.removeChild(last.el);
+        }
+      } else {
+        showToast('No strokes to undo.', 'warn');
+      }
+    });
+
+    content.querySelector('#draw-btn-clear').addEventListener('click', () => {
+      state.draw.paths.forEach(p => {
+        if (p.el && p.el.parentNode) p.el.parentNode.removeChild(p.el);
+      });
+      state.draw.paths = [];
+      state.ui.drawCanvas.innerHTML = '';
+      showToast('Canvas Cleared', 'success');
+    });
+  }
+
+  
 
   // ============================================================
   // BOOTSTRAP
