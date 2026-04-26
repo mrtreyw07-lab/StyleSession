@@ -1,15 +1,15 @@
 <p align="center">
-  <img src="https://img.shields.io/badge/StyleSession-v1.0.1-00E5CC?style=for-the-badge&labelColor=14141a" alt="StyleSession v1.0.1"/>
+  <img src="https://img.shields.io/badge/StyleSession-v1.1.0-00E5CC?style=for-the-badge&labelColor=14141a" alt="StyleSession v1.1.0"/>
   <img src="https://img.shields.io/badge/license-MIT-blue?style=for-the-badge&labelColor=14141a" alt="MIT License"/>
   <img src="https://img.shields.io/badge/zero_dependencies-vanilla_JS-ffa502?style=for-the-badge&labelColor=14141a" alt="Zero Dependencies"/>
-  <img src="https://img.shields.io/badge/self--injecting-~193_KB-3b82f6?style=for-the-badge&labelColor=14141a" alt="Self-Injecting"/>
+  <img src="https://img.shields.io/badge/self--injecting-~236_KB-3b82f6?style=for-the-badge&labelColor=14141a" alt="Self-Injecting"/>
 </p>
 
 <h1 align="center">🔮 StyleSession</h1>
 
 <p align="center">
   <strong>The visual CSS inspector that actually lets you undo.</strong><br/>
-  Point-and-click style editing directly in the browser — with full session persistence, real undo/redo, and clean CSS export.
+  Point-and-click style editing directly in the browser — with full session persistence, real undo/redo, clean CSS export, and developer workflow tools.
 </p>
 
 <p align="center">
@@ -17,6 +17,7 @@
   <a href="#-features">Features</a> •
   <a href="#shortcuts">Shortcuts</a> •
   <a href="#-usage-methods">Usage</a> •
+  <a href="#-workflow-tools">Workflow</a> •
   <a href="#-why-stylesession">Why?</a> •
   <a href="#-license">License</a>
 </p>
@@ -74,6 +75,9 @@ Born out of frustration with [VisBug](https://github.com/GoogleChromeLabs/Projec
 | Session download | Not available | ✅ Download/restore `.stylesession` files |
 | Element diffing | Not available | ✅ 2-element property diff matrix |
 | Batch editing | Not available | ✅ Multi-select → batch apply to all |
+| Change reports | Not available | ✅ Markdown diff reports with before/after |
+| Screenshot capture | Not available | ✅ Annotated viewport capture with html2canvas |
+| Element bookmarks | Not available | ✅ Pin frequently-used elements for quick access |
 
 ---
 
@@ -84,7 +88,7 @@ Born out of frustration with [VisBug](https://github.com/GoogleChromeLabs/Projec
 - **Select mode** — Click to lock an element for editing. **Shift+Click** to multi-select
 - **Breadcrumb navigation** — Walk up/down the DOM tree from any selected element
 - **Element label** — Live tooltip shows tag name, dimensions, and classes on hover
-- **Computed tab** — Full computed styles for any selected element with searchable filter and one-click copy
+- **Computed tab** — Full computed styles for any selected element with searchable filter and one-click copy per property
 
 ### ✏️ Visual Editing Tools
 - **Move** — Grab-and-drag in one motion (auto-selects on mousedown). GPU-accelerated transforms during drag with rAF throttling. Arrow-key nudge (1px / Shift+10px). Freezes CSS transitions and animations during drag so elements follow the cursor instantly. Auto-sets `position: relative`
@@ -96,6 +100,15 @@ Born out of frustration with [VisBug](https://github.com/GoogleChromeLabs/Projec
 - **Animation** — Transition property/duration/timing/delay, animation name/duration/timing/iteration/direction/fill-mode with 8 easing presets including cubic-bezier
 - **Shape Tool** — Click-drag to draw isolated `<div>` containers directly on the page. Style with fill, border, and 6 quick presets (Card, Pill, Circle, Glass, Outline, Shadow). Generates live, production-ready CSS output with one-click copy
 
+### 🎨 Draw Tool
+- **Freehand drawing** — Draw annotations directly on the page with configurable brush size and color
+- **Line tool** — Click two points to draw straight lines. Hold **Shift** to lock to horizontal or vertical axes
+- **Eraser** — Click any drawn path to remove it
+- **5 color swatches** — Quick-select red, green, blue, orange, and teal
+- **Adjustable brush size** — Slider from 1px to 20px
+- **Clear all** — One-click clear all drawings
+- **Session-persistent** — Drawings are saved and restored with sessions
+
 ### 🔎 Element Diffing & Batch Editing
 - **2-element diff matrix** — Select exactly 2 elements to see a side-by-side property comparison highlighting differences across 15 key CSS properties
 - **Batch editing** — Multi-select 3+ elements with Shift+Click, then switch to any tool (Spacing, Typography, Color, etc.) to apply changes to all selected elements simultaneously
@@ -105,7 +118,7 @@ Auto-scans the entire page and extracts:
 - **Colors** — All unique background and text colors with hex values and usage counts (click to copy)
 - **Fonts** — All font families in use with sample preview and usage counts
 - **Spacing** — All unique margin/padding/gap values with frequency (top 12)
-- **CSS Variables** — All custom properties from `:root` and stylesheets (excludes StyleSession's own `--vi-` variables)
+- **CSS Variables** — All custom properties from `:root` and stylesheets (excludes StyleSession's own `--vi-` variables). Editable in-place with live preview
 
 ### ♿ Accessibility Auditing
 - **WCAG contrast checker** — Flags text elements below 3:1 as errors and below 4.5:1 as warnings with live ratio badges
@@ -123,13 +136,68 @@ Auto-scans the entire page and extracts:
 ### 🔮 Session System
 - **Auto-save** — Debounced 5-second save to `localStorage` after every undo stack change
 - **Session restore** — Automatically rehydrates all changes on page reload using dual selector + DOM path targeting
-- **Download session** — Export a `.stylesession` JSON file with all changes, selectors, and DOM paths
+- **Download session** — Export a `.stylesession` JSON file with all changes, notes, text edits, drawings, bookmarks, and injected CSS
 - **Load session** — Re-apply downloaded sessions to matching pages
+- **Import session** — File upload UI for `.stylesession` files
 - **Backward compatibility** — Automatically handles legacy CSS-only session payloads from earlier versions
 - **Structured format** — Version 2 JSON with CSS selectors + nth-of-type DOM paths for resilient targeting
 
+---
+
+## 🚀 Workflow Tools
+
+### 📋 Structured Change Report (`Ctrl+Shift+R`)
+Generate a Markdown-formatted report of all session changes — optimized for pasting into AI coding assistants, PR descriptions, or design handoffs.
+
+**Output includes:**
+- Page URL and session timestamp
+- Per-element before/after diff tables with CSS selectors and DOM paths
+- Text content changes section
+
+**Access:** Keyboard `Ctrl+Shift+R` · Command Palette `> Change Report` · Context Menu `📋 Copy Change Report`
+
+### 🌳 Component Tree Export
+Export all StyleSession changes within a component subtree as a single CSS block using **modern CSS nesting syntax**. Automatically builds relative selectors from the root element to all modified children.
+
+```css
+/* Component: .card */
+.card {
+  border-radius: 16px;
+
+  h2 {
+    font-size: 24px;
+  }
+  .btn {
+    background: #00E5CC;
+  }
+}
+```
+
+**Access:** Command Palette `> Export Component CSS` · Context Menu `🌳 Export Component CSS`
+
+### 🔖 Element Bookmarks (`Ctrl+Shift+B`)
+Pin up to 8 frequently-used elements as teal chips below the breadcrumb bar. Click a bookmark to instantly select and scroll to the element. Right-click to remove.
+
+- Bookmarks persist across auto-saves, session downloads, and imports
+- Labeled with tag name + class or ID for quick identification
+- Integrated into the full session lifecycle
+
+**Access:** Keyboard `Ctrl+Shift+B` · Command Palette `> Toggle Bookmark` · Context Menu `🔖 Toggle Bookmark`
+
+### 📸 Annotated Screenshot (`Shift+X`)
+Capture a viewport screenshot with all your annotations (draw marks, sticky notes) visible but with the StyleSession toolbar and panel cropped out. Powered by [html2canvas](https://html2canvas.hertzen.com/) loaded on-demand from CDN.
+
+- Downloads as `stylesession-capture-{timestamp}.png`
+- Copies to clipboard (via `ClipboardItem` API where supported)
+- Preserves draw annotations and sticky notes in the capture
+- Excludes toolbar, panel, overlays, rulers, and bookmark chips
+
+**Access:** Keyboard `Shift+X` · Command Palette `> Capture Screenshot`
+
+---
+
 ### 🛠️ Power Features
-- **Command palette** — Shift+P to search elements by tag/class/ID/text content, or type `>` for command mode (12 commands with shortcuts)
+- **Command palette** — Shift+P to search elements by tag/class/ID/text content, or type `>` for command mode (18+ commands with shortcuts)
 - **Context menu** — Right-click any element for quick actions:
   - Copy CSS selector
   - Copy computed styles (14 key properties)
@@ -138,11 +206,19 @@ Auto-scans the entire page and extracts:
   - Select parent element
   - Scroll parent into view
   - Hide element (undoable)
+  - Copy Change Report
+  - Export Component CSS
+  - Toggle Bookmark
+- **CSS Editor** — Live CSS injection panel with syntax-highlighted textarea, auto-apply on `Ctrl+Enter`, and Tab key support. Injected CSS persists with sessions
 - **Split-view snapshot** — Resizable before/after comparison with full-page clone in iframe (Shift+S)
 - **Compare mode** — Toggle between current and original styles with one click (Shift+C)
-- **Dark mode** — Force dark scheme on any page for testing (Shift+D)
+- **Optical Lens Dark Mode** — High-fidelity dark scheme rendering engine for testing pages without washing out media (Shift+D)
 - **Mobile viewport** — Simulate 375px mobile width with responsive wrapper and darkened edges (Shift+M)
-- **Annotations** — Click to drop sticky-note text annotations at any point on the page (Shift+N)
+- **Annotations** — Click to drop sticky-note text annotations at any point on the page. Notes are natively resizable and scale with content (Shift+N)
+- **Inline text editing** — Double-click any text element to edit content in-place
+- **Copy/Paste styles** — Copy computed styles from one element (`Ctrl+Alt+C`) and paste onto another (`Ctrl+Alt+V`)
+- **Hidden elements manager** — View and restore all elements hidden during the session
+- **Undo history** — Visual stack of all changes with one-click jump
 - **Clean CSS export** — Copy or auto-save scoped CSS with proper selectors and formatted output
 - **Draggable toolbar** — Grab the toolbar drag handle to reposition anywhere on screen (full XY axis)
 - **Draggable panel** — Grab the panel header to reposition and float anywhere on screen
@@ -170,6 +246,7 @@ Auto-scans the entire page and extracts:
 | `O` | Animation tool |
 | `K` | Design Tokens |
 | `G` | Shape Tool |
+| `W` | Draw Tool |
 
 ### Actions
 | Key | Action |
@@ -178,7 +255,11 @@ Auto-scans the entire page and extracts:
 | `Ctrl+Shift+Z` | Redo |
 | `Ctrl+S` | Save session |
 | `Ctrl+Shift+E` | Export CSS to clipboard |
+| `Ctrl+Shift+R` | Copy Change Report (Markdown) |
+| `Ctrl+Shift+B` | Toggle Element Bookmark |
 | `Ctrl+Shift+I` | Re-enable after turning off |
+| `Ctrl+Alt+C` | Copy element styles |
+| `Ctrl+Alt+V` | Paste element styles |
 | `Delete` / `Backspace` | Hide selected element(s) |
 | `Escape` | Deselect / close modal / close palette |
 | `?` | Show shortcuts reference |
@@ -195,6 +276,7 @@ Auto-scans the entire page and extracts:
 | `Shift+N` | Drop annotation note |
 | `Shift+S` | Toggle snapshot comparison |
 | `Shift+C` | Toggle before/after compare |
+| `Shift+X` | Capture annotated screenshot |
 
 ### Navigation
 | Key | Action |
@@ -202,7 +284,8 @@ Auto-scans the entire page and extracts:
 | `Shift+Click` | Multi-select elements |
 | `Arrow keys` | Nudge element 1px (Move tool) |
 | `Shift+Arrow` | Nudge element 10px |
-| `Right-click` | Context menu (7 actions) |
+| `Right-click` | Context menu (10 actions) |
+| `Double-click` | Edit text in-place |
 
 ---
 
@@ -243,10 +326,10 @@ Open `stylesession.html` directly in a browser. It loads `stylesession.js` on a 
 
 ## 🏗️ Architecture
 
-StyleSession is a **self-injecting, zero-dependency** tool. The core is a single JavaScript file that injects its own CSS, HTML, and fonts when executed on any page.
+StyleSession is a **self-injecting, zero-dependency** tool. The core is a single JavaScript file that injects its own CSS, HTML, and fonts when executed on any page. The only external dependency is **html2canvas** (loaded on-demand from CDN when capturing screenshots).
 
-```
-stylesession.js (~3,840 lines, ~193 KB)
+```text
+stylesession.js (~4,820 lines, ~236 KB)
 ├── Self-Injection Guard   — Prevents double-load, toggles visibility
 ├── Font Injection         — Google Fonts (Inter + JetBrains Mono)
 ├── CSS Injection          — Glassmorphism dark theme, __vi- namespace
@@ -255,14 +338,17 @@ stylesession.js (~3,840 lines, ~193 KB)
     ├── State Management   — Central state object with Map-based original style tracking
     ├── Command System     — applyChange() → undo stack → redo stack (auto-save hooked)
     ├── Render Loop        — 60fps requestAnimationFrame for overlays
-    ├── Tool Renderers     — Per-tool panel UI generators (10 tools + computed tab)
+    ├── Tool Renderers     — Per-tool panel UI generators (12 tools + computed tab)
     ├── Session System     — JSON v2 with selector + DOM path persistence + legacy compat
+    ├── Workflow Tools     — Change Report, Component Export, Bookmarks, Screenshot
     ├── Security           — escAttr() sanitization, CSS.escape() selectors
     ├── A11y Engine        — WCAG luminance-based contrast ratio calculations
-    ├── Command Palette    — Element search + > command mode (12 commands)
+    ├── Draw Engine        — Freehand, line, and eraser modes with SVG paths
+    ├── CSS Editor         — Live stylesheet injection with Tab/Ctrl+Enter support
+    ├── Command Palette    — Element search + > command mode (18+ commands)
     └── Event System       — Mouse, keyboard, drag, resize, context menu
 
-stylesession.html          — Minimal loader (just a <script> tag)
+stylesession.html          — Source file (edit here, then build)
 build.js                   — Build script: regenerates .js from .html source + copies to extension/
 
 extension/
@@ -270,6 +356,9 @@ extension/
 ├── background.js          — Service worker: injects stylesession.js on icon click
 ├── stylesession.js        — Auto-copied from root on build
 └── icons/                 — Extension toolbar icons (16/48/128px)
+
+.github/
+└── workflows/             — Automated Open-Core build and release pipeline
 ```
 
 ### Design Decisions
@@ -281,8 +370,9 @@ extension/
 - **Double-injection guard** — Running the script again toggles visibility instead of duplicating UI
 - **No build step required** — Works by pasting the script. `build.js` is only needed if editing the HTML source
 - **Late-injection safe** — `_bindPaletteInput()` uses a `DOMContentLoaded` fallback pattern for immediate-or-deferred binding
-- **Auto-save via monkey-patch** — The undo stack's `.push()` is overridden to trigger debounced auto-save after every change
+- **Auto-save via monkey-patch** — The undo stack's `.push()` is overridden to trigger debounced auto-save after every change. Stack pruning uses in-place `splice()` to preserve this hook
 - **Canvas-based rulers** — Rulers are rendered on `<canvas>` elements for crisp pixel-perfect tick marks at 10px intervals
+- **CDN lazy-load** — html2canvas is loaded on first screenshot capture only, keeping the base bundle dependency-free
 
 ---
 
@@ -317,7 +407,7 @@ StyleSession saves and loads `.stylesession` JSON files:
 ```json
 {
   "version": 2,
-  "date": "2026-03-25T12:00:00.000Z",
+  "date": "2026-04-12T12:00:00.000Z",
   "changes": [
     {
       "selector": ".hero h1",
@@ -328,13 +418,31 @@ StyleSession saves and loads `.stylesession` JSON files:
         "letter-spacing": "-3px"
       }
     }
-  ]
+  ],
+  "notes": [
+    { "x": "100px", "y": "200px", "text": "Fix this spacing" }
+  ],
+  "textChanges": [
+    { "selector": ".hero h1", "path": "body>header>h1", "text": "Updated headline" }
+  ],
+  "drawings": [
+    { "d": "M10,20 L30,40", "color": "#ff4757", "size": 3 }
+  ],
+  "bookmarks": [
+    { "selector": ".hero h1", "path": "body>header>h1", "label": "h1.hero-title" }
+  ],
+  "injectedCSS": ".my-class { color: red; }"
 }
 ```
 
 - **`selector`** — CSS selector (escaped with `CSS.escape`)
 - **`path`** — Stable `nth-of-type` DOM path as fallback
 - **`styles`** — Only properties changed by StyleSession (not all inline styles)
+- **`notes`** — Sticky note annotations with position and text
+- **`textChanges`** — Inline text content edits
+- **`drawings`** — SVG path data from the draw tool
+- **`bookmarks`** — Pinned element references
+- **`injectedCSS`** — CSS Editor content
 
 ---
 
@@ -365,32 +473,25 @@ Contributions are welcome! Please note that this project uses a **non-commercial
 
 1. Fork the repository
 2. Create a feature branch: `git checkout -b feature/my-feature`
-3. Edit the source — the engine lives in `stylesession.js`
-4. If editing CSS/HTML injection blocks, run `node build.js` to regenerate
+3. Edit the source in `stylesession.html` (this is the source of truth)
+4. Run `node build.js` to regenerate `stylesession.js` and copy to `extension/`
 5. Test by opening `stylesession.html` or pasting the JS into any site's console
 6. Submit a pull request
 
 ### Areas for Contribution
 - Chrome Web Store publishing & review
-- VS Code extension wrapper  
+- VS Code extension wrapper
 - Additional tool panels (grid editor, variable editor)
 - Theme presets (light mode, high contrast)
 - Localization / i18n
 - Performance optimization for very large DOMs
-- Session import via file upload (currently download-only in UI)
+- Firefox / Safari extension ports
 
 ---
 
 ## 🗺️ Roadmap
 
 - [x] Chrome extension (unpacked — load from `extension/` folder)
-- [ ] Chrome Web Store publishing
-- [ ] VS Code sidebar extension
-- [ ] CSS grid visual editor tool
-- [ ] Animation keyframe timeline
-- [ ] Multi-page session support
-- [ ] Collaborative editing (WebRTC)
-- [ ] Export to Tailwind / CSS-in-JS
 - [x] GPU-accelerated move tool with grab-and-drag
 - [x] Inline text editing (double-click)
 - [x] Copy/paste element styles (Ctrl+Alt+C / Ctrl+Alt+V)
@@ -401,12 +502,31 @@ Contributions are welcome! Please note that this project uses a **non-commercial
 - [x] Dark mode toggle
 - [x] Annotation sticky notes
 - [x] Shape Tool — layout prototyping with CSS export
+- [x] Draw Tool — freehand, line, and eraser with Shift-lock
 - [x] Split-view snapshot comparison
 - [x] Command palette with element search and command mode
-- [x] Context menu (7 actions)
+- [x] Context menu (10 actions)
 - [x] Session file upload/import UI
+- [x] CSS Editor — live stylesheet injection
+- [x] Structured Change Report (Markdown export)
+- [x] Component Tree Export (CSS nesting)
+- [x] Element Bookmarks with session persistence
+- [x] Annotated Screenshot Capture (html2canvas)
+- [x] Computed styles tab with searchable filter
+- [x] Undo History panel
+- [ ] Chrome Web Store publishing
+- [ ] VS Code sidebar extension
+- [ ] CSS grid visual editor tool
+- [ ] Animation keyframe timeline
+- [ ] Multi-page session support
+- [ ] Collaborative editing (WebRTC)
+- [ ] Export to Tailwind / CSS-in-JS
 - [ ] Light theme / high-contrast theme
 - [ ] Plugin system for custom tools
+- [ ] Style Transfer Brush (reference-based style application)
+- [ ] Design System Drift Detector (token consistency checks)
+- [ ] Session Merge & Diff (intelligent preview/merge)
+- [ ] Responsive Breakpoint Preview Strip
 
 ---
 

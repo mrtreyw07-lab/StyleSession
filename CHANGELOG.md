@@ -1,5 +1,19 @@
 # StyleSession — Changelog
 
+## [1.1.0] - 2026-04-24
+
+### Added
+- **Draw Tool**: A comprehensive annotation system (W) allowing freehand drawing, straight lines (with Shift-axis lock), and an eraser. Features include 5 color swatches, an adjustable brush size slider (1px to 20px), and an interactive undo stack that integrates seamlessly with the primary state manager.
+- **Optical Lens Dark Mode**: Upgraded the dark mode algorithm to an optical-lens rendering approach for higher fidelity color inversion without washing out images or videos.
+- **Resizable Annotations**: Sticky Note annotations can now be manually resized via CSS `resize: both` and scale automatically using `fit-content`.
+- **Automated Release Pipeline**: Re-architected the build system with GitHub Actions to securely synchronize the public `StyleSession` repository with the private dev environment, ensuring a clean Open-Core separation.
+
+### Fixed
+- **Filter Slider Hardening**: Refactored the CSS filter sliders (blur, contrast, brightness) to track initial state on `pointerdown` and only execute undo-stack commits on `change`. This prevents the undo stack from flooding and eliminates compounding math errors during rapid dragging.
+- **Strict Falsy Handling**: Patched core property extraction logic to explicitly handle strict falsy values, preventing bugs where `0px` margins or opacity values were being inadvertently skipped during serialization.
+- **Tool Mapping**: Fixed an edge case race condition where rapid toggling between the Shape and Draw tools would cause overlapping cursor artifacts and input hijacking.
+- **Async Selection Parsing**: Resolved race condition bugs with CSS selector generation.
+
 ## [1.0.1] - 2026-04-01
 
 ### Added
